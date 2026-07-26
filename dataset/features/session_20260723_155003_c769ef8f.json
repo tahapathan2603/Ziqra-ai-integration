@@ -1,0 +1,646 @@
+{
+  "session_id": "session_20260723_155003_c769ef8f",
+  "analysis": {
+    "fluency": {
+      "fillers": {
+        "filler_count": 0,
+        "fillers_per_minute": 0.0,
+        "classification": "good",
+        "fillers": []
+      },
+      "pauses": {
+        "total_pauses": 1,
+        "pauses": [
+          {
+            "start": 7.880000000000001,
+            "end": 9.2,
+            "duration": 1.3199999999999985,
+            "type": "hesitation"
+          }
+        ]
+      },
+      "speaking_speed": {
+        "words_per_minute": 113,
+        "sentences_per_minute": 7,
+        "classification": "slow"
+      }
+    },
+    "pronunciation": {
+      "pronunciation_score": 94,
+      "phoneme_accuracy": 0.88,
+      "stress_accuracy": 1.0,
+      "rhythm_score": 1.0,
+      "phoneme_errors": [
+        {
+          "word": "pooja",
+          "expected": "/ə/",
+          "detected": "/æ/"
+        },
+        {
+          "word": "i",
+          "expected": "/ɐ/",
+          "detected": "/æ/"
+        },
+        {
+          "word": "am",
+          "expected": "/ɜː/",
+          "detected": "/ʌ/"
+        },
+        {
+          "word": "tech",
+          "expected": "/n/",
+          "detected": "/ŋ/"
+        },
+        {
+          "word": "in",
+          "expected": "/ɾ/",
+          "detected": "/t/"
+        },
+        {
+          "word": "artificial",
+          "expected": null,
+          "detected": "/l/"
+        },
+        {
+          "word": "from",
+          "expected": null,
+          "detected": "/ə/"
+        },
+        {
+          "word": "from",
+          "expected": "/ɐ/",
+          "detected": null
+        }
+      ],
+      "detected_phonemes": [
+        {
+          "phoneme": "/m/",
+          "start": 1.261,
+          "end": 1.281
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 1.321,
+          "end": 1.341
+        },
+        {
+          "phoneme": "/n/",
+          "start": 1.541,
+          "end": 1.581
+        },
+        {
+          "phoneme": "/eɪ/",
+          "start": 1.601,
+          "end": 1.621
+        },
+        {
+          "phoneme": "/m/",
+          "start": 1.802,
+          "end": 1.842
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 1.942,
+          "end": 1.962
+        },
+        {
+          "phoneme": "/z/",
+          "start": 2.203,
+          "end": 2.223
+        },
+        {
+          "phoneme": "/p/",
+          "start": 2.804,
+          "end": 2.824
+        },
+        {
+          "phoneme": "/uː/",
+          "start": 2.844,
+          "end": 2.864
+        },
+        {
+          "phoneme": "/dʒ/",
+          "start": 3.004,
+          "end": 3.024
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 3.105,
+          "end": 3.125
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 3.525,
+          "end": 3.546
+        },
+        {
+          "phoneme": "/n/",
+          "start": 3.766,
+          "end": 3.806
+        },
+        {
+          "phoneme": "/d/",
+          "start": 3.846,
+          "end": 3.866
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 4.007,
+          "end": 4.027
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 4.127,
+          "end": 4.147
+        },
+        {
+          "phoneme": "/m/",
+          "start": 4.187,
+          "end": 4.207
+        },
+        {
+          "phoneme": "/k/",
+          "start": 4.287,
+          "end": 4.307
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 4.347,
+          "end": 4.367
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 4.407,
+          "end": 4.447
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 4.447,
+          "end": 4.468
+        },
+        {
+          "phoneme": "/n/",
+          "start": 4.528,
+          "end": 4.568
+        },
+        {
+          "phoneme": "/t/",
+          "start": 4.608,
+          "end": 4.628
+        },
+        {
+          "phoneme": "/l/",
+          "start": 4.668,
+          "end": 4.708
+        },
+        {
+          "phoneme": "/i/",
+          "start": 4.708,
+          "end": 4.728
+        },
+        {
+          "phoneme": "/p/",
+          "start": 4.868,
+          "end": 4.888
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 4.929,
+          "end": 4.949
+        },
+        {
+          "phoneme": "/s/",
+          "start": 5.089,
+          "end": 5.109
+        },
+        {
+          "phoneme": "/uː/",
+          "start": 5.229,
+          "end": 5.249
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 5.349,
+          "end": 5.369
+        },
+        {
+          "phoneme": "/ŋ/",
+          "start": 5.51,
+          "end": 5.57
+        },
+        {
+          "phoneme": "/ɐ/",
+          "start": 5.61,
+          "end": 5.63
+        },
+        {
+          "phoneme": "/b/",
+          "start": 5.71,
+          "end": 5.73
+        },
+        {
+          "phoneme": "/iː/",
+          "start": 5.75,
+          "end": 5.77
+        },
+        {
+          "phoneme": "/t/",
+          "start": 5.891,
+          "end": 5.911
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 5.951,
+          "end": 5.971
+        },
+        {
+          "phoneme": "/k/",
+          "start": 6.091,
+          "end": 6.111
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 6.151,
+          "end": 6.171
+        },
+        {
+          "phoneme": "/ŋ/",
+          "start": 6.251,
+          "end": 6.271
+        },
+        {
+          "phoneme": "/ɑːɹ/",
+          "start": 6.352,
+          "end": 6.372
+        },
+        {
+          "phoneme": "/t/",
+          "start": 6.532,
+          "end": 6.552
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 6.572,
+          "end": 6.592
+        },
+        {
+          "phoneme": "/f/",
+          "start": 6.672,
+          "end": 6.692
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 6.712,
+          "end": 6.732
+        },
+        {
+          "phoneme": "/ʃ/",
+          "start": 6.793,
+          "end": 6.813
+        },
+        {
+          "phoneme": "/əl/",
+          "start": 6.873,
+          "end": 6.893
+        },
+        {
+          "phoneme": "/l/",
+          "start": 6.973,
+          "end": 6.993
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 7.013,
+          "end": 7.033
+        },
+        {
+          "phoneme": "/n/",
+          "start": 7.073,
+          "end": 7.093
+        },
+        {
+          "phoneme": "/t/",
+          "start": 7.153,
+          "end": 7.173
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 7.193,
+          "end": 7.214
+        },
+        {
+          "phoneme": "/l/",
+          "start": 7.294,
+          "end": 7.314
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 7.314,
+          "end": 7.334
+        },
+        {
+          "phoneme": "/dʒ/",
+          "start": 7.414,
+          "end": 7.434
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 7.454,
+          "end": 7.474
+        },
+        {
+          "phoneme": "/n/",
+          "start": 7.534,
+          "end": 7.574
+        },
+        {
+          "phoneme": "/s/",
+          "start": 7.614,
+          "end": 7.634
+        },
+        {
+          "phoneme": "/f/",
+          "start": 7.775,
+          "end": 7.795
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 7.835,
+          "end": 7.875
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 7.895,
+          "end": 7.915
+        },
+        {
+          "phoneme": "/m/",
+          "start": 8.176,
+          "end": 8.216
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 9.579,
+          "end": 9.599
+        },
+        {
+          "phoneme": "/b/",
+          "start": 9.659,
+          "end": 9.679
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 9.699,
+          "end": 9.719
+        },
+        {
+          "phoneme": "/ŋ/",
+          "start": 9.799,
+          "end": 9.819
+        },
+        {
+          "phoneme": "/ɡ/",
+          "start": 9.859,
+          "end": 9.879
+        },
+        {
+          "phoneme": "/l/",
+          "start": 9.959,
+          "end": 9.98
+        },
+        {
+          "phoneme": "/ɔːɹ/",
+          "start": 10.02,
+          "end": 10.04
+        }
+      ],
+      "mispronounced_words": [
+        {
+          "word": "pooja",
+          "severity": "low",
+          "start": 2.12,
+          "end": 2.9400000000000004
+        },
+        {
+          "word": "i",
+          "severity": "low",
+          "start": 3.56,
+          "end": 3.98
+        },
+        {
+          "word": "am",
+          "severity": "low",
+          "start": 3.98,
+          "end": 4.18
+        },
+        {
+          "word": "tech",
+          "severity": "medium",
+          "start": 5.76,
+          "end": 5.960000000000001
+        },
+        {
+          "word": "in",
+          "severity": "low",
+          "start": 5.960000000000001,
+          "end": 6.199999999999999
+        },
+        {
+          "word": "artificial",
+          "severity": "low",
+          "start": 6.199999999999999,
+          "end": 6.68
+        },
+        {
+          "word": "from",
+          "severity": "medium",
+          "start": 7.359999999999999,
+          "end": 7.880000000000001
+        }
+      ],
+      "stress_errors": [],
+      "rhythm_issues": [],
+      "overall_observations": [
+        "Overall pronunciation is strong.",
+        "7 word(s) show minor pronunciation deviations."
+      ]
+    },
+    "mti": {
+      "overall_mti_score": 91,
+      "clarity_impact": "low",
+      "summary": {
+        "vowel_pattern_issues": 2,
+        "consonant_pattern_issues": 1,
+        "stress_transfer_issues": 0
+      },
+      "vowel_patterns": [
+        {
+          "word": "pooja",
+          "timestamp": {
+            "start": 2.12,
+            "end": 2.9400000000000004
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ə/",
+          "detected": "/æ/",
+          "severity": "low"
+        },
+        {
+          "word": "am",
+          "timestamp": {
+            "start": 3.98,
+            "end": 4.18
+          },
+          "issue": "vowel_shortening",
+          "expected": "/ɜː/",
+          "detected": "/ʌ/",
+          "severity": "low"
+        }
+      ],
+      "consonant_patterns": [
+        {
+          "word": "tech",
+          "timestamp": {
+            "start": 5.76,
+            "end": 5.960000000000001
+          },
+          "issue": "consonant_substitution",
+          "expected": "/n/",
+          "detected": "/ŋ/",
+          "severity": "medium"
+        }
+      ],
+      "stress_transfer": [],
+      "speech_statistics": {
+        "total_words_analyzed": 17,
+        "affected_words": 3,
+        "affected_percentage": 17.6
+      },
+      "patterns_detected": [
+        "vowel substitution",
+        "shortened vowels",
+        "consonant substitution"
+      ],
+      "top_recurring_issue": "vowel substitution",
+      "clarity_risk_words": [],
+      "overall_observations": [
+        "Overall clarity impact from native-language speech patterns is low.",
+        "Most common pattern: vowel substitution."
+      ]
+    },
+    "intonation": {
+      "intonation_score": 84,
+      "delivery_label": "Moderately expressive",
+      "pitch_variation": {
+        "pitch_score": 84,
+        "average_pitch": 171.1,
+        "min_pitch": 78.7,
+        "max_pitch": 318.0,
+        "pitch_range": 239.3,
+        "observations": [
+          "Pitch variation is healthy."
+        ]
+      },
+      "energy_variation": {
+        "energy_score": 83,
+        "low_energy_sections": [
+          {
+            "start": 10.27,
+            "end": 11.68,
+            "severity": "high"
+          }
+        ],
+        "observations": [
+          "Energy fades over the course of the answer, which can read as running out of steam."
+        ]
+      },
+      "monotonicity": {
+        "monotonicity_score": 69,
+        "monotone_sections": [
+          {
+            "start": 4.0,
+            "end": 7.0,
+            "severity": "medium"
+          }
+        ],
+        "observations": [
+          "Detected 1 monotone section(s)."
+        ]
+      },
+      "emphasis": {
+        "emphasis_score": 100,
+        "under_emphasized_words": [],
+        "observations": [
+          "Important words receive adequate vocal emphasis."
+        ]
+      },
+      "overall_observations": [
+        "Overall delivery: Moderately expressive.",
+        "Energy drops in parts of the response.",
+        "Some sections of speech lack vocal variation."
+      ]
+    },
+    "engagement": {
+      "engagement_score": 79,
+      "engagement_level": "moderately_engaging",
+      "strengths": [
+        "Good vocal variation — pitch moves naturally and delivery stays lively",
+        "Smooth flow with no disruptive pauses"
+      ],
+      "improvement_areas": [
+        "Speaking pace runs slightly slow",
+        "Significant energy drop between 10.3s and 11.7s"
+      ],
+      "timeline": [
+        {
+          "start": 0,
+          "end": 12,
+          "engagement": "medium"
+        }
+      ],
+      "energy_patterns": {
+        "energy_engagement_score": 83,
+        "low_energy_segments": [
+          {
+            "start": 10.27,
+            "end": 11.68,
+            "severity": "high"
+          }
+        ],
+        "observations": [
+          "1 noticeable energy dip(s) may read as reduced enthusiasm."
+        ]
+      },
+      "pause_patterns": {
+        "pause_engagement_score": 100,
+        "disengaging_pauses": [],
+        "hesitation_clusters": [],
+        "observations": [
+          "No significant disengaging pauses detected."
+        ]
+      },
+      "speaking_dynamics": {
+        "dynamics_score": 88,
+        "strengths": [
+          "Good vocal variation — pitch moves naturally and delivery stays lively"
+        ],
+        "issues": [
+          "Speaking pace runs slightly slow"
+        ],
+        "observations": [
+          "Speech delivery reads as animated and expressive."
+        ]
+      }
+    }
+  },
+  "processing_metadata": {
+    "analyzer_durations_seconds": {
+      "fluency": 0.0,
+      "intonation": 0.74,
+      "pronunciation": 2.125,
+      "mti": 0.0,
+      "engagement": 0.0
+    },
+    "parallel_execution": true
+  }
+}

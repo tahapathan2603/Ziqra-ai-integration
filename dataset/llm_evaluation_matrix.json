@@ -1,0 +1,408 @@
+{
+  "session_20260725_174356_73f99abd": {
+    "label": "audio sample_1.opus",
+    "qwen3.7-max": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Although there are zero filler words, the slow speaking rate of 120 wpm and a prominent 3.08-second dead air pause from 1.02s to 4.1s negatively impact the overall flow."
+      },
+      "pronunciation": {
+        "score": 2,
+        "reasoning": "With a phoneme accuracy of only 84% and 20 mispronounced words, including high-severity errors on 'rewarded', 'naturally', 'oriented', and 'pain', clarity is frequently compromised."
+      },
+      "mti": {
+        "score": 3,
+        "reasoning": "Native-language patterns affect 17.6% of words, featuring notable consonant substitutions like /w/ to /v/ in 'rewarded' and /r/ to /l/ in 'naturally', which pose a moderate risk to listener clarity."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "The speaker demonstrates good pitch expressiveness with a 99.0 Hz range and no monotone sections, with only the word 'thank' noted as under-emphasized."
+      },
+      "rhythm": {
+        "score": 4,
+        "reasoning": "The analysis detected zero specific rhythm issues, indicating that the timing and pacing regularity remain natural despite the slower overall speaking speed."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "While the lack of low-energy segments and good pitch range suggest adequate vocal energy, the initial 3.08-second dead air pause and slow 120 wpm pace detract from the candidate's perceived confidence and dynamism."
+      }
+    },
+    "minimax-m3": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Zero fillers is strong, but a 3.08s dead-air pause at 1.02s and a 1.28s hesitation pause at 13.52s, combined with a slow 120 wpm pace, disrupt the natural flow of the response."
+      },
+      "pronunciation": {
+        "score": 2,
+        "reasoning": "Phoneme accuracy of 84% is pulled down by multiple high-severity errors including 'rewarded' (w→v, /ᵻ/→/ɪ/), 'naturally' (/ɹ/→/l/), 'oriented' (/ɔː/→/əl/), and 'pain' (/eɪ/→/ɪ/, /n/→/ŋ/) at 12.94s–22.72s, which would noticeably distort meaning for a listener."
+      },
+      "mti": {
+        "score": 3,
+        "reasoning": "With 17.6% of analyzed words affected and patterns of vowel substitution (e.g., 'pain' /eɪ/→/ɪ/, 'grow' /oʊ/→/uː/) and consonant substitution (e.g., /ɹ/→/l/, /n/→/ŋ/) appearing across the response, clarity is reduced but the meaning remains generally recoverable."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "Pitch range of 99 Hz (76.2–208.2 Hz) and average of 159.2 Hz indicate good expressiveness, with no monotone or low-energy sections detected, though 'thank' at 0.9s is flagged as under-emphasized."
+      },
+      "rhythm": {
+        "score": 4,
+        "reasoning": "No rhythm issues were detected in the analysis, and the natural short pauses (0.16s, 0.18s) at 5.58s and 16.88s support reasonable pacing despite the slow overall wpm."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "The 3.08s dead-air pause at 1.02s suggests an uncertain or disengaged opening, and multiple high-severity pronunciation errors may undermine confidence, though the strong pitch range and zero fillers provide some positive energy signals."
+      }
+    },
+    "mimo-v2.5": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "No fillers were detected, but the speaking speed is slow at 120 words per minute with a 3.08-second dead_air pause."
+      },
+      "pronunciation": {
+        "score": 2,
+        "reasoning": "Phoneme accuracy is only 84% with high-severity errors in words like 'rewarded' and 'naturally', as listed in the phoneme_errors section."
+      },
+      "mti": {
+        "score": 2,
+        "reasoning": "17.6% of words are affected by substitution patterns, including a high-severity consonant substitution in 'rewarded' from /w/ to /v/."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "The pitch range is 99 Hz with average 159.2 Hz, and only one under-emphasized word 'thank' was noted."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "No rhythm issues were detected in the provided evidence."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "There is one disengaging dead_air pause from 1.02 to 4.1 seconds, but no low-energy segments or hesitation clusters."
+      }
+    }
+  },
+  "session_20260725_174408_e97bd3b1": {
+    "label": "audio_ana2.opus",
+    "qwen3.7-max": {
+      "fluency": {
+        "score": 5,
+        "reasoning": "The candidate demonstrates excellent fluency with zero filler words, an ideal speaking speed of 134 words per minute, and only three brief, natural pauses."
+      },
+      "pronunciation": {
+        "score": 4,
+        "reasoning": "With a 92% phoneme accuracy rate and mostly low-severity errors, pronunciation is good, though the medium-severity mispronunciation of 'cost' and the skipped word 'budget' prevent a perfect score."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "Mother tongue influence is minimal and does not impact clarity, affecting only 11.1% of words with low-severity vowel substitutions like in 'primary' and 'concern'."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "The candidate exhibits excellent intonation with a healthy pitch range of 75.7 Hz and zero monotone sections, low-energy segments, or under-emphasized words."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "The rhythm is highly natural and regular, as evidenced by the complete absence of any detected timing or pacing issues in the analysis."
+      },
+      "engagement": {
+        "score": 5,
+        "reasoning": "The candidate projects high engagement and confidence, supported by an ideal speaking pace, zero disengaging pauses or hesitation clusters, and expressive intonation without any low-energy segments."
+      }
+    },
+    "minimax-m3": {
+      "fluency": {
+        "score": 5,
+        "reasoning": "Zero filler words (0.0 per minute), only three short natural pauses (≤0.36s) at 4.9s, 6.04s, and 9.28s, and an ideal speaking pace of 134 wpm indicate highly fluent delivery."
+      },
+      "pronunciation": {
+        "score": 4,
+        "reasoning": "Phoneme accuracy is 92% with 7 low-severity and 1 medium-severity mispronunciation (e.g., 'cost' as /kɔːz/ at 8.7s) plus a skipped 'budget', but errors are minor and unlikely to impede understanding."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "Only 11.1% of words are affected by low-severity vowel substitutions (e.g., 'primary' /ɚ/→/ɪ/, 'cost' /ɔ/→/ɔː/) and a single /s/→/z/ voicing, producing minimal clarity impact for a listener."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "A pitch range of 75.7 Hz (107.8–250.6 Hz) is wide and expressive, with no low-energy, monotone, or under-emphasized sections detected, indicating strong prosodic engagement."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "Rhythm analysis lists zero issues; pauses are brief and natural (max 0.36s) and the 134 wpm pace is classified as ideal, yielding smooth and natural timing."
+      },
+      "engagement": {
+        "score": 5,
+        "reasoning": "Combining zero fillers, no disengaging pauses or low-energy segments, ideal pace, and a 75.7 Hz expressive pitch range, an interviewer would likely perceive this candidate as confident, energetic, and fully engaged."
+      }
+    },
+    "mimo-v2.5": {
+      "fluency": {
+        "score": 5,
+        "reasoning": "Zero fillers and ideal speaking speed of 134 words per minute with only natural pauses indicate high fluency."
+      },
+      "pronunciation": {
+        "score": 4,
+        "reasoning": "92% phoneme accuracy with mispronunciations like 'cost' at medium severity and mostly low-severity errors shows good but imperfect pronunciation."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "Three low-severity vowel substitutions and no consonant or stress transfer issues suggest minimal mother tongue influence."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "No low energy or monotone sections, with a pitch range of 75.7 Hz, demonstrate excellent intonation."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "No rhythm issues were detected, indicating natural and consistent pacing throughout the response."
+      },
+      "engagement": {
+        "score": 5,
+        "reasoning": "Absence of low energy segments, disengaging pauses, or hesitation clusters points to sustained engagement."
+      }
+    }
+  },
+  "session_20260725_174424_f81483e7": {
+    "label": "audio_ana4.opus",
+    "qwen3.7-max": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Although there are zero filler words, the slow speaking pace of 113 WPM and a 1.32-second hesitation pause between 7.88s and 9.2s reduce overall flow."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "Despite an 89% phoneme accuracy rate, the candidate produces multiple errors in a short utterance, including medium-severity mispronunciations on the words 'tech' and 'from'."
+      },
+      "mti": {
+        "score": 5,
+        "reasoning": "The evidence shows a 0.0% affected word percentage and zero systemic vowel or stress transfer issues, with only a single isolated consonant substitution on the word 'tech'."
+      },
+      "intonation": {
+        "score": 3,
+        "reasoning": "The candidate exhibits a relatively narrow pitch range of 48.3 Hz and a medium-severity monotone section lasting three seconds from 4.0s to 7.0s."
+      },
+      "rhythm": {
+        "score": 4,
+        "reasoning": "The rhythm analysis detected zero specific timing issues, though the overall slow speaking speed of 113 WPM slightly limits the naturalness of the conversational flow."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "While there are no flagged low-energy segments, the slow pace of 113 WPM combined with a three-second monotone stretch and a 1.32-second hesitation results in a somewhat flat delivery."
+      }
+    },
+    "minimax-m3": {
+      "fluency": {
+        "score": 4,
+        "reasoning": "Zero fillers and only one 1.32s hesitation pause at 7.88s suggest generally smooth delivery, though the 113 wpm speaking rate is classified as slow, slightly reducing naturalness."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "Phoneme accuracy is 89% with multiple errors including a medium-severity /n/→/ŋ/ substitution in 'tech' (5.76s) and dropped schwa in 'from' (7.36s), alongside low-severity errors in 'i', 'am', and 'artificial', indicating noticeable but not severe mispronunciations."
+      },
+      "mti": {
+        "score": 5,
+        "reasoning": "Only 1 candidate pattern issue (the 'tech' /n/→/ŋ/ substitution) and 0.0% affected words across 17 analyzed words, meaning mother-tongue interference has negligible clarity impact on a listener."
+      },
+      "intonation": {
+        "score": 3,
+        "reasoning": "Pitch range of 48.3 Hz (min 143.7, max 203.7) is adequate, but a medium-severity monotone stretch from 4.0s to 7.0s covers nearly a third of the response, reducing expressiveness."
+      },
+      "rhythm": {
+        "score": 4,
+        "reasoning": "No rhythm issues were detected and the 1.32s pause at 7.88s is the only timing irregularity, suggesting mostly natural pacing despite the slow overall speed."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "The zero-filler count and absence of disengaging pauses or low-energy segments show confidence, but the 3-second monotone stretch (4.0–7.0s) and slow 113 wpm pace would likely make an interviewer perceive the candidate as less energetic and dynamic overall."
+      }
+    },
+    "mimo-v2.5": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Fluency is impacted by a slow speaking speed of 113 words per minute and one hesitation pause, though no fillers are present."
+      },
+      "pronunciation": {
+        "score": 4,
+        "reasoning": "Pronunciation is generally good with 89% phoneme accuracy, but contains a medium-severity error with 'tech' being pronounced with a velar nasal instead of an alveolar nasal."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "MTI shows one medium-severity candidate pattern for consonant substitution in 'tech', but overall vowel and consonant pattern issues are zero with low affected percentage."
+      },
+      "intonation": {
+        "score": 3,
+        "reasoning": "Intonation has a medium-severity monotone section between 4.0 and 7.0 seconds, though the average pitch range is moderate."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "Rhythm analysis detected no issues in the speech patterns."
+      },
+      "engagement": {
+        "score": 5,
+        "reasoning": "Engagement analysis found no low-energy segments, disengaging pauses, or hesitation clusters."
+      }
+    }
+  },
+  "session_20260725_174441_b2e836ee": {
+    "label": "audio_ana5.opus",
+    "qwen3.7-max": {
+      "fluency": {
+        "score": 4,
+        "reasoning": "The candidate exhibits excellent pause and filler control with zero fillers and only three brief natural pauses (max 0.3s), but the score is slightly reduced because the speaking speed of 182 words per minute is classified as too fast."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "With an 89% phoneme accuracy rate, the candidate makes several noticeable errors, most notably the high-severity mispronunciation of 'thank' (substituting /f/ for /θ/ and /n/ for /ŋ/) and a medium-severity error on 'that's' (/k/ for /ð/)."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "Mother tongue influence is relatively mild, affecting only 10% of analyzed words with zero clarity risk words, though there are medium-severity consonant substitutions like /f/ for /θ/ in 'thank' and /k/ for /ð/ in 'that's'."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "The candidate demonstrates excellent pitch expressiveness with zero monotone sections, zero low-energy segments, and a solid pitch range spanning from 76.9 Hz to 207.2 Hz."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "The rhythm analysis detected zero timing or pacing issues in the data array, indicating a highly regular and natural flow independent of the fast overall speaking rate."
+      },
+      "engagement": {
+        "score": 4,
+        "reasoning": "The candidate shows strong engagement with zero low-energy segments, disengaging pauses, or hesitation clusters, though the overly fast speaking rate of 182 words per minute slightly detracts from a relaxed, conversational connection."
+      }
+    },
+    "minimax-m3": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Zero filler words and only 3 short natural pauses (max 0.3s) are strong positives, but speaking speed of 182 wpm is classified as too fast, which undermines overall fluency and comprehensibility."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "Phoneme accuracy is 89% with 8 mispronounced words including a high-severity 'thank' (/θ/→/f/, /æ/→/a/, /ŋ/→/n/) and medium-severity 'that's' (/ð/→/k/), while several words like 'learner' and 'pharma' show clip-edge errors suggesting rushed or truncated production."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "Only 10% of analyzed words (3/30) show systematic vowel or consonant substitutions, and the patterns (vowel lowering in 'role', /θ/→/f/, /ð/→/k/) are limited in scope and unlikely to severely reduce clarity for a listener."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "Pitch range of 130.3 Hz (76.9–207.2 Hz) is healthy and expressive with no monotone stretches or under-emphasized words detected, though no specific emphasis data was provided to confirm full engagement."
+      },
+      "rhythm": {
+        "score": 3,
+        "reasoning": "No rhythm issues were flagged in the analysis, but the 182 wpm pace (too fast) combined with clip-edge truncations on 'learner' and 'pharma' suggests pacing that is rushed rather than naturally timed."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "An interviewer would likely perceive a confident, filler-free speaker with good pitch dynamics, but the too-fast delivery (182 wpm) and notable mispronunciations of key content words like 'thank' and 'that's' would undermine perceived polish and professionalism."
+      }
+    },
+    "mimo-v2.5": {
+      "fluency": {
+        "score": 4,
+        "reasoning": "Despite zero fillers and natural pauses, the speaking speed is classified as too fast at 182 words per minute."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "Phoneme accuracy is 89% with one high-severity error on the word 'thank' and multiple low-severity mispronunciations."
+      },
+      "mti": {
+        "score": 3,
+        "reasoning": "Two vowel and two consonant substitution patterns affect 10% of the analyzed words, with medium severity substitutions like 'that's' and 'thank'."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "No low energy sections, monotone sections, or under-emphasized words were detected, indicating natural pitch variation."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "No rhythm issues were identified in the analysis, with smooth and consistent pacing."
+      },
+      "engagement": {
+        "score": 5,
+        "reasoning": "The absence of low energy segments, disengaging pauses, and hesitation clusters suggests strong and consistent engagement."
+      }
+    }
+  },
+  "session_20260725_174519_9eb9ea83": {
+    "label": "audio_ana6.opus",
+    "qwen3.7-max": {
+      "fluency": {
+        "score": 4,
+        "reasoning": "Although the speaking speed is ideal at 157 wpm with zero filler words, the presence of two long pauses of 1.94s and 1.78s and multiple hesitations slightly disrupts the overall flow."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "With a phoneme accuracy of 79% and 14 mispronounced words, including high-severity errors on study and that's, the speaker's articulation requires noticeable improvement."
+      },
+      "mti": {
+        "score": 4,
+        "reasoning": "While 24.4% of words exhibit MTI patterns such as vowel substitutions and a high-severity missing aspiration on that's, the complete absence of clarity risk words indicates that listener comprehension is not significantly impeded."
+      },
+      "intonation": {
+        "score": 5,
+        "reasoning": "The speaker demonstrates excellent pitch expressiveness with a wide range from 66.4 Hz to 302.1 Hz and absolutely zero monotone or low-energy sections."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "The timing and pacing are highly natural, as evidenced by the complete absence of any detected rhythm issues in the analysis."
+      },
+      "engagement": {
+        "score": 4,
+        "reasoning": "Despite strong vocal energy and expressiveness, the two disengaging long pauses up to 1.94s and a hesitation cluster between 7.4s and 12.48s slightly detract from the candidate's perceived confidence."
+      }
+    },
+    "minimax-m3": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Zero fillers and an ideal 157 wpm pace are positive, but two long pauses of 1.94s and 1.78s back-to-back near the end (15.26–19.3s) plus three hesitation pauses totaling ~2.78s create a choppy, halting flow."
+      },
+      "pronunciation": {
+        "score": 2,
+        "reasoning": "Phoneme accuracy is only 79% with 14 mispronounced words including high-severity errors on 'study' (ʌ→ɚ, missing /i/) and 'that's' (ð→d, æ→a, s→ts), and a medium-severity /ɡ/→/k/ in 'good', which together would noticeably reduce intelligibility."
+      },
+      "mti": {
+        "score": 3,
+        "reasoning": "24.4% of analyzed words are affected (10/41), with 9 vowel substitutions (e.g., æ→a in 'yeah'/'that's', ɛ→æ in 'chess') and 3 consonant substitutions (ɹ→ɾ in 'carom', ɡ→k in 'good', h→d in 'yeah') that create moderate but not severe clarity reduction."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "No monotone or low-energy sections flagged, pitch range of 82.1 Hz (66.4–302.1 Hz average 133.4 Hz) indicates good expressiveness, and no under-emphasized words were detected, suggesting natural prosodic variation."
+      },
+      "rhythm": {
+        "score": 3,
+        "reasoning": "While no specific rhythm issues were flagged and the 157 wpm pace is ideal, the cluster of two long pauses at 15.26–19.3s (totaling ~3.7s of dead air) and the 7.4–12.48s hesitation cluster break the temporal regularity and hurt naturalness."
+      },
+      "engagement": {
+        "score": 2,
+        "reasoning": "The two consecutive long pauses at 15.26–17.2s and 17.52–19.3s labeled as 'disengaging_pauses' near the response's end, combined with the 2.78s of hesitation pauses and multiple high-severity pronunciation errors, would likely make an interviewer perceive loss of confidence and momentum despite the strong intonation and zero fillers."
+      }
+    },
+    "mimo-v2.5": {
+      "fluency": {
+        "score": 3,
+        "reasoning": "Despite an ideal speaking speed of 157 words per minute and zero fillers, the presence of two long pauses (15.26-17.2 and 17.52-19.3 seconds) and hesitation clusters disrupts smoothness."
+      },
+      "pronunciation": {
+        "score": 3,
+        "reasoning": "With a phoneme accuracy of 79% and high-severity mispronunciations in words like 'study' and 'that's', clarity is moderately affected."
+      },
+      "mti": {
+        "score": 3,
+        "reasoning": "24.4% of words are affected by vowel and consonant substitution patterns, indicating moderate mother tongue interference."
+      },
+      "intonation": {
+        "score": 4,
+        "reasoning": "The pitch range of 82.1 Hz and absence of monotone sections suggest generally natural and varied intonation."
+      },
+      "rhythm": {
+        "score": 5,
+        "reasoning": "No rhythm issues are reported in the data, indicating consistent and appropriate pacing."
+      },
+      "engagement": {
+        "score": 3,
+        "reasoning": "Disengaging long pauses and hesitation clusters at the end reduce sustained engagement."
+      }
+    }
+  },
+  "_errors": []
+}

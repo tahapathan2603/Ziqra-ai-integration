@@ -1,0 +1,20 @@
+# Secrets — never commit real API keys/config. Copy .env.example to .env instead.
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# OS
+.DS_Store
+
+# Local tool state (not part of the codebase)
+.claude/
+
+# Project-generated runtime artifacts
+backend/storage/chunks/
+backend/storage/feedback_samples/

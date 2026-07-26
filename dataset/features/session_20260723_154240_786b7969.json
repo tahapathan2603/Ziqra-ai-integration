@@ -1,0 +1,953 @@
+{
+  "session_id": "session_20260723_154240_786b7969",
+  "analysis": {
+    "fluency": {
+      "fillers": {
+        "filler_count": 0,
+        "fillers_per_minute": 0.0,
+        "classification": "good",
+        "fillers": []
+      },
+      "pauses": {
+        "total_pauses": 3,
+        "pauses": [
+          {
+            "start": 4.9,
+            "end": 5.26,
+            "duration": 0.35999999999999943,
+            "type": "natural"
+          },
+          {
+            "start": 6.04,
+            "end": 6.28,
+            "duration": 0.2400000000000002,
+            "type": "natural"
+          },
+          {
+            "start": 9.299999999999999,
+            "end": 9.58,
+            "duration": 0.28000000000000114,
+            "type": "natural"
+          }
+        ]
+      },
+      "speaking_speed": {
+        "words_per_minute": 134,
+        "sentences_per_minute": 5,
+        "classification": "ideal"
+      }
+    },
+    "pronunciation": {
+      "pronunciation_score": 94,
+      "phoneme_accuracy": 0.87,
+      "stress_accuracy": 1.0,
+      "rhythm_score": 1.0,
+      "phoneme_errors": [
+        {
+          "word": "completely",
+          "expected": "/ə/",
+          "detected": "/ʌ/"
+        },
+        {
+          "word": "budget",
+          "expected": "/ɪ/",
+          "detected": "/ɛ/"
+        },
+        {
+          "word": "primary",
+          "expected": "/ɚ/",
+          "detected": "/ɪ/"
+        },
+        {
+          "word": "concern",
+          "expected": "/ɜː/",
+          "detected": "/ɚ/"
+        },
+        {
+          "word": "than",
+          "expected": "/ɐ/",
+          "detected": "/æ/"
+        },
+        {
+          "word": "the",
+          "expected": "/ɪ/",
+          "detected": "/ə/"
+        },
+        {
+          "word": "upfront",
+          "expected": "/ʌ/",
+          "detected": "/ə/"
+        },
+        {
+          "word": "cost",
+          "expected": "/ɔ/",
+          "detected": "/ɔː/"
+        },
+        {
+          "word": "cost",
+          "expected": "/s/",
+          "detected": "/z/"
+        },
+        {
+          "word": "cost",
+          "expected": "/t/",
+          "detected": "/d/"
+        },
+        {
+          "word": "for",
+          "expected": "/ɔːɹ/",
+          "detected": "/ɜː/"
+        },
+        {
+          "word": "your",
+          "expected": "/ʊɹ/",
+          "detected": "/ɔːɹ/"
+        },
+        {
+          "word": "team",
+          "expected": "/iː/",
+          "detected": null
+        },
+        {
+          "word": "team",
+          "expected": "/m/",
+          "detected": "/i/"
+        }
+      ],
+      "detected_phonemes": [
+        {
+          "phoneme": "/aɪ/",
+          "start": 1.22,
+          "end": 1.24
+        },
+        {
+          "phoneme": "/k/",
+          "start": 1.421,
+          "end": 1.441
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 1.461,
+          "end": 1.481
+        },
+        {
+          "phoneme": "/m/",
+          "start": 1.521,
+          "end": 1.541
+        },
+        {
+          "phoneme": "/p/",
+          "start": 1.601,
+          "end": 1.621
+        },
+        {
+          "phoneme": "/l/",
+          "start": 1.681,
+          "end": 1.721
+        },
+        {
+          "phoneme": "/iː/",
+          "start": 1.721,
+          "end": 1.741
+        },
+        {
+          "phoneme": "/t/",
+          "start": 1.881,
+          "end": 1.921
+        },
+        {
+          "phoneme": "/l/",
+          "start": 1.941,
+          "end": 1.961
+        },
+        {
+          "phoneme": "/i/",
+          "start": 1.981,
+          "end": 2.002
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 2.102,
+          "end": 2.122
+        },
+        {
+          "phoneme": "/n/",
+          "start": 2.162,
+          "end": 2.202
+        },
+        {
+          "phoneme": "/d/",
+          "start": 2.242,
+          "end": 2.262
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 2.262,
+          "end": 2.282
+        },
+        {
+          "phoneme": "/s/",
+          "start": 2.382,
+          "end": 2.402
+        },
+        {
+          "phoneme": "/t/",
+          "start": 2.502,
+          "end": 2.522
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 2.562,
+          "end": 2.582
+        },
+        {
+          "phoneme": "/n/",
+          "start": 2.803,
+          "end": 2.843
+        },
+        {
+          "phoneme": "/d/",
+          "start": 2.863,
+          "end": 2.883
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 3.003,
+          "end": 3.023
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 3.063,
+          "end": 3.083
+        },
+        {
+          "phoneme": "/t/",
+          "start": 3.244,
+          "end": 3.264
+        },
+        {
+          "phoneme": "/b/",
+          "start": 3.404,
+          "end": 3.424
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 3.444,
+          "end": 3.464
+        },
+        {
+          "phoneme": "/dʒ/",
+          "start": 3.524,
+          "end": 3.544
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 3.584,
+          "end": 3.604
+        },
+        {
+          "phoneme": "/t/",
+          "start": 3.724,
+          "end": 3.744
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 3.785,
+          "end": 3.805
+        },
+        {
+          "phoneme": "/z/",
+          "start": 3.865,
+          "end": 3.885
+        },
+        {
+          "phoneme": "/ɐ/",
+          "start": 3.945,
+          "end": 3.965
+        },
+        {
+          "phoneme": "/p/",
+          "start": 4.065,
+          "end": 4.085
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 4.145,
+          "end": 4.185
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 4.205,
+          "end": 4.225
+        },
+        {
+          "phoneme": "/m/",
+          "start": 4.365,
+          "end": 4.386
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 4.406,
+          "end": 4.426
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 4.466,
+          "end": 4.486
+        },
+        {
+          "phoneme": "/i/",
+          "start": 4.486,
+          "end": 4.506
+        },
+        {
+          "phoneme": "/k/",
+          "start": 4.606,
+          "end": 4.626
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 4.646,
+          "end": 4.666
+        },
+        {
+          "phoneme": "/n/",
+          "start": 4.746,
+          "end": 4.786
+        },
+        {
+          "phoneme": "/s/",
+          "start": 4.846,
+          "end": 4.866
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 4.967,
+          "end": 4.987
+        },
+        {
+          "phoneme": "/n/",
+          "start": 5.247,
+          "end": 5.267
+        },
+        {
+          "phoneme": "/h/",
+          "start": 5.848,
+          "end": 5.868
+        },
+        {
+          "phoneme": "/aʊ/",
+          "start": 5.908,
+          "end": 5.928
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 6.128,
+          "end": 6.148
+        },
+        {
+          "phoneme": "/v/",
+          "start": 6.269,
+          "end": 6.289
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 6.329,
+          "end": 6.349
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 6.81,
+          "end": 6.83
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 6.87,
+          "end": 6.89
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 7.03,
+          "end": 7.05
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 7.07,
+          "end": 7.09
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 7.25,
+          "end": 7.27
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 7.31,
+          "end": 7.33
+        },
+        {
+          "phoneme": "/n/",
+          "start": 7.411,
+          "end": 7.431
+        },
+        {
+          "phoneme": "/l/",
+          "start": 7.531,
+          "end": 7.571
+        },
+        {
+          "phoneme": "/ʊ/",
+          "start": 7.571,
+          "end": 7.591
+        },
+        {
+          "phoneme": "/k/",
+          "start": 7.691,
+          "end": 7.711
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 7.751,
+          "end": 7.771
+        },
+        {
+          "phoneme": "/ŋ/",
+          "start": 7.871,
+          "end": 7.911
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 8.072,
+          "end": 8.092
+        },
+        {
+          "phoneme": "/t/",
+          "start": 8.232,
+          "end": 8.252
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 8.312,
+          "end": 8.332
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 8.332,
+          "end": 8.352
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 8.492,
+          "end": 8.512
+        },
+        {
+          "phoneme": "/p/",
+          "start": 8.653,
+          "end": 8.673
+        },
+        {
+          "phoneme": "/f/",
+          "start": 8.733,
+          "end": 8.753
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 8.813,
+          "end": 8.833
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 8.833,
+          "end": 8.853
+        },
+        {
+          "phoneme": "/n/",
+          "start": 8.933,
+          "end": 8.953
+        },
+        {
+          "phoneme": "/t/",
+          "start": 9.013,
+          "end": 9.033
+        },
+        {
+          "phoneme": "/k/",
+          "start": 9.134,
+          "end": 9.154
+        },
+        {
+          "phoneme": "/ɔː/",
+          "start": 9.214,
+          "end": 9.234
+        },
+        {
+          "phoneme": "/z/",
+          "start": 9.514,
+          "end": 9.534
+        },
+        {
+          "phoneme": "/d/",
+          "start": 9.634,
+          "end": 9.654
+        },
+        {
+          "phoneme": "/l/",
+          "start": 9.795,
+          "end": 9.835
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 9.835,
+          "end": 9.855
+        },
+        {
+          "phoneme": "/t/",
+          "start": 9.995,
+          "end": 10.015
+        },
+        {
+          "phoneme": "/s/",
+          "start": 10.035,
+          "end": 10.055
+        },
+        {
+          "phoneme": "/l/",
+          "start": 10.195,
+          "end": 10.215
+        },
+        {
+          "phoneme": "/ʊ/",
+          "start": 10.235,
+          "end": 10.255
+        },
+        {
+          "phoneme": "/k/",
+          "start": 10.376,
+          "end": 10.396
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 10.536,
+          "end": 10.556
+        },
+        {
+          "phoneme": "/t/",
+          "start": 10.776,
+          "end": 10.796
+        },
+        {
+          "phoneme": "/w/",
+          "start": 10.876,
+          "end": 10.917
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 10.937,
+          "end": 10.957
+        },
+        {
+          "phoneme": "/t/",
+          "start": 11.097,
+          "end": 11.117
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 11.217,
+          "end": 11.237
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 11.257,
+          "end": 11.277
+        },
+        {
+          "phoneme": "/s/",
+          "start": 11.377,
+          "end": 11.397
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 11.518,
+          "end": 11.538
+        },
+        {
+          "phoneme": "/n/",
+          "start": 11.598,
+          "end": 11.618
+        },
+        {
+          "phoneme": "/v/",
+          "start": 11.658,
+          "end": 11.678
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 11.698,
+          "end": 11.718
+        },
+        {
+          "phoneme": "/s/",
+          "start": 11.778,
+          "end": 11.798
+        },
+        {
+          "phoneme": "/t/",
+          "start": 11.858,
+          "end": 11.898
+        },
+        {
+          "phoneme": "/m/",
+          "start": 11.958,
+          "end": 11.978
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 11.998,
+          "end": 12.018
+        },
+        {
+          "phoneme": "/n/",
+          "start": 12.058,
+          "end": 12.099
+        },
+        {
+          "phoneme": "/t/",
+          "start": 12.099,
+          "end": 12.119
+        },
+        {
+          "phoneme": "/d/",
+          "start": 12.159,
+          "end": 12.179
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 12.199,
+          "end": 12.219
+        },
+        {
+          "phoneme": "/z/",
+          "start": 12.279,
+          "end": 12.299
+        },
+        {
+          "phoneme": "/f/",
+          "start": 12.419,
+          "end": 12.439
+        },
+        {
+          "phoneme": "/ɜː/",
+          "start": 12.479,
+          "end": 12.499
+        },
+        {
+          "phoneme": "/j/",
+          "start": 12.579,
+          "end": 12.599
+        },
+        {
+          "phoneme": "/ɔːɹ/",
+          "start": 12.639,
+          "end": 12.659
+        },
+        {
+          "phoneme": "/t/",
+          "start": 12.84,
+          "end": 12.86
+        },
+        {
+          "phoneme": "/i/",
+          "start": 12.88,
+          "end": 12.9
+        }
+      ],
+      "mispronounced_words": [
+        {
+          "word": "completely",
+          "severity": "low",
+          "start": 1.3,
+          "end": 1.68
+        },
+        {
+          "word": "budget",
+          "severity": "low",
+          "start": 3.06,
+          "end": 3.4400000000000004
+        },
+        {
+          "word": "primary",
+          "severity": "low",
+          "start": 3.92,
+          "end": 4.32
+        },
+        {
+          "word": "concern",
+          "severity": "low",
+          "start": 4.32,
+          "end": 4.9
+        },
+        {
+          "word": "than",
+          "severity": "low",
+          "start": 6.86,
+          "end": 7.3
+        },
+        {
+          "word": "the",
+          "severity": "low",
+          "start": 8.08,
+          "end": 8.299999999999999
+        },
+        {
+          "word": "upfront",
+          "severity": "low",
+          "start": 8.299999999999999,
+          "end": 8.7
+        },
+        {
+          "word": "cost",
+          "severity": "high",
+          "start": 8.7,
+          "end": 9.299999999999999
+        },
+        {
+          "word": "for",
+          "severity": "low",
+          "start": 12.18,
+          "end": 12.42
+        },
+        {
+          "word": "your",
+          "severity": "low",
+          "start": 12.42,
+          "end": 12.62
+        },
+        {
+          "word": "team",
+          "severity": "medium",
+          "start": 12.62,
+          "end": 12.92
+        }
+      ],
+      "stress_errors": [],
+      "rhythm_issues": [],
+      "overall_observations": [
+        "Overall pronunciation is strong.",
+        "1 word(s) show significant mispronunciation: cost."
+      ]
+    },
+    "mti": {
+      "overall_mti_score": 83,
+      "clarity_impact": "medium",
+      "summary": {
+        "vowel_pattern_issues": 5,
+        "consonant_pattern_issues": 2,
+        "stress_transfer_issues": 0
+      },
+      "vowel_patterns": [
+        {
+          "word": "completely",
+          "timestamp": {
+            "start": 1.3,
+            "end": 1.68
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ə/",
+          "detected": "/ʌ/",
+          "severity": "low"
+        },
+        {
+          "word": "budget",
+          "timestamp": {
+            "start": 3.06,
+            "end": 3.4400000000000004
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ɪ/",
+          "detected": "/ɛ/",
+          "severity": "low"
+        },
+        {
+          "word": "the",
+          "timestamp": {
+            "start": 8.08,
+            "end": 8.299999999999999
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ɪ/",
+          "detected": "/ə/",
+          "severity": "low"
+        },
+        {
+          "word": "upfront",
+          "timestamp": {
+            "start": 8.299999999999999,
+            "end": 8.7
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ʌ/",
+          "detected": "/ə/",
+          "severity": "low"
+        },
+        {
+          "word": "cost",
+          "timestamp": {
+            "start": 8.7,
+            "end": 9.299999999999999
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ɔ/",
+          "detected": "/ɔː/",
+          "severity": "low"
+        }
+      ],
+      "consonant_patterns": [
+        {
+          "word": "cost",
+          "timestamp": {
+            "start": 8.7,
+            "end": 9.299999999999999
+          },
+          "issue": "consonant_substitution",
+          "expected": "/s/",
+          "detected": "/z/",
+          "severity": "low"
+        },
+        {
+          "word": "cost",
+          "timestamp": {
+            "start": 8.7,
+            "end": 9.299999999999999
+          },
+          "issue": "consonant_substitution",
+          "expected": "/t/",
+          "detected": "/d/",
+          "severity": "medium"
+        }
+      ],
+      "stress_transfer": [],
+      "speech_statistics": {
+        "total_words_analyzed": 27,
+        "affected_words": 5,
+        "affected_percentage": 18.5
+      },
+      "patterns_detected": [
+        "vowel substitution",
+        "consonant substitution"
+      ],
+      "top_recurring_issue": "vowel substitution",
+      "clarity_risk_words": [],
+      "overall_observations": [
+        "Overall clarity impact from native-language speech patterns is medium.",
+        "Most common pattern: vowel substitution."
+      ]
+    },
+    "intonation": {
+      "intonation_score": 94,
+      "delivery_label": "Expressive",
+      "pitch_variation": {
+        "pitch_score": 87,
+        "average_pitch": 177.1,
+        "min_pitch": 86.3,
+        "max_pitch": 252.1,
+        "pitch_range": 165.8,
+        "observations": [
+          "Pitch variation is healthy."
+        ]
+      },
+      "energy_variation": {
+        "energy_score": 87,
+        "low_energy_sections": [
+          {
+            "start": 0.0,
+            "end": 1.15,
+            "severity": "high"
+          }
+        ],
+        "observations": [
+          "Detected 1 low-energy section(s), but overall energy holds up."
+        ]
+      },
+      "monotonicity": {
+        "monotonicity_score": 100,
+        "monotone_sections": [],
+        "observations": [
+          "No sustained monotone sections detected."
+        ]
+      },
+      "emphasis": {
+        "emphasis_score": 100,
+        "under_emphasized_words": [],
+        "observations": [
+          "Important words receive adequate vocal emphasis."
+        ]
+      },
+      "overall_observations": [
+        "Overall delivery: Expressive.",
+        "Energy drops in parts of the response."
+      ]
+    },
+    "engagement": {
+      "engagement_score": 91,
+      "engagement_level": "highly_engaging",
+      "strengths": [
+        "Good vocal variation — pitch moves naturally and delivery stays lively",
+        "Comfortable speaking pace",
+        "Smooth flow with no disruptive pauses"
+      ],
+      "improvement_areas": [
+        "Significant energy drop between 0.0s and 1.1s",
+        "Clarity issues on key word(s): cost"
+      ],
+      "timeline": [
+        {
+          "start": 0,
+          "end": 14,
+          "engagement": "high"
+        }
+      ],
+      "energy_patterns": {
+        "energy_engagement_score": 87,
+        "low_energy_segments": [
+          {
+            "start": 0.0,
+            "end": 1.15,
+            "severity": "high"
+          }
+        ],
+        "observations": [
+          "1 noticeable energy dip(s) may read as reduced enthusiasm."
+        ]
+      },
+      "pause_patterns": {
+        "pause_engagement_score": 100,
+        "disengaging_pauses": [],
+        "hesitation_clusters": [],
+        "observations": [
+          "No significant disengaging pauses detected."
+        ]
+      },
+      "speaking_dynamics": {
+        "dynamics_score": 97,
+        "strengths": [
+          "Good vocal variation — pitch moves naturally and delivery stays lively",
+          "Comfortable speaking pace"
+        ],
+        "issues": [],
+        "observations": [
+          "Speech delivery reads as animated and expressive."
+        ]
+      }
+    }
+  },
+  "processing_metadata": {
+    "analyzer_durations_seconds": {
+      "fluency": 0.0,
+      "intonation": 1.134,
+      "pronunciation": 4.516,
+      "mti": 0.0,
+      "engagement": 0.0
+    },
+    "parallel_execution": true
+  }
+}

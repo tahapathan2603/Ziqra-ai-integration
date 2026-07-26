@@ -1,0 +1,4610 @@
+{
+  "session_id": "session_20260723_154240_786b7969",
+  "audio_metadata": {
+    "duration": 13.754,
+    "sample_rate": 16000,
+    "detected_language": "en",
+    "language_probability": 0.9868
+  },
+  "speech_chunks": [
+    {
+      "chunk_id": 1,
+      "start": 1.2,
+      "end": 13.3
+    }
+  ],
+  "sentences": [
+    {
+      "text": "I completely understand that budget is a primary concern, however, rather than looking at the upfront cost, let's look at what this investment does for your team.",
+      "start": 1.2,
+      "end": 12.92
+    }
+  ],
+  "words": [
+    {
+      "word": "I",
+      "start": 1.2,
+      "end": 1.3,
+      "confidence": 0.7345
+    },
+    {
+      "word": "completely",
+      "start": 1.3,
+      "end": 1.68,
+      "confidence": 0.9821
+    },
+    {
+      "word": "understand",
+      "start": 1.68,
+      "end": 2.26,
+      "confidence": 0.9866
+    },
+    {
+      "word": "that",
+      "start": 2.26,
+      "end": 3.06,
+      "confidence": 0.9751
+    },
+    {
+      "word": "budget",
+      "start": 3.06,
+      "end": 3.4400000000000004,
+      "confidence": 0.4621
+    },
+    {
+      "word": "is",
+      "start": 3.4400000000000004,
+      "end": 3.8,
+      "confidence": 0.9975
+    },
+    {
+      "word": "a",
+      "start": 3.8,
+      "end": 3.92,
+      "confidence": 0.9309
+    },
+    {
+      "word": "primary",
+      "start": 3.92,
+      "end": 4.32,
+      "confidence": 0.9944
+    },
+    {
+      "word": "concern,",
+      "start": 4.32,
+      "end": 4.9,
+      "confidence": 0.9983
+    },
+    {
+      "word": "however,",
+      "start": 5.26,
+      "end": 6.04,
+      "confidence": 0.9098
+    },
+    {
+      "word": "rather",
+      "start": 6.28,
+      "end": 6.86,
+      "confidence": 0.9879
+    },
+    {
+      "word": "than",
+      "start": 6.86,
+      "end": 7.3,
+      "confidence": 0.9866
+    },
+    {
+      "word": "looking",
+      "start": 7.3,
+      "end": 7.640000000000001,
+      "confidence": 0.9856
+    },
+    {
+      "word": "at",
+      "start": 7.640000000000001,
+      "end": 8.08,
+      "confidence": 0.9951
+    },
+    {
+      "word": "the",
+      "start": 8.08,
+      "end": 8.299999999999999,
+      "confidence": 0.8236
+    },
+    {
+      "word": "upfront",
+      "start": 8.299999999999999,
+      "end": 8.7,
+      "confidence": 0.9323
+    },
+    {
+      "word": "cost,",
+      "start": 8.7,
+      "end": 9.299999999999999,
+      "confidence": 0.9445
+    },
+    {
+      "word": "let's",
+      "start": 9.58,
+      "end": 10.0,
+      "confidence": 0.9017
+    },
+    {
+      "word": "look",
+      "start": 10.0,
+      "end": 10.219999999999999,
+      "confidence": 0.9939
+    },
+    {
+      "word": "at",
+      "start": 10.219999999999999,
+      "end": 10.5,
+      "confidence": 0.9885
+    },
+    {
+      "word": "what",
+      "start": 10.5,
+      "end": 10.92,
+      "confidence": 0.995
+    },
+    {
+      "word": "this",
+      "start": 10.92,
+      "end": 11.26,
+      "confidence": 0.9878
+    },
+    {
+      "word": "investment",
+      "start": 11.26,
+      "end": 11.819999999999999,
+      "confidence": 0.9822
+    },
+    {
+      "word": "does",
+      "start": 11.819999999999999,
+      "end": 12.18,
+      "confidence": 0.9941
+    },
+    {
+      "word": "for",
+      "start": 12.18,
+      "end": 12.42,
+      "confidence": 0.9937
+    },
+    {
+      "word": "your",
+      "start": 12.42,
+      "end": 12.62,
+      "confidence": 0.9919
+    },
+    {
+      "word": "team.",
+      "start": 12.62,
+      "end": 12.92,
+      "confidence": 0.977
+    }
+  ],
+  "detected_phonemes": [
+    {
+      "phoneme": "/aɪ/",
+      "start": 1.22,
+      "end": 1.24
+    },
+    {
+      "phoneme": "/k/",
+      "start": 1.421,
+      "end": 1.441
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 1.461,
+      "end": 1.481
+    },
+    {
+      "phoneme": "/m/",
+      "start": 1.521,
+      "end": 1.541
+    },
+    {
+      "phoneme": "/p/",
+      "start": 1.601,
+      "end": 1.621
+    },
+    {
+      "phoneme": "/l/",
+      "start": 1.681,
+      "end": 1.721
+    },
+    {
+      "phoneme": "/iː/",
+      "start": 1.721,
+      "end": 1.741
+    },
+    {
+      "phoneme": "/t/",
+      "start": 1.881,
+      "end": 1.921
+    },
+    {
+      "phoneme": "/l/",
+      "start": 1.941,
+      "end": 1.961
+    },
+    {
+      "phoneme": "/i/",
+      "start": 1.981,
+      "end": 2.002
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 2.102,
+      "end": 2.122
+    },
+    {
+      "phoneme": "/n/",
+      "start": 2.162,
+      "end": 2.202
+    },
+    {
+      "phoneme": "/d/",
+      "start": 2.242,
+      "end": 2.262
+    },
+    {
+      "phoneme": "/ɚ/",
+      "start": 2.262,
+      "end": 2.282
+    },
+    {
+      "phoneme": "/s/",
+      "start": 2.382,
+      "end": 2.402
+    },
+    {
+      "phoneme": "/t/",
+      "start": 2.502,
+      "end": 2.522
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 2.562,
+      "end": 2.582
+    },
+    {
+      "phoneme": "/n/",
+      "start": 2.803,
+      "end": 2.843
+    },
+    {
+      "phoneme": "/d/",
+      "start": 2.863,
+      "end": 2.883
+    },
+    {
+      "phoneme": "/ð/",
+      "start": 3.003,
+      "end": 3.023
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 3.063,
+      "end": 3.083
+    },
+    {
+      "phoneme": "/t/",
+      "start": 3.244,
+      "end": 3.264
+    },
+    {
+      "phoneme": "/b/",
+      "start": 3.404,
+      "end": 3.424
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 3.444,
+      "end": 3.464
+    },
+    {
+      "phoneme": "/dʒ/",
+      "start": 3.524,
+      "end": 3.544
+    },
+    {
+      "phoneme": "/ɛ/",
+      "start": 3.584,
+      "end": 3.604
+    },
+    {
+      "phoneme": "/t/",
+      "start": 3.724,
+      "end": 3.744
+    },
+    {
+      "phoneme": "/ɪ/",
+      "start": 3.785,
+      "end": 3.805
+    },
+    {
+      "phoneme": "/z/",
+      "start": 3.865,
+      "end": 3.885
+    },
+    {
+      "phoneme": "/ɐ/",
+      "start": 3.945,
+      "end": 3.965
+    },
+    {
+      "phoneme": "/p/",
+      "start": 4.065,
+      "end": 4.085
+    },
+    {
+      "phoneme": "/ɹ/",
+      "start": 4.145,
+      "end": 4.185
+    },
+    {
+      "phoneme": "/aɪ/",
+      "start": 4.205,
+      "end": 4.225
+    },
+    {
+      "phoneme": "/m/",
+      "start": 4.365,
+      "end": 4.386
+    },
+    {
+      "phoneme": "/ɪ/",
+      "start": 4.406,
+      "end": 4.426
+    },
+    {
+      "phoneme": "/ɹ/",
+      "start": 4.466,
+      "end": 4.486
+    },
+    {
+      "phoneme": "/i/",
+      "start": 4.486,
+      "end": 4.506
+    },
+    {
+      "phoneme": "/k/",
+      "start": 4.606,
+      "end": 4.626
+    },
+    {
+      "phoneme": "/ə/",
+      "start": 4.646,
+      "end": 4.666
+    },
+    {
+      "phoneme": "/n/",
+      "start": 4.746,
+      "end": 4.786
+    },
+    {
+      "phoneme": "/s/",
+      "start": 4.846,
+      "end": 4.866
+    },
+    {
+      "phoneme": "/ɚ/",
+      "start": 4.967,
+      "end": 4.987
+    },
+    {
+      "phoneme": "/n/",
+      "start": 5.247,
+      "end": 5.267
+    },
+    {
+      "phoneme": "/h/",
+      "start": 5.848,
+      "end": 5.868
+    },
+    {
+      "phoneme": "/aʊ/",
+      "start": 5.908,
+      "end": 5.928
+    },
+    {
+      "phoneme": "/ɛ/",
+      "start": 6.128,
+      "end": 6.148
+    },
+    {
+      "phoneme": "/v/",
+      "start": 6.269,
+      "end": 6.289
+    },
+    {
+      "phoneme": "/ɚ/",
+      "start": 6.329,
+      "end": 6.349
+    },
+    {
+      "phoneme": "/ɹ/",
+      "start": 6.81,
+      "end": 6.83
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 6.87,
+      "end": 6.89
+    },
+    {
+      "phoneme": "/ð/",
+      "start": 7.03,
+      "end": 7.05
+    },
+    {
+      "phoneme": "/ɚ/",
+      "start": 7.07,
+      "end": 7.09
+    },
+    {
+      "phoneme": "/ð/",
+      "start": 7.25,
+      "end": 7.27
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 7.31,
+      "end": 7.33
+    },
+    {
+      "phoneme": "/n/",
+      "start": 7.411,
+      "end": 7.431
+    },
+    {
+      "phoneme": "/l/",
+      "start": 7.531,
+      "end": 7.571
+    },
+    {
+      "phoneme": "/ʊ/",
+      "start": 7.571,
+      "end": 7.591
+    },
+    {
+      "phoneme": "/k/",
+      "start": 7.691,
+      "end": 7.711
+    },
+    {
+      "phoneme": "/ɪ/",
+      "start": 7.751,
+      "end": 7.771
+    },
+    {
+      "phoneme": "/ŋ/",
+      "start": 7.871,
+      "end": 7.911
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 8.072,
+      "end": 8.092
+    },
+    {
+      "phoneme": "/t/",
+      "start": 8.232,
+      "end": 8.252
+    },
+    {
+      "phoneme": "/ð/",
+      "start": 8.312,
+      "end": 8.332
+    },
+    {
+      "phoneme": "/ə/",
+      "start": 8.332,
+      "end": 8.352
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 8.492,
+      "end": 8.512
+    },
+    {
+      "phoneme": "/p/",
+      "start": 8.653,
+      "end": 8.673
+    },
+    {
+      "phoneme": "/f/",
+      "start": 8.733,
+      "end": 8.753
+    },
+    {
+      "phoneme": "/ɹ/",
+      "start": 8.813,
+      "end": 8.833
+    },
+    {
+      "phoneme": "/ə/",
+      "start": 8.833,
+      "end": 8.853
+    },
+    {
+      "phoneme": "/n/",
+      "start": 8.933,
+      "end": 8.953
+    },
+    {
+      "phoneme": "/t/",
+      "start": 9.013,
+      "end": 9.033
+    },
+    {
+      "phoneme": "/k/",
+      "start": 9.134,
+      "end": 9.154
+    },
+    {
+      "phoneme": "/ɔː/",
+      "start": 9.214,
+      "end": 9.234
+    },
+    {
+      "phoneme": "/z/",
+      "start": 9.514,
+      "end": 9.534
+    },
+    {
+      "phoneme": "/d/",
+      "start": 9.634,
+      "end": 9.654
+    },
+    {
+      "phoneme": "/l/",
+      "start": 9.795,
+      "end": 9.835
+    },
+    {
+      "phoneme": "/ɛ/",
+      "start": 9.835,
+      "end": 9.855
+    },
+    {
+      "phoneme": "/t/",
+      "start": 9.995,
+      "end": 10.015
+    },
+    {
+      "phoneme": "/s/",
+      "start": 10.035,
+      "end": 10.055
+    },
+    {
+      "phoneme": "/l/",
+      "start": 10.195,
+      "end": 10.215
+    },
+    {
+      "phoneme": "/ʊ/",
+      "start": 10.235,
+      "end": 10.255
+    },
+    {
+      "phoneme": "/k/",
+      "start": 10.376,
+      "end": 10.396
+    },
+    {
+      "phoneme": "/æ/",
+      "start": 10.536,
+      "end": 10.556
+    },
+    {
+      "phoneme": "/t/",
+      "start": 10.776,
+      "end": 10.796
+    },
+    {
+      "phoneme": "/w/",
+      "start": 10.876,
+      "end": 10.917
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 10.937,
+      "end": 10.957
+    },
+    {
+      "phoneme": "/t/",
+      "start": 11.097,
+      "end": 11.117
+    },
+    {
+      "phoneme": "/ð/",
+      "start": 11.217,
+      "end": 11.237
+    },
+    {
+      "phoneme": "/ɪ/",
+      "start": 11.257,
+      "end": 11.277
+    },
+    {
+      "phoneme": "/s/",
+      "start": 11.377,
+      "end": 11.397
+    },
+    {
+      "phoneme": "/ɪ/",
+      "start": 11.518,
+      "end": 11.538
+    },
+    {
+      "phoneme": "/n/",
+      "start": 11.598,
+      "end": 11.618
+    },
+    {
+      "phoneme": "/v/",
+      "start": 11.658,
+      "end": 11.678
+    },
+    {
+      "phoneme": "/ɛ/",
+      "start": 11.698,
+      "end": 11.718
+    },
+    {
+      "phoneme": "/s/",
+      "start": 11.778,
+      "end": 11.798
+    },
+    {
+      "phoneme": "/t/",
+      "start": 11.858,
+      "end": 11.898
+    },
+    {
+      "phoneme": "/m/",
+      "start": 11.958,
+      "end": 11.978
+    },
+    {
+      "phoneme": "/ə/",
+      "start": 11.998,
+      "end": 12.018
+    },
+    {
+      "phoneme": "/n/",
+      "start": 12.058,
+      "end": 12.099
+    },
+    {
+      "phoneme": "/t/",
+      "start": 12.099,
+      "end": 12.119
+    },
+    {
+      "phoneme": "/d/",
+      "start": 12.159,
+      "end": 12.179
+    },
+    {
+      "phoneme": "/ʌ/",
+      "start": 12.199,
+      "end": 12.219
+    },
+    {
+      "phoneme": "/z/",
+      "start": 12.279,
+      "end": 12.299
+    },
+    {
+      "phoneme": "/f/",
+      "start": 12.419,
+      "end": 12.439
+    },
+    {
+      "phoneme": "/ɜː/",
+      "start": 12.479,
+      "end": 12.499
+    },
+    {
+      "phoneme": "/j/",
+      "start": 12.579,
+      "end": 12.599
+    },
+    {
+      "phoneme": "/ɔːɹ/",
+      "start": 12.639,
+      "end": 12.659
+    },
+    {
+      "phoneme": "/t/",
+      "start": 12.84,
+      "end": 12.86
+    },
+    {
+      "phoneme": "/i/",
+      "start": 12.88,
+      "end": 12.9
+    }
+  ],
+  "acoustic_contours": {
+    "pitch_hz": [
+      {
+        "time": 0.0,
+        "hz": 291.6,
+        "voiced": false
+      },
+      {
+        "time": 0.032,
+        "hz": 409.7,
+        "voiced": false
+      },
+      {
+        "time": 0.064,
+        "hz": 409.7,
+        "voiced": false
+      },
+      {
+        "time": 0.096,
+        "hz": 291.6,
+        "voiced": false
+      },
+      {
+        "time": 0.128,
+        "hz": 203.8,
+        "voiced": false
+      },
+      {
+        "time": 0.16,
+        "hz": 185.2,
+        "voiced": false
+      },
+      {
+        "time": 0.192,
+        "hz": 176.0,
+        "voiced": false
+      },
+      {
+        "time": 0.224,
+        "hz": 176.0,
+        "voiced": false
+      },
+      {
+        "time": 0.256,
+        "hz": 176.0,
+        "voiced": false
+      },
+      {
+        "time": 0.288,
+        "hz": 500.0,
+        "voiced": false
+      },
+      {
+        "time": 0.32,
+        "hz": 500.0,
+        "voiced": false
+      },
+      {
+        "time": 0.352,
+        "hz": 500.0,
+        "voiced": false
+      },
+      {
+        "time": 0.384,
+        "hz": 500.0,
+        "voiced": false
+      },
+      {
+        "time": 0.416,
+        "hz": 128.8,
+        "voiced": false
+      },
+      {
+        "time": 0.448,
+        "hz": 127.0,
+        "voiced": false
+      },
+      {
+        "time": 0.48,
+        "hz": 91.9,
+        "voiced": false
+      },
+      {
+        "time": 0.512,
+        "hz": 84.2,
+        "voiced": false
+      },
+      {
+        "time": 0.544,
+        "hz": 84.2,
+        "voiced": false
+      },
+      {
+        "time": 0.576,
+        "hz": 91.9,
+        "voiced": false
+      },
+      {
+        "time": 0.608,
+        "hz": 87.5,
+        "voiced": false
+      },
+      {
+        "time": 0.64,
+        "hz": 87.5,
+        "voiced": false
+      },
+      {
+        "time": 0.672,
+        "hz": 87.5,
+        "voiced": false
+      },
+      {
+        "time": 0.704,
+        "hz": 82.9,
+        "voiced": false
+      },
+      {
+        "time": 0.736,
+        "hz": 81.6,
+        "voiced": false
+      },
+      {
+        "time": 0.768,
+        "hz": 78.7,
+        "voiced": false
+      },
+      {
+        "time": 0.8,
+        "hz": 78.7,
+        "voiced": false
+      },
+      {
+        "time": 0.832,
+        "hz": 81.6,
+        "voiced": false
+      },
+      {
+        "time": 0.864,
+        "hz": 78.7,
+        "voiced": false
+      },
+      {
+        "time": 0.896,
+        "hz": 78.7,
+        "voiced": false
+      },
+      {
+        "time": 0.928,
+        "hz": 78.2,
+        "voiced": false
+      },
+      {
+        "time": 0.96,
+        "hz": 78.2,
+        "voiced": false
+      },
+      {
+        "time": 0.992,
+        "hz": 78.2,
+        "voiced": false
+      },
+      {
+        "time": 1.024,
+        "hz": 465.9,
+        "voiced": false
+      },
+      {
+        "time": 1.056,
+        "hz": 465.9,
+        "voiced": false
+      },
+      {
+        "time": 1.088,
+        "hz": 465.9,
+        "voiced": false
+      },
+      {
+        "time": 1.12,
+        "hz": 463.9,
+        "voiced": false
+      },
+      {
+        "time": 1.152,
+        "hz": 241.7,
+        "voiced": false
+      },
+      {
+        "time": 1.184,
+        "hz": 105.7,
+        "voiced": false
+      },
+      {
+        "time": 1.216,
+        "hz": 105.0,
+        "voiced": true
+      },
+      {
+        "time": 1.248,
+        "hz": 105.0,
+        "voiced": true
+      },
+      {
+        "time": 1.28,
+        "hz": 105.0,
+        "voiced": true
+      },
+      {
+        "time": 1.312,
+        "hz": 208.0,
+        "voiced": true
+      },
+      {
+        "time": 1.344,
+        "hz": 208.9,
+        "voiced": true
+      },
+      {
+        "time": 1.376,
+        "hz": 208.9,
+        "voiced": false
+      },
+      {
+        "time": 1.408,
+        "hz": 208.9,
+        "voiced": false
+      },
+      {
+        "time": 1.44,
+        "hz": 200.7,
+        "voiced": true
+      },
+      {
+        "time": 1.472,
+        "hz": 200.0,
+        "voiced": true
+      },
+      {
+        "time": 1.504,
+        "hz": 199.5,
+        "voiced": true
+      },
+      {
+        "time": 1.536,
+        "hz": 199.5,
+        "voiced": true
+      },
+      {
+        "time": 1.568,
+        "hz": 199.5,
+        "voiced": true
+      },
+      {
+        "time": 1.6,
+        "hz": 200.3,
+        "voiced": true
+      },
+      {
+        "time": 1.632,
+        "hz": 202.2,
+        "voiced": true
+      },
+      {
+        "time": 1.664,
+        "hz": 203.4,
+        "voiced": true
+      },
+      {
+        "time": 1.696,
+        "hz": 210.1,
+        "voiced": true
+      },
+      {
+        "time": 1.728,
+        "hz": 218.1,
+        "voiced": true
+      },
+      {
+        "time": 1.76,
+        "hz": 225.5,
+        "voiced": true
+      },
+      {
+        "time": 1.792,
+        "hz": 229.7,
+        "voiced": true
+      },
+      {
+        "time": 1.824,
+        "hz": 234.0,
+        "voiced": true
+      },
+      {
+        "time": 1.856,
+        "hz": 236.2,
+        "voiced": false
+      },
+      {
+        "time": 1.888,
+        "hz": 250.6,
+        "voiced": false
+      },
+      {
+        "time": 1.92,
+        "hz": 252.1,
+        "voiced": true
+      },
+      {
+        "time": 1.952,
+        "hz": 252.1,
+        "voiced": true
+      },
+      {
+        "time": 1.984,
+        "hz": 250.6,
+        "voiced": true
+      },
+      {
+        "time": 2.016,
+        "hz": 250.3,
+        "voiced": true
+      },
+      {
+        "time": 2.048,
+        "hz": 250.2,
+        "voiced": true
+      },
+      {
+        "time": 2.08,
+        "hz": 248.4,
+        "voiced": true
+      },
+      {
+        "time": 2.112,
+        "hz": 239.5,
+        "voiced": true
+      },
+      {
+        "time": 2.144,
+        "hz": 204.1,
+        "voiced": true
+      },
+      {
+        "time": 2.176,
+        "hz": 201.5,
+        "voiced": true
+      },
+      {
+        "time": 2.208,
+        "hz": 197.1,
+        "voiced": true
+      },
+      {
+        "time": 2.24,
+        "hz": 197.1,
+        "voiced": true
+      },
+      {
+        "time": 2.272,
+        "hz": 197.0,
+        "voiced": true
+      },
+      {
+        "time": 2.304,
+        "hz": 197.1,
+        "voiced": true
+      },
+      {
+        "time": 2.336,
+        "hz": 197.2,
+        "voiced": true
+      },
+      {
+        "time": 2.368,
+        "hz": 197.2,
+        "voiced": false
+      },
+      {
+        "time": 2.4,
+        "hz": 196.9,
+        "voiced": false
+      },
+      {
+        "time": 2.432,
+        "hz": 199.9,
+        "voiced": false
+      },
+      {
+        "time": 2.464,
+        "hz": 200.3,
+        "voiced": false
+      },
+      {
+        "time": 2.496,
+        "hz": 207.4,
+        "voiced": true
+      },
+      {
+        "time": 2.528,
+        "hz": 207.4,
+        "voiced": true
+      },
+      {
+        "time": 2.56,
+        "hz": 207.4,
+        "voiced": true
+      },
+      {
+        "time": 2.592,
+        "hz": 206.6,
+        "voiced": true
+      },
+      {
+        "time": 2.624,
+        "hz": 205.0,
+        "voiced": true
+      },
+      {
+        "time": 2.656,
+        "hz": 202.1,
+        "voiced": true
+      },
+      {
+        "time": 2.688,
+        "hz": 196.9,
+        "voiced": true
+      },
+      {
+        "time": 2.72,
+        "hz": 162.8,
+        "voiced": true
+      },
+      {
+        "time": 2.752,
+        "hz": 162.8,
+        "voiced": true
+      },
+      {
+        "time": 2.784,
+        "hz": 162.8,
+        "voiced": true
+      },
+      {
+        "time": 2.816,
+        "hz": 164.1,
+        "voiced": true
+      },
+      {
+        "time": 2.848,
+        "hz": 181.8,
+        "voiced": true
+      },
+      {
+        "time": 2.88,
+        "hz": 182.2,
+        "voiced": true
+      },
+      {
+        "time": 2.912,
+        "hz": 182.2,
+        "voiced": true
+      },
+      {
+        "time": 2.944,
+        "hz": 182.2,
+        "voiced": true
+      },
+      {
+        "time": 2.976,
+        "hz": 179.2,
+        "voiced": false
+      },
+      {
+        "time": 3.008,
+        "hz": 172.2,
+        "voiced": true
+      },
+      {
+        "time": 3.04,
+        "hz": 170.2,
+        "voiced": true
+      },
+      {
+        "time": 3.072,
+        "hz": 168.8,
+        "voiced": true
+      },
+      {
+        "time": 3.104,
+        "hz": 167.9,
+        "voiced": true
+      },
+      {
+        "time": 3.136,
+        "hz": 166.3,
+        "voiced": true
+      },
+      {
+        "time": 3.168,
+        "hz": 164.8,
+        "voiced": true
+      },
+      {
+        "time": 3.2,
+        "hz": 164.8,
+        "voiced": true
+      },
+      {
+        "time": 3.232,
+        "hz": 164.8,
+        "voiced": false
+      },
+      {
+        "time": 3.264,
+        "hz": 172.1,
+        "voiced": true
+      },
+      {
+        "time": 3.296,
+        "hz": 172.1,
+        "voiced": true
+      },
+      {
+        "time": 3.328,
+        "hz": 172.1,
+        "voiced": true
+      },
+      {
+        "time": 3.36,
+        "hz": 171.8,
+        "voiced": true
+      },
+      {
+        "time": 3.392,
+        "hz": 164.7,
+        "voiced": true
+      },
+      {
+        "time": 3.424,
+        "hz": 164.4,
+        "voiced": true
+      },
+      {
+        "time": 3.456,
+        "hz": 164.4,
+        "voiced": true
+      },
+      {
+        "time": 3.488,
+        "hz": 164.4,
+        "voiced": true
+      },
+      {
+        "time": 3.52,
+        "hz": 168.5,
+        "voiced": true
+      },
+      {
+        "time": 3.552,
+        "hz": 178.9,
+        "voiced": true
+      },
+      {
+        "time": 3.584,
+        "hz": 180.2,
+        "voiced": true
+      },
+      {
+        "time": 3.616,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.648,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.68,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.712,
+        "hz": 93.4,
+        "voiced": false
+      },
+      {
+        "time": 3.744,
+        "hz": 91.3,
+        "voiced": true
+      },
+      {
+        "time": 3.776,
+        "hz": 91.3,
+        "voiced": true
+      },
+      {
+        "time": 3.808,
+        "hz": 91.3,
+        "voiced": true
+      },
+      {
+        "time": 3.84,
+        "hz": 178.6,
+        "voiced": false
+      },
+      {
+        "time": 3.872,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.904,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.936,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 3.968,
+        "hz": 180.3,
+        "voiced": true
+      },
+      {
+        "time": 4.0,
+        "hz": 179.6,
+        "voiced": true
+      },
+      {
+        "time": 4.032,
+        "hz": 172.7,
+        "voiced": false
+      },
+      {
+        "time": 4.064,
+        "hz": 171.9,
+        "voiced": false
+      },
+      {
+        "time": 4.096,
+        "hz": 167.3,
+        "voiced": false
+      },
+      {
+        "time": 4.128,
+        "hz": 159.2,
+        "voiced": true
+      },
+      {
+        "time": 4.16,
+        "hz": 154.6,
+        "voiced": true
+      },
+      {
+        "time": 4.192,
+        "hz": 153.3,
+        "voiced": true
+      },
+      {
+        "time": 4.224,
+        "hz": 153.3,
+        "voiced": true
+      },
+      {
+        "time": 4.256,
+        "hz": 153.3,
+        "voiced": true
+      },
+      {
+        "time": 4.288,
+        "hz": 153.6,
+        "voiced": true
+      },
+      {
+        "time": 4.32,
+        "hz": 155.5,
+        "voiced": true
+      },
+      {
+        "time": 4.352,
+        "hz": 156.7,
+        "voiced": true
+      },
+      {
+        "time": 4.384,
+        "hz": 158.9,
+        "voiced": true
+      },
+      {
+        "time": 4.416,
+        "hz": 159.8,
+        "voiced": true
+      },
+      {
+        "time": 4.448,
+        "hz": 162.4,
+        "voiced": true
+      },
+      {
+        "time": 4.48,
+        "hz": 163.4,
+        "voiced": true
+      },
+      {
+        "time": 4.512,
+        "hz": 164.1,
+        "voiced": true
+      },
+      {
+        "time": 4.544,
+        "hz": 164.9,
+        "voiced": true
+      },
+      {
+        "time": 4.576,
+        "hz": 165.2,
+        "voiced": false
+      },
+      {
+        "time": 4.608,
+        "hz": 165.2,
+        "voiced": true
+      },
+      {
+        "time": 4.64,
+        "hz": 165.2,
+        "voiced": true
+      },
+      {
+        "time": 4.672,
+        "hz": 164.8,
+        "voiced": true
+      },
+      {
+        "time": 4.704,
+        "hz": 164.3,
+        "voiced": true
+      },
+      {
+        "time": 4.736,
+        "hz": 159.1,
+        "voiced": true
+      },
+      {
+        "time": 4.768,
+        "hz": 158.4,
+        "voiced": true
+      },
+      {
+        "time": 4.8,
+        "hz": 158.4,
+        "voiced": false
+      },
+      {
+        "time": 4.832,
+        "hz": 158.4,
+        "voiced": false
+      },
+      {
+        "time": 4.864,
+        "hz": 158.6,
+        "voiced": false
+      },
+      {
+        "time": 4.896,
+        "hz": 163.7,
+        "voiced": false
+      },
+      {
+        "time": 4.928,
+        "hz": 163.7,
+        "voiced": true
+      },
+      {
+        "time": 4.96,
+        "hz": 163.7,
+        "voiced": true
+      },
+      {
+        "time": 4.992,
+        "hz": 163.5,
+        "voiced": true
+      },
+      {
+        "time": 5.024,
+        "hz": 162.9,
+        "voiced": true
+      },
+      {
+        "time": 5.056,
+        "hz": 162.2,
+        "voiced": true
+      },
+      {
+        "time": 5.088,
+        "hz": 160.5,
+        "voiced": true
+      },
+      {
+        "time": 5.12,
+        "hz": 141.9,
+        "voiced": true
+      },
+      {
+        "time": 5.152,
+        "hz": 141.9,
+        "voiced": true
+      },
+      {
+        "time": 5.184,
+        "hz": 141.9,
+        "voiced": true
+      },
+      {
+        "time": 5.216,
+        "hz": 168.6,
+        "voiced": true
+      },
+      {
+        "time": 5.248,
+        "hz": 190.9,
+        "voiced": true
+      },
+      {
+        "time": 5.28,
+        "hz": 195.9,
+        "voiced": true
+      },
+      {
+        "time": 5.312,
+        "hz": 202.1,
+        "voiced": true
+      },
+      {
+        "time": 5.344,
+        "hz": 202.1,
+        "voiced": true
+      },
+      {
+        "time": 5.376,
+        "hz": 202.1,
+        "voiced": false
+      },
+      {
+        "time": 5.408,
+        "hz": 148.3,
+        "voiced": false
+      },
+      {
+        "time": 5.44,
+        "hz": 147.6,
+        "voiced": false
+      },
+      {
+        "time": 5.472,
+        "hz": 147.6,
+        "voiced": false
+      },
+      {
+        "time": 5.504,
+        "hz": 147.6,
+        "voiced": false
+      },
+      {
+        "time": 5.536,
+        "hz": 161.8,
+        "voiced": false
+      },
+      {
+        "time": 5.568,
+        "hz": 163.4,
+        "voiced": false
+      },
+      {
+        "time": 5.6,
+        "hz": 163.4,
+        "voiced": false
+      },
+      {
+        "time": 5.632,
+        "hz": 163.4,
+        "voiced": false
+      },
+      {
+        "time": 5.664,
+        "hz": 163.4,
+        "voiced": false
+      },
+      {
+        "time": 5.696,
+        "hz": 163.4,
+        "voiced": false
+      },
+      {
+        "time": 5.728,
+        "hz": 253.1,
+        "voiced": false
+      },
+      {
+        "time": 5.76,
+        "hz": 288.8,
+        "voiced": false
+      },
+      {
+        "time": 5.792,
+        "hz": 253.1,
+        "voiced": false
+      },
+      {
+        "time": 5.824,
+        "hz": 204.4,
+        "voiced": false
+      },
+      {
+        "time": 5.856,
+        "hz": 208.4,
+        "voiced": true
+      },
+      {
+        "time": 5.888,
+        "hz": 208.4,
+        "voiced": true
+      },
+      {
+        "time": 5.92,
+        "hz": 208.4,
+        "voiced": true
+      },
+      {
+        "time": 5.952,
+        "hz": 212.8,
+        "voiced": true
+      },
+      {
+        "time": 5.984,
+        "hz": 217.0,
+        "voiced": true
+      },
+      {
+        "time": 6.016,
+        "hz": 226.8,
+        "voiced": true
+      },
+      {
+        "time": 6.048,
+        "hz": 238.5,
+        "voiced": true
+      },
+      {
+        "time": 6.08,
+        "hz": 238.5,
+        "voiced": true
+      },
+      {
+        "time": 6.112,
+        "hz": 238.5,
+        "voiced": true
+      },
+      {
+        "time": 6.144,
+        "hz": 236.4,
+        "voiced": true
+      },
+      {
+        "time": 6.176,
+        "hz": 198.5,
+        "voiced": true
+      },
+      {
+        "time": 6.208,
+        "hz": 191.3,
+        "voiced": true
+      },
+      {
+        "time": 6.24,
+        "hz": 175.2,
+        "voiced": true
+      },
+      {
+        "time": 6.272,
+        "hz": 156.9,
+        "voiced": false
+      },
+      {
+        "time": 6.304,
+        "hz": 154.0,
+        "voiced": true
+      },
+      {
+        "time": 6.336,
+        "hz": 149.8,
+        "voiced": true
+      },
+      {
+        "time": 6.368,
+        "hz": 148.6,
+        "voiced": true
+      },
+      {
+        "time": 6.4,
+        "hz": 148.6,
+        "voiced": true
+      },
+      {
+        "time": 6.432,
+        "hz": 148.6,
+        "voiced": true
+      },
+      {
+        "time": 6.464,
+        "hz": 153.2,
+        "voiced": true
+      },
+      {
+        "time": 6.496,
+        "hz": 160.8,
+        "voiced": true
+      },
+      {
+        "time": 6.528,
+        "hz": 165.9,
+        "voiced": false
+      },
+      {
+        "time": 6.56,
+        "hz": 165.9,
+        "voiced": false
+      },
+      {
+        "time": 6.592,
+        "hz": 165.9,
+        "voiced": false
+      },
+      {
+        "time": 6.624,
+        "hz": 172.4,
+        "voiced": false
+      },
+      {
+        "time": 6.656,
+        "hz": 169.2,
+        "voiced": false
+      },
+      {
+        "time": 6.688,
+        "hz": 169.1,
+        "voiced": true
+      },
+      {
+        "time": 6.72,
+        "hz": 169.1,
+        "voiced": true
+      },
+      {
+        "time": 6.752,
+        "hz": 169.1,
+        "voiced": true
+      },
+      {
+        "time": 6.784,
+        "hz": 168.9,
+        "voiced": true
+      },
+      {
+        "time": 6.816,
+        "hz": 164.0,
+        "voiced": true
+      },
+      {
+        "time": 6.848,
+        "hz": 162.0,
+        "voiced": true
+      },
+      {
+        "time": 6.88,
+        "hz": 161.3,
+        "voiced": true
+      },
+      {
+        "time": 6.912,
+        "hz": 160.2,
+        "voiced": true
+      },
+      {
+        "time": 6.944,
+        "hz": 160.2,
+        "voiced": false
+      },
+      {
+        "time": 6.976,
+        "hz": 159.0,
+        "voiced": false
+      },
+      {
+        "time": 7.008,
+        "hz": 158.0,
+        "voiced": false
+      },
+      {
+        "time": 7.04,
+        "hz": 107.9,
+        "voiced": true
+      },
+      {
+        "time": 7.072,
+        "hz": 107.8,
+        "voiced": true
+      },
+      {
+        "time": 7.104,
+        "hz": 107.8,
+        "voiced": true
+      },
+      {
+        "time": 7.136,
+        "hz": 107.8,
+        "voiced": true
+      },
+      {
+        "time": 7.168,
+        "hz": 107.9,
+        "voiced": true
+      },
+      {
+        "time": 7.2,
+        "hz": 110.8,
+        "voiced": false
+      },
+      {
+        "time": 7.232,
+        "hz": 185.2,
+        "voiced": true
+      },
+      {
+        "time": 7.264,
+        "hz": 185.2,
+        "voiced": true
+      },
+      {
+        "time": 7.296,
+        "hz": 185.2,
+        "voiced": true
+      },
+      {
+        "time": 7.328,
+        "hz": 184.8,
+        "voiced": true
+      },
+      {
+        "time": 7.36,
+        "hz": 183.4,
+        "voiced": true
+      },
+      {
+        "time": 7.392,
+        "hz": 179.0,
+        "voiced": true
+      },
+      {
+        "time": 7.424,
+        "hz": 173.3,
+        "voiced": true
+      },
+      {
+        "time": 7.456,
+        "hz": 173.3,
+        "voiced": true
+      },
+      {
+        "time": 7.488,
+        "hz": 173.3,
+        "voiced": true
+      },
+      {
+        "time": 7.52,
+        "hz": 182.2,
+        "voiced": true
+      },
+      {
+        "time": 7.552,
+        "hz": 183.4,
+        "voiced": true
+      },
+      {
+        "time": 7.584,
+        "hz": 183.4,
+        "voiced": true
+      },
+      {
+        "time": 7.616,
+        "hz": 185.8,
+        "voiced": true
+      },
+      {
+        "time": 7.648,
+        "hz": 185.8,
+        "voiced": false
+      },
+      {
+        "time": 7.68,
+        "hz": 176.7,
+        "voiced": false
+      },
+      {
+        "time": 7.712,
+        "hz": 173.1,
+        "voiced": true
+      },
+      {
+        "time": 7.744,
+        "hz": 172.6,
+        "voiced": true
+      },
+      {
+        "time": 7.776,
+        "hz": 171.6,
+        "voiced": true
+      },
+      {
+        "time": 7.808,
+        "hz": 171.6,
+        "voiced": true
+      },
+      {
+        "time": 7.84,
+        "hz": 171.6,
+        "voiced": true
+      },
+      {
+        "time": 7.872,
+        "hz": 172.2,
+        "voiced": true
+      },
+      {
+        "time": 7.904,
+        "hz": 176.3,
+        "voiced": true
+      },
+      {
+        "time": 7.936,
+        "hz": 181.1,
+        "voiced": false
+      },
+      {
+        "time": 7.968,
+        "hz": 181.1,
+        "voiced": false
+      },
+      {
+        "time": 8.0,
+        "hz": 181.1,
+        "voiced": false
+      },
+      {
+        "time": 8.032,
+        "hz": 175.6,
+        "voiced": false
+      },
+      {
+        "time": 8.064,
+        "hz": 175.5,
+        "voiced": false
+      },
+      {
+        "time": 8.096,
+        "hz": 175.5,
+        "voiced": true
+      },
+      {
+        "time": 8.128,
+        "hz": 175.6,
+        "voiced": true
+      },
+      {
+        "time": 8.16,
+        "hz": 175.6,
+        "voiced": false
+      },
+      {
+        "time": 8.192,
+        "hz": 175.5,
+        "voiced": false
+      },
+      {
+        "time": 8.224,
+        "hz": 177.1,
+        "voiced": false
+      },
+      {
+        "time": 8.256,
+        "hz": 169.4,
+        "voiced": false
+      },
+      {
+        "time": 8.288,
+        "hz": 86.4,
+        "voiced": false
+      },
+      {
+        "time": 8.32,
+        "hz": 86.4,
+        "voiced": true
+      },
+      {
+        "time": 8.352,
+        "hz": 86.4,
+        "voiced": true
+      },
+      {
+        "time": 8.384,
+        "hz": 86.4,
+        "voiced": true
+      },
+      {
+        "time": 8.416,
+        "hz": 192.6,
+        "voiced": false
+      },
+      {
+        "time": 8.448,
+        "hz": 192.9,
+        "voiced": true
+      },
+      {
+        "time": 8.48,
+        "hz": 192.9,
+        "voiced": true
+      },
+      {
+        "time": 8.512,
+        "hz": 192.8,
+        "voiced": true
+      },
+      {
+        "time": 8.544,
+        "hz": 192.8,
+        "voiced": true
+      },
+      {
+        "time": 8.576,
+        "hz": 192.3,
+        "voiced": true
+      },
+      {
+        "time": 8.608,
+        "hz": 182.6,
+        "voiced": false
+      },
+      {
+        "time": 8.64,
+        "hz": 167.3,
+        "voiced": false
+      },
+      {
+        "time": 8.672,
+        "hz": 167.3,
+        "voiced": false
+      },
+      {
+        "time": 8.704,
+        "hz": 167.3,
+        "voiced": false
+      },
+      {
+        "time": 8.736,
+        "hz": 196.3,
+        "voiced": true
+      },
+      {
+        "time": 8.768,
+        "hz": 204.7,
+        "voiced": true
+      },
+      {
+        "time": 8.8,
+        "hz": 207.0,
+        "voiced": true
+      },
+      {
+        "time": 8.832,
+        "hz": 207.2,
+        "voiced": true
+      },
+      {
+        "time": 8.864,
+        "hz": 207.6,
+        "voiced": true
+      },
+      {
+        "time": 8.896,
+        "hz": 207.6,
+        "voiced": true
+      },
+      {
+        "time": 8.928,
+        "hz": 207.6,
+        "voiced": true
+      },
+      {
+        "time": 8.96,
+        "hz": 207.6,
+        "voiced": true
+      },
+      {
+        "time": 8.992,
+        "hz": 207.6,
+        "voiced": true
+      },
+      {
+        "time": 9.024,
+        "hz": 273.3,
+        "voiced": false
+      },
+      {
+        "time": 9.056,
+        "hz": 273.3,
+        "voiced": false
+      },
+      {
+        "time": 9.088,
+        "hz": 273.3,
+        "voiced": false
+      },
+      {
+        "time": 9.12,
+        "hz": 199.4,
+        "voiced": true
+      },
+      {
+        "time": 9.152,
+        "hz": 198.6,
+        "voiced": true
+      },
+      {
+        "time": 9.184,
+        "hz": 197.7,
+        "voiced": true
+      },
+      {
+        "time": 9.216,
+        "hz": 197.7,
+        "voiced": true
+      },
+      {
+        "time": 9.248,
+        "hz": 197.0,
+        "voiced": true
+      },
+      {
+        "time": 9.28,
+        "hz": 193.1,
+        "voiced": true
+      },
+      {
+        "time": 9.312,
+        "hz": 186.3,
+        "voiced": true
+      },
+      {
+        "time": 9.344,
+        "hz": 171.1,
+        "voiced": true
+      },
+      {
+        "time": 9.376,
+        "hz": 171.1,
+        "voiced": true
+      },
+      {
+        "time": 9.408,
+        "hz": 171.1,
+        "voiced": false
+      },
+      {
+        "time": 9.44,
+        "hz": 174.0,
+        "voiced": false
+      },
+      {
+        "time": 9.472,
+        "hz": 174.0,
+        "voiced": false
+      },
+      {
+        "time": 9.504,
+        "hz": 177.9,
+        "voiced": false
+      },
+      {
+        "time": 9.536,
+        "hz": 178.4,
+        "voiced": false
+      },
+      {
+        "time": 9.568,
+        "hz": 334.8,
+        "voiced": false
+      },
+      {
+        "time": 9.6,
+        "hz": 334.8,
+        "voiced": false
+      },
+      {
+        "time": 9.632,
+        "hz": 334.8,
+        "voiced": false
+      },
+      {
+        "time": 9.664,
+        "hz": 190.2,
+        "voiced": false
+      },
+      {
+        "time": 9.696,
+        "hz": 177.3,
+        "voiced": true
+      },
+      {
+        "time": 9.728,
+        "hz": 177.3,
+        "voiced": true
+      },
+      {
+        "time": 9.76,
+        "hz": 177.3,
+        "voiced": true
+      },
+      {
+        "time": 9.792,
+        "hz": 181.5,
+        "voiced": true
+      },
+      {
+        "time": 9.824,
+        "hz": 183.8,
+        "voiced": true
+      },
+      {
+        "time": 9.856,
+        "hz": 184.6,
+        "voiced": true
+      },
+      {
+        "time": 9.888,
+        "hz": 184.8,
+        "voiced": true
+      },
+      {
+        "time": 9.92,
+        "hz": 184.8,
+        "voiced": true
+      },
+      {
+        "time": 9.952,
+        "hz": 184.6,
+        "voiced": false
+      },
+      {
+        "time": 9.984,
+        "hz": 184.6,
+        "voiced": false
+      },
+      {
+        "time": 10.016,
+        "hz": 185.9,
+        "voiced": false
+      },
+      {
+        "time": 10.048,
+        "hz": 206.6,
+        "voiced": false
+      },
+      {
+        "time": 10.08,
+        "hz": 206.6,
+        "voiced": true
+      },
+      {
+        "time": 10.112,
+        "hz": 206.9,
+        "voiced": true
+      },
+      {
+        "time": 10.144,
+        "hz": 206.9,
+        "voiced": true
+      },
+      {
+        "time": 10.176,
+        "hz": 208.8,
+        "voiced": true
+      },
+      {
+        "time": 10.208,
+        "hz": 209.3,
+        "voiced": true
+      },
+      {
+        "time": 10.24,
+        "hz": 209.3,
+        "voiced": true
+      },
+      {
+        "time": 10.272,
+        "hz": 212.2,
+        "voiced": true
+      },
+      {
+        "time": 10.304,
+        "hz": 213.2,
+        "voiced": false
+      },
+      {
+        "time": 10.336,
+        "hz": 445.3,
+        "voiced": false
+      },
+      {
+        "time": 10.368,
+        "hz": 445.3,
+        "voiced": false
+      },
+      {
+        "time": 10.4,
+        "hz": 445.3,
+        "voiced": false
+      },
+      {
+        "time": 10.432,
+        "hz": 429.7,
+        "voiced": false
+      },
+      {
+        "time": 10.464,
+        "hz": 177.3,
+        "voiced": true
+      },
+      {
+        "time": 10.496,
+        "hz": 175.3,
+        "voiced": true
+      },
+      {
+        "time": 10.528,
+        "hz": 175.1,
+        "voiced": true
+      },
+      {
+        "time": 10.56,
+        "hz": 174.9,
+        "voiced": true
+      },
+      {
+        "time": 10.592,
+        "hz": 174.9,
+        "voiced": true
+      },
+      {
+        "time": 10.624,
+        "hz": 175.1,
+        "voiced": true
+      },
+      {
+        "time": 10.656,
+        "hz": 177.0,
+        "voiced": false
+      },
+      {
+        "time": 10.688,
+        "hz": 177.4,
+        "voiced": false
+      },
+      {
+        "time": 10.72,
+        "hz": 178.5,
+        "voiced": false
+      },
+      {
+        "time": 10.752,
+        "hz": 180.3,
+        "voiced": false
+      },
+      {
+        "time": 10.784,
+        "hz": 179.2,
+        "voiced": false
+      },
+      {
+        "time": 10.816,
+        "hz": 179.2,
+        "voiced": true
+      },
+      {
+        "time": 10.848,
+        "hz": 179.2,
+        "voiced": true
+      },
+      {
+        "time": 10.88,
+        "hz": 179.1,
+        "voiced": true
+      },
+      {
+        "time": 10.912,
+        "hz": 178.5,
+        "voiced": true
+      },
+      {
+        "time": 10.944,
+        "hz": 178.1,
+        "voiced": true
+      },
+      {
+        "time": 10.976,
+        "hz": 177.8,
+        "voiced": true
+      },
+      {
+        "time": 11.008,
+        "hz": 177.8,
+        "voiced": true
+      },
+      {
+        "time": 11.04,
+        "hz": 176.9,
+        "voiced": false
+      },
+      {
+        "time": 11.072,
+        "hz": 176.2,
+        "voiced": false
+      },
+      {
+        "time": 11.104,
+        "hz": 175.5,
+        "voiced": false
+      },
+      {
+        "time": 11.136,
+        "hz": 171.3,
+        "voiced": false
+      },
+      {
+        "time": 11.168,
+        "hz": 170.5,
+        "voiced": false
+      },
+      {
+        "time": 11.2,
+        "hz": 162.4,
+        "voiced": true
+      },
+      {
+        "time": 11.232,
+        "hz": 162.4,
+        "voiced": true
+      },
+      {
+        "time": 11.264,
+        "hz": 162.4,
+        "voiced": true
+      },
+      {
+        "time": 11.296,
+        "hz": 162.4,
+        "voiced": true
+      },
+      {
+        "time": 11.328,
+        "hz": 163.0,
+        "voiced": true
+      },
+      {
+        "time": 11.36,
+        "hz": 163.0,
+        "voiced": true
+      },
+      {
+        "time": 11.392,
+        "hz": 163.2,
+        "voiced": false
+      },
+      {
+        "time": 11.424,
+        "hz": 163.8,
+        "voiced": false
+      },
+      {
+        "time": 11.456,
+        "hz": 169.3,
+        "voiced": false
+      },
+      {
+        "time": 11.488,
+        "hz": 171.0,
+        "voiced": false
+      },
+      {
+        "time": 11.52,
+        "hz": 174.4,
+        "voiced": true
+      },
+      {
+        "time": 11.552,
+        "hz": 174.4,
+        "voiced": true
+      },
+      {
+        "time": 11.584,
+        "hz": 176.7,
+        "voiced": true
+      },
+      {
+        "time": 11.616,
+        "hz": 182.0,
+        "voiced": true
+      },
+      {
+        "time": 11.648,
+        "hz": 182.0,
+        "voiced": true
+      },
+      {
+        "time": 11.68,
+        "hz": 182.0,
+        "voiced": true
+      },
+      {
+        "time": 11.712,
+        "hz": 182.0,
+        "voiced": true
+      },
+      {
+        "time": 11.744,
+        "hz": 179.9,
+        "voiced": true
+      },
+      {
+        "time": 11.776,
+        "hz": 179.5,
+        "voiced": false
+      },
+      {
+        "time": 11.808,
+        "hz": 175.1,
+        "voiced": false
+      },
+      {
+        "time": 11.84,
+        "hz": 175.1,
+        "voiced": false
+      },
+      {
+        "time": 11.872,
+        "hz": 175.1,
+        "voiced": false
+      },
+      {
+        "time": 11.904,
+        "hz": 178.5,
+        "voiced": false
+      },
+      {
+        "time": 11.936,
+        "hz": 178.5,
+        "voiced": false
+      },
+      {
+        "time": 11.968,
+        "hz": 178.5,
+        "voiced": true
+      },
+      {
+        "time": 12.0,
+        "hz": 178.4,
+        "voiced": true
+      },
+      {
+        "time": 12.032,
+        "hz": 178.1,
+        "voiced": true
+      },
+      {
+        "time": 12.064,
+        "hz": 177.5,
+        "voiced": true
+      },
+      {
+        "time": 12.096,
+        "hz": 176.8,
+        "voiced": true
+      },
+      {
+        "time": 12.128,
+        "hz": 86.3,
+        "voiced": true
+      },
+      {
+        "time": 12.16,
+        "hz": 86.3,
+        "voiced": true
+      },
+      {
+        "time": 12.192,
+        "hz": 86.3,
+        "voiced": true
+      },
+      {
+        "time": 12.224,
+        "hz": 168.0,
+        "voiced": true
+      },
+      {
+        "time": 12.256,
+        "hz": 168.3,
+        "voiced": true
+      },
+      {
+        "time": 12.288,
+        "hz": 168.3,
+        "voiced": false
+      },
+      {
+        "time": 12.32,
+        "hz": 168.3,
+        "voiced": false
+      },
+      {
+        "time": 12.352,
+        "hz": 168.3,
+        "voiced": false
+      },
+      {
+        "time": 12.384,
+        "hz": 168.8,
+        "voiced": false
+      },
+      {
+        "time": 12.416,
+        "hz": 168.8,
+        "voiced": true
+      },
+      {
+        "time": 12.448,
+        "hz": 168.8,
+        "voiced": true
+      },
+      {
+        "time": 12.48,
+        "hz": 167.1,
+        "voiced": true
+      },
+      {
+        "time": 12.512,
+        "hz": 166.7,
+        "voiced": true
+      },
+      {
+        "time": 12.544,
+        "hz": 164.7,
+        "voiced": true
+      },
+      {
+        "time": 12.576,
+        "hz": 161.4,
+        "voiced": true
+      },
+      {
+        "time": 12.608,
+        "hz": 158.3,
+        "voiced": true
+      },
+      {
+        "time": 12.64,
+        "hz": 156.0,
+        "voiced": true
+      },
+      {
+        "time": 12.672,
+        "hz": 153.7,
+        "voiced": true
+      },
+      {
+        "time": 12.704,
+        "hz": 151.8,
+        "voiced": true
+      },
+      {
+        "time": 12.736,
+        "hz": 151.8,
+        "voiced": true
+      },
+      {
+        "time": 12.768,
+        "hz": 151.8,
+        "voiced": false
+      },
+      {
+        "time": 12.8,
+        "hz": 168.3,
+        "voiced": false
+      },
+      {
+        "time": 12.832,
+        "hz": 168.3,
+        "voiced": true
+      },
+      {
+        "time": 12.864,
+        "hz": 168.3,
+        "voiced": true
+      },
+      {
+        "time": 12.896,
+        "hz": 167.1,
+        "voiced": true
+      },
+      {
+        "time": 12.928,
+        "hz": 166.5,
+        "voiced": true
+      },
+      {
+        "time": 12.96,
+        "hz": 156.2,
+        "voiced": false
+      },
+      {
+        "time": 12.992,
+        "hz": 155.3,
+        "voiced": false
+      },
+      {
+        "time": 13.024,
+        "hz": 155.3,
+        "voiced": false
+      },
+      {
+        "time": 13.056,
+        "hz": 155.3,
+        "voiced": false
+      },
+      {
+        "time": 13.088,
+        "hz": 155.3,
+        "voiced": false
+      },
+      {
+        "time": 13.12,
+        "hz": 159.7,
+        "voiced": false
+      },
+      {
+        "time": 13.152,
+        "hz": 163.0,
+        "voiced": false
+      },
+      {
+        "time": 13.184,
+        "hz": 170.9,
+        "voiced": false
+      },
+      {
+        "time": 13.216,
+        "hz": 171.5,
+        "voiced": false
+      },
+      {
+        "time": 13.248,
+        "hz": 191.5,
+        "voiced": false
+      },
+      {
+        "time": 13.28,
+        "hz": 191.5,
+        "voiced": false
+      },
+      {
+        "time": 13.312,
+        "hz": 191.5,
+        "voiced": false
+      },
+      {
+        "time": 13.344,
+        "hz": 160.0,
+        "voiced": false
+      },
+      {
+        "time": 13.376,
+        "hz": 153.6,
+        "voiced": false
+      },
+      {
+        "time": 13.408,
+        "hz": 150.4,
+        "voiced": false
+      },
+      {
+        "time": 13.44,
+        "hz": 137.0,
+        "voiced": false
+      },
+      {
+        "time": 13.472,
+        "hz": 131.7,
+        "voiced": false
+      },
+      {
+        "time": 13.504,
+        "hz": 95.2,
+        "voiced": false
+      },
+      {
+        "time": 13.536,
+        "hz": 95.2,
+        "voiced": false
+      },
+      {
+        "time": 13.568,
+        "hz": 95.2,
+        "voiced": false
+      },
+      {
+        "time": 13.6,
+        "hz": 95.2,
+        "voiced": false
+      },
+      {
+        "time": 13.632,
+        "hz": 176.1,
+        "voiced": false
+      },
+      {
+        "time": 13.664,
+        "hz": 176.1,
+        "voiced": false
+      },
+      {
+        "time": 13.696,
+        "hz": 176.1,
+        "voiced": false
+      },
+      {
+        "time": 13.728,
+        "hz": 78.2,
+        "voiced": false
+      }
+    ],
+    "energy_rms": [
+      {
+        "time": 0.0,
+        "rms": 0.0
+      },
+      {
+        "time": 0.032,
+        "rms": 0.0
+      },
+      {
+        "time": 0.064,
+        "rms": 0.00014
+      },
+      {
+        "time": 0.096,
+        "rms": 0.00052
+      },
+      {
+        "time": 0.128,
+        "rms": 0.00079
+      },
+      {
+        "time": 0.16,
+        "rms": 0.00107
+      },
+      {
+        "time": 0.192,
+        "rms": 0.00135
+      },
+      {
+        "time": 0.224,
+        "rms": 0.00226
+      },
+      {
+        "time": 0.256,
+        "rms": 0.00448
+      },
+      {
+        "time": 0.288,
+        "rms": 0.04388
+      },
+      {
+        "time": 0.32,
+        "rms": 0.0448
+      },
+      {
+        "time": 0.352,
+        "rms": 0.04499
+      },
+      {
+        "time": 0.384,
+        "rms": 0.05819
+      },
+      {
+        "time": 0.416,
+        "rms": 0.0387
+      },
+      {
+        "time": 0.448,
+        "rms": 0.03768
+      },
+      {
+        "time": 0.48,
+        "rms": 0.03748
+      },
+      {
+        "time": 0.512,
+        "rms": 0.00537
+      },
+      {
+        "time": 0.544,
+        "rms": 0.00397
+      },
+      {
+        "time": 0.576,
+        "rms": 0.00385
+      },
+      {
+        "time": 0.608,
+        "rms": 0.00495
+      },
+      {
+        "time": 0.64,
+        "rms": 0.00589
+      },
+      {
+        "time": 0.672,
+        "rms": 0.00586
+      },
+      {
+        "time": 0.704,
+        "rms": 0.0059
+      },
+      {
+        "time": 0.736,
+        "rms": 0.00473
+      },
+      {
+        "time": 0.768,
+        "rms": 0.00385
+      },
+      {
+        "time": 0.8,
+        "rms": 0.0037
+      },
+      {
+        "time": 0.832,
+        "rms": 0.00346
+      },
+      {
+        "time": 0.864,
+        "rms": 0.0032
+      },
+      {
+        "time": 0.896,
+        "rms": 0.00238
+      },
+      {
+        "time": 0.928,
+        "rms": 0.00166
+      },
+      {
+        "time": 0.96,
+        "rms": 0.00097
+      },
+      {
+        "time": 0.992,
+        "rms": 1e-05
+      },
+      {
+        "time": 1.024,
+        "rms": 0.00129
+      },
+      {
+        "time": 1.056,
+        "rms": 0.00156
+      },
+      {
+        "time": 1.088,
+        "rms": 0.00185
+      },
+      {
+        "time": 1.12,
+        "rms": 0.00204
+      },
+      {
+        "time": 1.152,
+        "rms": 0.02597
+      },
+      {
+        "time": 1.184,
+        "rms": 0.06324
+      },
+      {
+        "time": 1.216,
+        "rms": 0.08162
+      },
+      {
+        "time": 1.248,
+        "rms": 0.09943
+      },
+      {
+        "time": 1.28,
+        "rms": 0.10807
+      },
+      {
+        "time": 1.312,
+        "rms": 0.09402
+      },
+      {
+        "time": 1.344,
+        "rms": 0.07867
+      },
+      {
+        "time": 1.376,
+        "rms": 0.05648
+      },
+      {
+        "time": 1.408,
+        "rms": 0.06305
+      },
+      {
+        "time": 1.44,
+        "rms": 0.10415
+      },
+      {
+        "time": 1.472,
+        "rms": 0.12375
+      },
+      {
+        "time": 1.504,
+        "rms": 0.12878
+      },
+      {
+        "time": 1.536,
+        "rms": 0.11593
+      },
+      {
+        "time": 1.568,
+        "rms": 0.07807
+      },
+      {
+        "time": 1.6,
+        "rms": 0.07844
+      },
+      {
+        "time": 1.632,
+        "rms": 0.10467
+      },
+      {
+        "time": 1.664,
+        "rms": 0.13201
+      },
+      {
+        "time": 1.696,
+        "rms": 0.16192
+      },
+      {
+        "time": 1.728,
+        "rms": 0.17397
+      },
+      {
+        "time": 1.76,
+        "rms": 0.1699
+      },
+      {
+        "time": 1.792,
+        "rms": 0.15019
+      },
+      {
+        "time": 1.824,
+        "rms": 0.11737
+      },
+      {
+        "time": 1.856,
+        "rms": 0.07286
+      },
+      {
+        "time": 1.888,
+        "rms": 0.05239
+      },
+      {
+        "time": 1.92,
+        "rms": 0.10712
+      },
+      {
+        "time": 1.952,
+        "rms": 0.15876
+      },
+      {
+        "time": 1.984,
+        "rms": 0.20484
+      },
+      {
+        "time": 2.016,
+        "rms": 0.21967
+      },
+      {
+        "time": 2.048,
+        "rms": 0.20275
+      },
+      {
+        "time": 2.08,
+        "rms": 0.1722
+      },
+      {
+        "time": 2.112,
+        "rms": 0.12454
+      },
+      {
+        "time": 2.144,
+        "rms": 0.09603
+      },
+      {
+        "time": 2.176,
+        "rms": 0.09028
+      },
+      {
+        "time": 2.208,
+        "rms": 0.09574
+      },
+      {
+        "time": 2.24,
+        "rms": 0.10942
+      },
+      {
+        "time": 2.272,
+        "rms": 0.11374
+      },
+      {
+        "time": 2.304,
+        "rms": 0.11209
+      },
+      {
+        "time": 2.336,
+        "rms": 0.09738
+      },
+      {
+        "time": 2.368,
+        "rms": 0.06543
+      },
+      {
+        "time": 2.4,
+        "rms": 0.03149
+      },
+      {
+        "time": 2.432,
+        "rms": 0.02453
+      },
+      {
+        "time": 2.464,
+        "rms": 0.02658
+      },
+      {
+        "time": 2.496,
+        "rms": 0.0801
+      },
+      {
+        "time": 2.528,
+        "rms": 0.10434
+      },
+      {
+        "time": 2.56,
+        "rms": 0.1209
+      },
+      {
+        "time": 2.592,
+        "rms": 0.13221
+      },
+      {
+        "time": 2.624,
+        "rms": 0.11399
+      },
+      {
+        "time": 2.656,
+        "rms": 0.09931
+      },
+      {
+        "time": 2.688,
+        "rms": 0.09149
+      },
+      {
+        "time": 2.72,
+        "rms": 0.08361
+      },
+      {
+        "time": 2.752,
+        "rms": 0.08399
+      },
+      {
+        "time": 2.784,
+        "rms": 0.08819
+      },
+      {
+        "time": 2.816,
+        "rms": 0.07906
+      },
+      {
+        "time": 2.848,
+        "rms": 0.09866
+      },
+      {
+        "time": 2.88,
+        "rms": 0.10868
+      },
+      {
+        "time": 2.912,
+        "rms": 0.10136
+      },
+      {
+        "time": 2.944,
+        "rms": 0.09816
+      },
+      {
+        "time": 2.976,
+        "rms": 0.06706
+      },
+      {
+        "time": 3.008,
+        "rms": 0.08113
+      },
+      {
+        "time": 3.04,
+        "rms": 0.11054
+      },
+      {
+        "time": 3.072,
+        "rms": 0.12796
+      },
+      {
+        "time": 3.104,
+        "rms": 0.13887
+      },
+      {
+        "time": 3.136,
+        "rms": 0.12774
+      },
+      {
+        "time": 3.168,
+        "rms": 0.10146
+      },
+      {
+        "time": 3.2,
+        "rms": 0.07844
+      },
+      {
+        "time": 3.232,
+        "rms": 0.06244
+      },
+      {
+        "time": 3.264,
+        "rms": 0.08981
+      },
+      {
+        "time": 3.296,
+        "rms": 0.09607
+      },
+      {
+        "time": 3.328,
+        "rms": 0.1009
+      },
+      {
+        "time": 3.36,
+        "rms": 0.10634
+      },
+      {
+        "time": 3.392,
+        "rms": 0.12577
+      },
+      {
+        "time": 3.424,
+        "rms": 0.15022
+      },
+      {
+        "time": 3.456,
+        "rms": 0.15284
+      },
+      {
+        "time": 3.488,
+        "rms": 0.1495
+      },
+      {
+        "time": 3.52,
+        "rms": 0.14022
+      },
+      {
+        "time": 3.552,
+        "rms": 0.16549
+      },
+      {
+        "time": 3.584,
+        "rms": 0.18193
+      },
+      {
+        "time": 3.616,
+        "rms": 0.17983
+      },
+      {
+        "time": 3.648,
+        "rms": 0.15343
+      },
+      {
+        "time": 3.68,
+        "rms": 0.0882
+      },
+      {
+        "time": 3.712,
+        "rms": 0.05029
+      },
+      {
+        "time": 3.744,
+        "rms": 0.07416
+      },
+      {
+        "time": 3.776,
+        "rms": 0.08404
+      },
+      {
+        "time": 3.808,
+        "rms": 0.08614
+      },
+      {
+        "time": 3.84,
+        "rms": 0.07173
+      },
+      {
+        "time": 3.872,
+        "rms": 0.07616
+      },
+      {
+        "time": 3.904,
+        "rms": 0.12945
+      },
+      {
+        "time": 3.936,
+        "rms": 0.14147
+      },
+      {
+        "time": 3.968,
+        "rms": 0.14141
+      },
+      {
+        "time": 4.0,
+        "rms": 0.12726
+      },
+      {
+        "time": 4.032,
+        "rms": 0.06065
+      },
+      {
+        "time": 4.064,
+        "rms": 0.04016
+      },
+      {
+        "time": 4.096,
+        "rms": 0.05474
+      },
+      {
+        "time": 4.128,
+        "rms": 0.08348
+      },
+      {
+        "time": 4.16,
+        "rms": 0.10348
+      },
+      {
+        "time": 4.192,
+        "rms": 0.11036
+      },
+      {
+        "time": 4.224,
+        "rms": 0.11432
+      },
+      {
+        "time": 4.256,
+        "rms": 0.10325
+      },
+      {
+        "time": 4.288,
+        "rms": 0.08834
+      },
+      {
+        "time": 4.32,
+        "rms": 0.07757
+      },
+      {
+        "time": 4.352,
+        "rms": 0.07769
+      },
+      {
+        "time": 4.384,
+        "rms": 0.08424
+      },
+      {
+        "time": 4.416,
+        "rms": 0.09328
+      },
+      {
+        "time": 4.448,
+        "rms": 0.11822
+      },
+      {
+        "time": 4.48,
+        "rms": 0.11941
+      },
+      {
+        "time": 4.512,
+        "rms": 0.10799
+      },
+      {
+        "time": 4.544,
+        "rms": 0.09581
+      },
+      {
+        "time": 4.576,
+        "rms": 0.05235
+      },
+      {
+        "time": 4.608,
+        "rms": 0.08687
+      },
+      {
+        "time": 4.64,
+        "rms": 0.10183
+      },
+      {
+        "time": 4.672,
+        "rms": 0.11103
+      },
+      {
+        "time": 4.704,
+        "rms": 0.11902
+      },
+      {
+        "time": 4.736,
+        "rms": 0.09391
+      },
+      {
+        "time": 4.768,
+        "rms": 0.08113
+      },
+      {
+        "time": 4.8,
+        "rms": 0.06888
+      },
+      {
+        "time": 4.832,
+        "rms": 0.05451
+      },
+      {
+        "time": 4.864,
+        "rms": 0.03174
+      },
+      {
+        "time": 4.896,
+        "rms": 0.05437
+      },
+      {
+        "time": 4.928,
+        "rms": 0.0996
+      },
+      {
+        "time": 4.96,
+        "rms": 0.131
+      },
+      {
+        "time": 4.992,
+        "rms": 0.14954
+      },
+      {
+        "time": 5.024,
+        "rms": 0.1542
+      },
+      {
+        "time": 5.056,
+        "rms": 0.13923
+      },
+      {
+        "time": 5.088,
+        "rms": 0.11843
+      },
+      {
+        "time": 5.12,
+        "rms": 0.10428
+      },
+      {
+        "time": 5.152,
+        "rms": 0.09165
+      },
+      {
+        "time": 5.184,
+        "rms": 0.09212
+      },
+      {
+        "time": 5.216,
+        "rms": 0.10166
+      },
+      {
+        "time": 5.248,
+        "rms": 0.1164
+      },
+      {
+        "time": 5.28,
+        "rms": 0.11718
+      },
+      {
+        "time": 5.312,
+        "rms": 0.10478
+      },
+      {
+        "time": 5.344,
+        "rms": 0.08423
+      },
+      {
+        "time": 5.376,
+        "rms": 0.04194
+      },
+      {
+        "time": 5.408,
+        "rms": 0.00899
+      },
+      {
+        "time": 5.44,
+        "rms": 0.00765
+      },
+      {
+        "time": 5.472,
+        "rms": 0.00806
+      },
+      {
+        "time": 5.504,
+        "rms": 0.00828
+      },
+      {
+        "time": 5.536,
+        "rms": 0.0082
+      },
+      {
+        "time": 5.568,
+        "rms": 0.00798
+      },
+      {
+        "time": 5.6,
+        "rms": 0.00778
+      },
+      {
+        "time": 5.632,
+        "rms": 0.00726
+      },
+      {
+        "time": 5.664,
+        "rms": 0.00641
+      },
+      {
+        "time": 5.696,
+        "rms": 0.00668
+      },
+      {
+        "time": 5.728,
+        "rms": 0.00804
+      },
+      {
+        "time": 5.76,
+        "rms": 0.01416
+      },
+      {
+        "time": 5.792,
+        "rms": 0.02595
+      },
+      {
+        "time": 5.824,
+        "rms": 0.02933
+      },
+      {
+        "time": 5.856,
+        "rms": 0.08171
+      },
+      {
+        "time": 5.888,
+        "rms": 0.1519
+      },
+      {
+        "time": 5.92,
+        "rms": 0.21037
+      },
+      {
+        "time": 5.952,
+        "rms": 0.25672
+      },
+      {
+        "time": 5.984,
+        "rms": 0.26872
+      },
+      {
+        "time": 6.016,
+        "rms": 0.25638
+      },
+      {
+        "time": 6.048,
+        "rms": 0.25509
+      },
+      {
+        "time": 6.08,
+        "rms": 0.22495
+      },
+      {
+        "time": 6.112,
+        "rms": 0.21725
+      },
+      {
+        "time": 6.144,
+        "rms": 0.20335
+      },
+      {
+        "time": 6.176,
+        "rms": 0.14461
+      },
+      {
+        "time": 6.208,
+        "rms": 0.11844
+      },
+      {
+        "time": 6.24,
+        "rms": 0.07781
+      },
+      {
+        "time": 6.272,
+        "rms": 0.06953
+      },
+      {
+        "time": 6.304,
+        "rms": 0.0948
+      },
+      {
+        "time": 6.336,
+        "rms": 0.11858
+      },
+      {
+        "time": 6.368,
+        "rms": 0.13029
+      },
+      {
+        "time": 6.4,
+        "rms": 0.13056
+      },
+      {
+        "time": 6.432,
+        "rms": 0.12596
+      },
+      {
+        "time": 6.464,
+        "rms": 0.10283
+      },
+      {
+        "time": 6.496,
+        "rms": 0.08319
+      },
+      {
+        "time": 6.528,
+        "rms": 0.06241
+      },
+      {
+        "time": 6.56,
+        "rms": 0.01968
+      },
+      {
+        "time": 6.592,
+        "rms": 0.01094
+      },
+      {
+        "time": 6.624,
+        "rms": 0.00995
+      },
+      {
+        "time": 6.656,
+        "rms": 0.0158
+      },
+      {
+        "time": 6.688,
+        "rms": 0.10299
+      },
+      {
+        "time": 6.72,
+        "rms": 0.12547
+      },
+      {
+        "time": 6.752,
+        "rms": 0.12595
+      },
+      {
+        "time": 6.784,
+        "rms": 0.13297
+      },
+      {
+        "time": 6.816,
+        "rms": 0.0989
+      },
+      {
+        "time": 6.848,
+        "rms": 0.07857
+      },
+      {
+        "time": 6.88,
+        "rms": 0.08627
+      },
+      {
+        "time": 6.912,
+        "rms": 0.07701
+      },
+      {
+        "time": 6.944,
+        "rms": 0.06072
+      },
+      {
+        "time": 6.976,
+        "rms": 0.04804
+      },
+      {
+        "time": 7.008,
+        "rms": 0.0486
+      },
+      {
+        "time": 7.04,
+        "rms": 0.10326
+      },
+      {
+        "time": 7.072,
+        "rms": 0.12404
+      },
+      {
+        "time": 7.104,
+        "rms": 0.1337
+      },
+      {
+        "time": 7.136,
+        "rms": 0.12997
+      },
+      {
+        "time": 7.168,
+        "rms": 0.09258
+      },
+      {
+        "time": 7.2,
+        "rms": 0.06728
+      },
+      {
+        "time": 7.232,
+        "rms": 0.09659
+      },
+      {
+        "time": 7.264,
+        "rms": 0.13658
+      },
+      {
+        "time": 7.296,
+        "rms": 0.15609
+      },
+      {
+        "time": 7.328,
+        "rms": 0.16738
+      },
+      {
+        "time": 7.36,
+        "rms": 0.15518
+      },
+      {
+        "time": 7.392,
+        "rms": 0.13047
+      },
+      {
+        "time": 7.424,
+        "rms": 0.11781
+      },
+      {
+        "time": 7.456,
+        "rms": 0.11882
+      },
+      {
+        "time": 7.488,
+        "rms": 0.13147
+      },
+      {
+        "time": 7.52,
+        "rms": 0.15647
+      },
+      {
+        "time": 7.552,
+        "rms": 0.15134
+      },
+      {
+        "time": 7.584,
+        "rms": 0.13692
+      },
+      {
+        "time": 7.616,
+        "rms": 0.11094
+      },
+      {
+        "time": 7.648,
+        "rms": 0.05136
+      },
+      {
+        "time": 7.68,
+        "rms": 0.05842
+      },
+      {
+        "time": 7.712,
+        "rms": 0.09941
+      },
+      {
+        "time": 7.744,
+        "rms": 0.11606
+      },
+      {
+        "time": 7.776,
+        "rms": 0.12777
+      },
+      {
+        "time": 7.808,
+        "rms": 0.13163
+      },
+      {
+        "time": 7.84,
+        "rms": 0.11083
+      },
+      {
+        "time": 7.872,
+        "rms": 0.10054
+      },
+      {
+        "time": 7.904,
+        "rms": 0.09202
+      },
+      {
+        "time": 7.936,
+        "rms": 0.07345
+      },
+      {
+        "time": 7.968,
+        "rms": 0.05864
+      },
+      {
+        "time": 8.0,
+        "rms": 0.04401
+      },
+      {
+        "time": 8.032,
+        "rms": 0.05667
+      },
+      {
+        "time": 8.064,
+        "rms": 0.06579
+      },
+      {
+        "time": 8.096,
+        "rms": 0.08339
+      },
+      {
+        "time": 8.128,
+        "rms": 0.08571
+      },
+      {
+        "time": 8.16,
+        "rms": 0.06809
+      },
+      {
+        "time": 8.192,
+        "rms": 0.05845
+      },
+      {
+        "time": 8.224,
+        "rms": 0.02716
+      },
+      {
+        "time": 8.256,
+        "rms": 0.01847
+      },
+      {
+        "time": 8.288,
+        "rms": 0.07242
+      },
+      {
+        "time": 8.32,
+        "rms": 0.08121
+      },
+      {
+        "time": 8.352,
+        "rms": 0.08104
+      },
+      {
+        "time": 8.384,
+        "rms": 0.08054
+      },
+      {
+        "time": 8.416,
+        "rms": 0.04348
+      },
+      {
+        "time": 8.448,
+        "rms": 0.08976
+      },
+      {
+        "time": 8.48,
+        "rms": 0.13346
+      },
+      {
+        "time": 8.512,
+        "rms": 0.13585
+      },
+      {
+        "time": 8.544,
+        "rms": 0.13469
+      },
+      {
+        "time": 8.576,
+        "rms": 0.10296
+      },
+      {
+        "time": 8.608,
+        "rms": 0.0292
+      },
+      {
+        "time": 8.64,
+        "rms": 0.01368
+      },
+      {
+        "time": 8.672,
+        "rms": 0.01321
+      },
+      {
+        "time": 8.704,
+        "rms": 0.01278
+      },
+      {
+        "time": 8.736,
+        "rms": 0.13474
+      },
+      {
+        "time": 8.768,
+        "rms": 0.17902
+      },
+      {
+        "time": 8.8,
+        "rms": 0.2095
+      },
+      {
+        "time": 8.832,
+        "rms": 0.22539
+      },
+      {
+        "time": 8.864,
+        "rms": 0.20126
+      },
+      {
+        "time": 8.896,
+        "rms": 0.17973
+      },
+      {
+        "time": 8.928,
+        "rms": 0.14465
+      },
+      {
+        "time": 8.96,
+        "rms": 0.12163
+      },
+      {
+        "time": 8.992,
+        "rms": 0.08417
+      },
+      {
+        "time": 9.024,
+        "rms": 0.03667
+      },
+      {
+        "time": 9.056,
+        "rms": 0.02918
+      },
+      {
+        "time": 9.088,
+        "rms": 0.02135
+      },
+      {
+        "time": 9.12,
+        "rms": 0.09552
+      },
+      {
+        "time": 9.152,
+        "rms": 0.18183
+      },
+      {
+        "time": 9.184,
+        "rms": 0.21354
+      },
+      {
+        "time": 9.216,
+        "rms": 0.2296
+      },
+      {
+        "time": 9.248,
+        "rms": 0.22289
+      },
+      {
+        "time": 9.28,
+        "rms": 0.17009
+      },
+      {
+        "time": 9.312,
+        "rms": 0.13442
+      },
+      {
+        "time": 9.344,
+        "rms": 0.10439
+      },
+      {
+        "time": 9.376,
+        "rms": 0.07627
+      },
+      {
+        "time": 9.408,
+        "rms": 0.06013
+      },
+      {
+        "time": 9.44,
+        "rms": 0.04806
+      },
+      {
+        "time": 9.472,
+        "rms": 0.04529
+      },
+      {
+        "time": 9.504,
+        "rms": 0.03851
+      },
+      {
+        "time": 9.536,
+        "rms": 0.02252
+      },
+      {
+        "time": 9.568,
+        "rms": 0.01198
+      },
+      {
+        "time": 9.6,
+        "rms": 0.01693
+      },
+      {
+        "time": 9.632,
+        "rms": 0.01748
+      },
+      {
+        "time": 9.664,
+        "rms": 0.03206
+      },
+      {
+        "time": 9.696,
+        "rms": 0.12944
+      },
+      {
+        "time": 9.728,
+        "rms": 0.18487
+      },
+      {
+        "time": 9.76,
+        "rms": 0.23258
+      },
+      {
+        "time": 9.792,
+        "rms": 0.26329
+      },
+      {
+        "time": 9.824,
+        "rms": 0.24979
+      },
+      {
+        "time": 9.856,
+        "rms": 0.21614
+      },
+      {
+        "time": 9.888,
+        "rms": 0.16381
+      },
+      {
+        "time": 9.92,
+        "rms": 0.10473
+      },
+      {
+        "time": 9.952,
+        "rms": 0.04978
+      },
+      {
+        "time": 9.984,
+        "rms": 0.03799
+      },
+      {
+        "time": 10.016,
+        "rms": 0.04303
+      },
+      {
+        "time": 10.048,
+        "rms": 0.05099
+      },
+      {
+        "time": 10.08,
+        "rms": 0.08492
+      },
+      {
+        "time": 10.112,
+        "rms": 0.12549
+      },
+      {
+        "time": 10.144,
+        "rms": 0.15075
+      },
+      {
+        "time": 10.176,
+        "rms": 0.17894
+      },
+      {
+        "time": 10.208,
+        "rms": 0.16975
+      },
+      {
+        "time": 10.24,
+        "rms": 0.13913
+      },
+      {
+        "time": 10.272,
+        "rms": 0.10919
+      },
+      {
+        "time": 10.304,
+        "rms": 0.04358
+      },
+      {
+        "time": 10.336,
+        "rms": 0.02318
+      },
+      {
+        "time": 10.368,
+        "rms": 0.02311
+      },
+      {
+        "time": 10.4,
+        "rms": 0.02318
+      },
+      {
+        "time": 10.432,
+        "rms": 0.02545
+      },
+      {
+        "time": 10.464,
+        "rms": 0.10325
+      },
+      {
+        "time": 10.496,
+        "rms": 0.1311
+      },
+      {
+        "time": 10.528,
+        "rms": 0.1424
+      },
+      {
+        "time": 10.56,
+        "rms": 0.14828
+      },
+      {
+        "time": 10.592,
+        "rms": 0.11295
+      },
+      {
+        "time": 10.624,
+        "rms": 0.07889
+      },
+      {
+        "time": 10.656,
+        "rms": 0.05595
+      },
+      {
+        "time": 10.688,
+        "rms": 0.03461
+      },
+      {
+        "time": 10.72,
+        "rms": 0.01147
+      },
+      {
+        "time": 10.752,
+        "rms": 0.01926
+      },
+      {
+        "time": 10.784,
+        "rms": 0.05388
+      },
+      {
+        "time": 10.816,
+        "rms": 0.07919
+      },
+      {
+        "time": 10.848,
+        "rms": 0.11805
+      },
+      {
+        "time": 10.88,
+        "rms": 0.15339
+      },
+      {
+        "time": 10.912,
+        "rms": 0.16617
+      },
+      {
+        "time": 10.944,
+        "rms": 0.16409
+      },
+      {
+        "time": 10.976,
+        "rms": 0.13851
+      },
+      {
+        "time": 11.008,
+        "rms": 0.09667
+      },
+      {
+        "time": 11.04,
+        "rms": 0.05235
+      },
+      {
+        "time": 11.072,
+        "rms": 0.00798
+      },
+      {
+        "time": 11.104,
+        "rms": 0.0081
+      },
+      {
+        "time": 11.136,
+        "rms": 0.0142
+      },
+      {
+        "time": 11.168,
+        "rms": 0.05923
+      },
+      {
+        "time": 11.2,
+        "rms": 0.15081
+      },
+      {
+        "time": 11.232,
+        "rms": 0.19586
+      },
+      {
+        "time": 11.264,
+        "rms": 0.21263
+      },
+      {
+        "time": 11.296,
+        "rms": 0.20501
+      },
+      {
+        "time": 11.328,
+        "rms": 0.15116
+      },
+      {
+        "time": 11.36,
+        "rms": 0.08525
+      },
+      {
+        "time": 11.392,
+        "rms": 0.01688
+      },
+      {
+        "time": 11.424,
+        "rms": 0.01217
+      },
+      {
+        "time": 11.456,
+        "rms": 0.02826
+      },
+      {
+        "time": 11.488,
+        "rms": 0.05728
+      },
+      {
+        "time": 11.52,
+        "rms": 0.08563
+      },
+      {
+        "time": 11.552,
+        "rms": 0.10217
+      },
+      {
+        "time": 11.584,
+        "rms": 0.10976
+      },
+      {
+        "time": 11.616,
+        "rms": 0.1319
+      },
+      {
+        "time": 11.648,
+        "rms": 0.15291
+      },
+      {
+        "time": 11.68,
+        "rms": 0.15064
+      },
+      {
+        "time": 11.712,
+        "rms": 0.14336
+      },
+      {
+        "time": 11.744,
+        "rms": 0.1127
+      },
+      {
+        "time": 11.776,
+        "rms": 0.05158
+      },
+      {
+        "time": 11.808,
+        "rms": 0.01791
+      },
+      {
+        "time": 11.84,
+        "rms": 0.01441
+      },
+      {
+        "time": 11.872,
+        "rms": 0.01375
+      },
+      {
+        "time": 11.904,
+        "rms": 0.04481
+      },
+      {
+        "time": 11.936,
+        "rms": 0.07408
+      },
+      {
+        "time": 11.968,
+        "rms": 0.09913
+      },
+      {
+        "time": 12.0,
+        "rms": 0.11514
+      },
+      {
+        "time": 12.032,
+        "rms": 0.12209
+      },
+      {
+        "time": 12.064,
+        "rms": 0.11594
+      },
+      {
+        "time": 12.096,
+        "rms": 0.1036
+      },
+      {
+        "time": 12.128,
+        "rms": 0.13967
+      },
+      {
+        "time": 12.16,
+        "rms": 0.15886
+      },
+      {
+        "time": 12.192,
+        "rms": 0.15978
+      },
+      {
+        "time": 12.224,
+        "rms": 0.1548
+      },
+      {
+        "time": 12.256,
+        "rms": 0.10871
+      },
+      {
+        "time": 12.288,
+        "rms": 0.05134
+      },
+      {
+        "time": 12.32,
+        "rms": 0.01571
+      },
+      {
+        "time": 12.352,
+        "rms": 0.01074
+      },
+      {
+        "time": 12.384,
+        "rms": 0.00759
+      },
+      {
+        "time": 12.416,
+        "rms": 0.10007
+      },
+      {
+        "time": 12.448,
+        "rms": 0.16832
+      },
+      {
+        "time": 12.48,
+        "rms": 0.19328
+      },
+      {
+        "time": 12.512,
+        "rms": 0.20582
+      },
+      {
+        "time": 12.544,
+        "rms": 0.1977
+      },
+      {
+        "time": 12.576,
+        "rms": 0.17596
+      },
+      {
+        "time": 12.608,
+        "rms": 0.16828
+      },
+      {
+        "time": 12.64,
+        "rms": 0.1658
+      },
+      {
+        "time": 12.672,
+        "rms": 0.15164
+      },
+      {
+        "time": 12.704,
+        "rms": 0.11325
+      },
+      {
+        "time": 12.736,
+        "rms": 0.08029
+      },
+      {
+        "time": 12.768,
+        "rms": 0.04766
+      },
+      {
+        "time": 12.8,
+        "rms": 0.03343
+      },
+      {
+        "time": 12.832,
+        "rms": 0.08506
+      },
+      {
+        "time": 12.864,
+        "rms": 0.10228
+      },
+      {
+        "time": 12.896,
+        "rms": 0.10718
+      },
+      {
+        "time": 12.928,
+        "rms": 0.10314
+      },
+      {
+        "time": 12.96,
+        "rms": 0.0684
+      },
+      {
+        "time": 12.992,
+        "rms": 0.04056
+      },
+      {
+        "time": 13.024,
+        "rms": 0.028
+      },
+      {
+        "time": 13.056,
+        "rms": 0.02533
+      },
+      {
+        "time": 13.088,
+        "rms": 0.02363
+      },
+      {
+        "time": 13.12,
+        "rms": 0.01996
+      },
+      {
+        "time": 13.152,
+        "rms": 0.01862
+      },
+      {
+        "time": 13.184,
+        "rms": 0.01967
+      },
+      {
+        "time": 13.216,
+        "rms": 0.01864
+      },
+      {
+        "time": 13.248,
+        "rms": 0.05145
+      },
+      {
+        "time": 13.28,
+        "rms": 0.05015
+      },
+      {
+        "time": 13.312,
+        "rms": 0.04924
+      },
+      {
+        "time": 13.344,
+        "rms": 0.04858
+      },
+      {
+        "time": 13.376,
+        "rms": 0.00456
+      },
+      {
+        "time": 13.408,
+        "rms": 0.00492
+      },
+      {
+        "time": 13.44,
+        "rms": 0.00534
+      },
+      {
+        "time": 13.472,
+        "rms": 0.00554
+      },
+      {
+        "time": 13.504,
+        "rms": 0.00556
+      },
+      {
+        "time": 13.536,
+        "rms": 0.00551
+      },
+      {
+        "time": 13.568,
+        "rms": 0.00499
+      },
+      {
+        "time": 13.6,
+        "rms": 0.00414
+      },
+      {
+        "time": 13.632,
+        "rms": 0.00328
+      },
+      {
+        "time": 13.664,
+        "rms": 0.00206
+      },
+      {
+        "time": 13.696,
+        "rms": 0.00034
+      },
+      {
+        "time": 13.728,
+        "rms": 1e-05
+      }
+    ]
+  }
+}

@@ -1,0 +1,772 @@
+{
+  "session_id": "session_20260721_141534_8ccf657e",
+  "analysis": {
+    "fluency": {
+      "fillers": {
+        "filler_count": 0,
+        "fillers_per_minute": 0.0,
+        "classification": "good",
+        "fillers": []
+      },
+      "pauses": {
+        "total_pauses": 3,
+        "pauses": [
+          {
+            "start": 1.86,
+            "end": 1.88,
+            "duration": 0.019999999999999796,
+            "type": "natural"
+          },
+          {
+            "start": 2.86,
+            "end": 2.92,
+            "duration": 0.06000000000000005,
+            "type": "natural"
+          },
+          {
+            "start": 5.24,
+            "end": 5.92,
+            "duration": 0.6799999999999997,
+            "type": "hesitation"
+          }
+        ]
+      },
+      "speaking_speed": {
+        "words_per_minute": 168,
+        "sentences_per_minute": 15,
+        "classification": "fast"
+      }
+    },
+    "pronunciation": {
+      "pronunciation_score": 91,
+      "phoneme_accuracy": 0.82,
+      "stress_accuracy": 1.0,
+      "rhythm_score": 1.0,
+      "phoneme_errors": [
+        {
+          "word": "to",
+          "expected": "/ə/",
+          "detected": "/ʊ/"
+        },
+        {
+          "word": "one",
+          "expected": null,
+          "detected": "/m/"
+        },
+        {
+          "word": "one",
+          "expected": null,
+          "detected": "/i/"
+        },
+        {
+          "word": "we",
+          "expected": "/w/",
+          "detected": null
+        },
+        {
+          "word": "arrived",
+          "expected": "/ɚ/",
+          "detected": "/ɐ/"
+        },
+        {
+          "word": "our",
+          "expected": "/aʊ/",
+          "detected": "/ɑːɹ/"
+        },
+        {
+          "word": "our",
+          "expected": "/ɚ/",
+          "detected": "/d/"
+        },
+        {
+          "word": "favorite",
+          "expected": "/ᵻ/",
+          "detected": "/ɪ/"
+        },
+        {
+          "word": "in",
+          "expected": "/ɪ/",
+          "detected": null
+        },
+        {
+          "word": "europe",
+          "expected": null,
+          "detected": "/uː/"
+        },
+        {
+          "word": "europe",
+          "expected": "/ʊɹ/",
+          "detected": "/oʊ/"
+        },
+        {
+          "word": "europe",
+          "expected": "/ə/",
+          "detected": "/oʊ/"
+        },
+        {
+          "word": "smith",
+          "expected": "/θ/",
+          "detected": "/t/"
+        },
+        {
+          "word": "home",
+          "expected": "/m/",
+          "detected": null
+        }
+      ],
+      "detected_phonemes": [
+        {
+          "phoneme": "/f/",
+          "start": 0.061,
+          "end": 0.081
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 0.141,
+          "end": 0.162
+        },
+        {
+          "phoneme": "/m/",
+          "start": 0.303,
+          "end": 0.323
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 0.344,
+          "end": 0.364
+        },
+        {
+          "phoneme": "/l/",
+          "start": 0.445,
+          "end": 0.465
+        },
+        {
+          "phoneme": "/i/",
+          "start": 0.485,
+          "end": 0.505
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 0.687,
+          "end": 0.707
+        },
+        {
+          "phoneme": "/z/",
+          "start": 0.788,
+          "end": 0.828
+        },
+        {
+          "phoneme": "/v/",
+          "start": 0.889,
+          "end": 0.909
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 0.929,
+          "end": 0.95
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 1.01,
+          "end": 1.031
+        },
+        {
+          "phoneme": "/i/",
+          "start": 1.051,
+          "end": 1.071
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 1.132,
+          "end": 1.152
+        },
+        {
+          "phoneme": "/m/",
+          "start": 1.192,
+          "end": 1.212
+        },
+        {
+          "phoneme": "/p/",
+          "start": 1.273,
+          "end": 1.293
+        },
+        {
+          "phoneme": "/ɔːɹ/",
+          "start": 1.334,
+          "end": 1.354
+        },
+        {
+          "phoneme": "/t/",
+          "start": 1.475,
+          "end": 1.495
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 1.536,
+          "end": 1.556
+        },
+        {
+          "phoneme": "/n/",
+          "start": 1.596,
+          "end": 1.616
+        },
+        {
+          "phoneme": "/t/",
+          "start": 1.616,
+          "end": 1.657
+        },
+        {
+          "phoneme": "/t/",
+          "start": 1.697,
+          "end": 1.718
+        },
+        {
+          "phoneme": "/ʊ/",
+          "start": 1.738,
+          "end": 1.758
+        },
+        {
+          "phoneme": "/m/",
+          "start": 1.819,
+          "end": 1.839
+        },
+        {
+          "phoneme": "/iː/",
+          "start": 1.859,
+          "end": 1.879
+        },
+        {
+          "phoneme": "/m/",
+          "start": 1.82,
+          "end": 1.84
+        },
+        {
+          "phoneme": "/i/",
+          "start": 1.84,
+          "end": 1.86
+        },
+        {
+          "phoneme": "/w/",
+          "start": 2.021,
+          "end": 2.041
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 2.061,
+          "end": 2.081
+        },
+        {
+          "phoneme": "/n/",
+          "start": 2.141,
+          "end": 2.161
+        },
+        {
+          "phoneme": "/d/",
+          "start": 2.221,
+          "end": 2.241
+        },
+        {
+          "phoneme": "/eɪ/",
+          "start": 2.262,
+          "end": 2.282
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 2.362,
+          "end": 2.382
+        },
+        {
+          "phoneme": "/v/",
+          "start": 2.442,
+          "end": 2.462
+        },
+        {
+          "phoneme": "/m/",
+          "start": 2.542,
+          "end": 2.563
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 2.563,
+          "end": 2.583
+        },
+        {
+          "phoneme": "/l/",
+          "start": 2.703,
+          "end": 2.723
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 2.743,
+          "end": 2.763
+        },
+        {
+          "phoneme": "/f/",
+          "start": 2.904,
+          "end": 2.944
+        },
+        {
+          "phoneme": "/iː/",
+          "start": 3.024,
+          "end": 3.044
+        },
+        {
+          "phoneme": "/ɐ/",
+          "start": 3.205,
+          "end": 3.225
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 3.265,
+          "end": 3.305
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 3.325,
+          "end": 3.345
+        },
+        {
+          "phoneme": "/v/",
+          "start": 3.486,
+          "end": 3.506
+        },
+        {
+          "phoneme": "/d/",
+          "start": 3.546,
+          "end": 3.566
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 3.626,
+          "end": 3.646
+        },
+        {
+          "phoneme": "/n/",
+          "start": 3.686,
+          "end": 3.726
+        },
+        {
+          "phoneme": "/ɑːɹ/",
+          "start": 3.746,
+          "end": 3.766
+        },
+        {
+          "phoneme": "/d/",
+          "start": 3.907,
+          "end": 3.927
+        },
+        {
+          "phoneme": "/f/",
+          "start": 3.967,
+          "end": 3.987
+        },
+        {
+          "phoneme": "/eɪ/",
+          "start": 4.047,
+          "end": 4.067
+        },
+        {
+          "phoneme": "/v/",
+          "start": 4.168,
+          "end": 4.188
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 4.208,
+          "end": 4.228
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 4.248,
+          "end": 4.268
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 4.288,
+          "end": 4.308
+        },
+        {
+          "phoneme": "/t/",
+          "start": 4.388,
+          "end": 4.408
+        },
+        {
+          "phoneme": "/s/",
+          "start": 4.429,
+          "end": 4.449
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 4.529,
+          "end": 4.549
+        },
+        {
+          "phoneme": "/ɾ/",
+          "start": 4.629,
+          "end": 4.649
+        },
+        {
+          "phoneme": "/i/",
+          "start": 4.669,
+          "end": 4.689
+        },
+        {
+          "phoneme": "/n/",
+          "start": 4.85,
+          "end": 4.87
+        },
+        {
+          "phoneme": "/j/",
+          "start": 5.051,
+          "end": 5.091
+        },
+        {
+          "phoneme": "/uː/",
+          "start": 5.171,
+          "end": 5.191
+        },
+        {
+          "phoneme": "/oʊ/",
+          "start": 5.452,
+          "end": 5.472
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 5.773,
+          "end": 5.813
+        },
+        {
+          "phoneme": "/oʊ/",
+          "start": 5.853,
+          "end": 5.873
+        },
+        {
+          "phoneme": "/p/",
+          "start": 6.174,
+          "end": 6.194
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 6.676,
+          "end": 6.696
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 6.716,
+          "end": 6.736
+        },
+        {
+          "phoneme": "/s/",
+          "start": 6.856,
+          "end": 6.876
+        },
+        {
+          "phoneme": "/m/",
+          "start": 7.057,
+          "end": 7.097
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 7.097,
+          "end": 7.117
+        },
+        {
+          "phoneme": "/t/",
+          "start": 7.258,
+          "end": 7.278
+        },
+        {
+          "phoneme": "/f/",
+          "start": 7.378,
+          "end": 7.418
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 7.458,
+          "end": 7.478
+        },
+        {
+          "phoneme": "/m/",
+          "start": 7.599,
+          "end": 7.619
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 7.639,
+          "end": 7.659
+        },
+        {
+          "phoneme": "/l/",
+          "start": 7.699,
+          "end": 7.719
+        },
+        {
+          "phoneme": "/i/",
+          "start": 7.739,
+          "end": 7.759
+        },
+        {
+          "phoneme": "/h/",
+          "start": 7.84,
+          "end": 7.86
+        },
+        {
+          "phoneme": "/oʊ/",
+          "start": 7.9,
+          "end": 7.92
+        }
+      ],
+      "mispronounced_words": [
+        {
+          "word": "to",
+          "severity": "low",
+          "start": 1.38,
+          "end": 1.7
+        },
+        {
+          "word": "one",
+          "severity": "medium",
+          "start": 1.88,
+          "end": 2.02
+        },
+        {
+          "word": "we",
+          "severity": "low",
+          "start": 2.92,
+          "end": 3.0
+        },
+        {
+          "word": "arrived",
+          "severity": "low",
+          "start": 3.0,
+          "end": 3.44
+        },
+        {
+          "word": "our",
+          "severity": "medium",
+          "start": 3.62,
+          "end": 3.78
+        },
+        {
+          "word": "favorite",
+          "severity": "low",
+          "start": 3.78,
+          "end": 4.2
+        },
+        {
+          "word": "in",
+          "severity": "low",
+          "start": 3.44,
+          "end": 3.62
+        },
+        {
+          "word": "europe",
+          "severity": "high",
+          "start": 4.86,
+          "end": 5.24
+        },
+        {
+          "word": "smith",
+          "severity": "high",
+          "start": 6.64,
+          "end": 7.0
+        },
+        {
+          "word": "home",
+          "severity": "low",
+          "start": 7.44,
+          "end": 7.9
+        }
+      ],
+      "stress_errors": [],
+      "rhythm_issues": [],
+      "overall_observations": [
+        "Overall pronunciation is strong.",
+        "2 word(s) show significant mispronunciation: europe, smith."
+      ]
+    },
+    "mti": {
+      "overall_mti_score": 86,
+      "clarity_impact": "low",
+      "summary": {
+        "vowel_pattern_issues": 2,
+        "consonant_pattern_issues": 1,
+        "stress_transfer_issues": 0
+      },
+      "vowel_patterns": [
+        {
+          "word": "to",
+          "timestamp": {
+            "start": 1.38,
+            "end": 1.7
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ə/",
+          "detected": "/ʊ/",
+          "severity": "low"
+        },
+        {
+          "word": "europe",
+          "timestamp": {
+            "start": 4.86,
+            "end": 5.24
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ə/",
+          "detected": "/oʊ/",
+          "severity": "low"
+        }
+      ],
+      "consonant_patterns": [
+        {
+          "word": "smith",
+          "timestamp": {
+            "start": 6.64,
+            "end": 7.0
+          },
+          "issue": "missing_aspiration",
+          "expected": "/θ/",
+          "detected": "/t/",
+          "severity": "high"
+        }
+      ],
+      "stress_transfer": [],
+      "speech_statistics": {
+        "total_words_analyzed": 23,
+        "affected_words": 3,
+        "affected_percentage": 13.0
+      },
+      "patterns_detected": [
+        "vowel substitution",
+        "missing aspirated sounds"
+      ],
+      "top_recurring_issue": "vowel substitution",
+      "clarity_risk_words": [
+        "smith"
+      ],
+      "overall_observations": [
+        "Overall clarity impact from native-language speech patterns is low.",
+        "Most common pattern: vowel substitution.",
+        "1 instance(s) carry high clarity impact."
+      ]
+    },
+    "intonation": {
+      "intonation_score": 68,
+      "delivery_label": "Somewhat flat",
+      "pitch_variation": {
+        "pitch_score": 85,
+        "average_pitch": 144.9,
+        "min_pitch": 124.6,
+        "max_pitch": 382.4,
+        "pitch_range": 257.8,
+        "observations": [
+          "Pitch varies overall, but delivery stays flat for sustained stretches."
+        ]
+      },
+      "energy_variation": {
+        "energy_score": 100,
+        "low_energy_sections": [],
+        "observations": [
+          "Energy fades over the course of the answer, which can read as running out of steam."
+        ]
+      },
+      "monotonicity": {
+        "monotonicity_score": 2,
+        "monotone_sections": [
+          {
+            "start": 2.0,
+            "end": 8.19,
+            "severity": "medium"
+          }
+        ],
+        "observations": [
+          "Detected 1 monotone section(s).",
+          "Speech becomes flat near the conclusion."
+        ]
+      },
+      "emphasis": {
+        "emphasis_score": 83,
+        "under_emphasized_words": [
+          {
+            "word": "favorite",
+            "timestamp": {
+              "start": 3.78,
+              "end": 4.2
+            }
+          },
+          {
+            "word": "city",
+            "timestamp": {
+              "start": 4.2,
+              "end": 4.52
+            }
+          }
+        ],
+        "observations": [
+          "2 of 12 important word(s) lack clear emphasis."
+        ]
+      },
+      "overall_observations": [
+        "Overall delivery: Somewhat flat.",
+        "Some sections of speech lack vocal variation.",
+        "Several important words lack emphasis."
+      ]
+    },
+    "engagement": {
+      "engagement_score": 65,
+      "engagement_level": "needs_improvement",
+      "strengths": [
+        "Consistent energy throughout the response",
+        "Smooth flow with no disruptive pauses"
+      ],
+      "improvement_areas": [
+        "Delivery sounds flat — limited pitch movement across the answer",
+        "Speaking pace runs slightly fast",
+        "Clarity issues on key word(s): europe, smith"
+      ],
+      "timeline": [
+        {
+          "start": 0,
+          "end": 8,
+          "engagement": "low"
+        }
+      ],
+      "energy_patterns": {
+        "energy_engagement_score": 100,
+        "low_energy_segments": [],
+        "observations": [
+          "Energy stays consistent, reading as steady enthusiasm."
+        ]
+      },
+      "pause_patterns": {
+        "pause_engagement_score": 100,
+        "disengaging_pauses": [],
+        "hesitation_clusters": [],
+        "observations": [
+          "No significant disengaging pauses detected."
+        ]
+      },
+      "speaking_dynamics": {
+        "dynamics_score": 68,
+        "strengths": [],
+        "issues": [
+          "Delivery sounds flat — limited pitch movement across the answer",
+          "Speaking pace runs slightly fast"
+        ],
+        "observations": [
+          "Speech delivery reads as moderately expressive."
+        ]
+      }
+    }
+  },
+  "processing_metadata": {
+    "analyzer_durations_seconds": {
+      "fluency": 0.0,
+      "intonation": 2.477,
+      "pronunciation": 9.081,
+      "mti": 0.0,
+      "engagement": 0.0
+    },
+    "parallel_execution": true
+  }
+}

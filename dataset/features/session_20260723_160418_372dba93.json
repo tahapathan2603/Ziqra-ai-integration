@@ -1,0 +1,936 @@
+{
+  "session_id": "session_20260723_160418_372dba93",
+  "analysis": {
+    "fluency": {
+      "fillers": {
+        "filler_count": 0,
+        "fillers_per_minute": 0.0,
+        "classification": "good",
+        "fillers": []
+      },
+      "pauses": {
+        "total_pauses": 3,
+        "pauses": [
+          {
+            "start": 4.3,
+            "end": 4.5,
+            "duration": 0.20000000000000018,
+            "type": "natural"
+          },
+          {
+            "start": 9.2,
+            "end": 9.5,
+            "duration": 0.3000000000000007,
+            "type": "natural"
+          },
+          {
+            "start": 10.5,
+            "end": 10.58,
+            "duration": 0.08000000000000007,
+            "type": "natural"
+          }
+        ]
+      },
+      "speaking_speed": {
+        "words_per_minute": 182,
+        "sentences_per_minute": 24,
+        "classification": "too_fast"
+      }
+    },
+    "pronunciation": {
+      "pronunciation_score": 91,
+      "phoneme_accuracy": 0.82,
+      "stress_accuracy": 1.0,
+      "rhythm_score": 1.0,
+      "phoneme_errors": [
+        {
+          "word": "consider",
+          "expected": "/ə/",
+          "detected": "/ʌ/"
+        },
+        {
+          "word": "learner",
+          "expected": "/n/",
+          "detected": null
+        },
+        {
+          "word": "learner",
+          "expected": "/ɚ/",
+          "detected": null
+        },
+        {
+          "word": "i",
+          "expected": null,
+          "detected": "/ɚ/"
+        },
+        {
+          "word": "trials",
+          "expected": null,
+          "detected": "/l/"
+        },
+        {
+          "word": "role",
+          "expected": "/oʊ/",
+          "detected": "/uː/"
+        },
+        {
+          "word": "the",
+          "expected": "/ə/",
+          "detected": "/ɚ/"
+        },
+        {
+          "word": "pharma",
+          "expected": "/s/",
+          "detected": null
+        },
+        {
+          "word": "pharma",
+          "expected": "/t/",
+          "detected": null
+        },
+        {
+          "word": "pharma",
+          "expected": "/ɹ/",
+          "detected": null
+        },
+        {
+          "word": "pharma",
+          "expected": "/i/",
+          "detected": null
+        },
+        {
+          "word": "that's",
+          "expected": "/ð/",
+          "detected": "/k/"
+        },
+        {
+          "word": "about",
+          "expected": "/ɐ/",
+          "detected": "/ə/"
+        },
+        {
+          "word": "me",
+          "expected": "/iː/",
+          "detected": null
+        },
+        {
+          "word": "thank",
+          "expected": "/θ/",
+          "detected": "/y5/"
+        },
+        {
+          "word": "thank",
+          "expected": "/æ/",
+          "detected": "/f/"
+        },
+        {
+          "word": "thank",
+          "expected": "/ŋ/",
+          "detected": "/a5/"
+        },
+        {
+          "word": "thank",
+          "expected": "/k/",
+          "detected": "/n/"
+        },
+        {
+          "word": "you",
+          "expected": "/j/",
+          "detected": "/k/"
+        },
+        {
+          "word": "you",
+          "expected": "/uː/",
+          "detected": "/y5/"
+        }
+      ],
+      "detected_phonemes": [
+        {
+          "phoneme": "/aɪ/",
+          "start": 1.441,
+          "end": 1.461
+        },
+        {
+          "phoneme": "/k/",
+          "start": 1.642,
+          "end": 1.662
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 1.703,
+          "end": 1.723
+        },
+        {
+          "phoneme": "/n/",
+          "start": 1.783,
+          "end": 1.803
+        },
+        {
+          "phoneme": "/s/",
+          "start": 1.844,
+          "end": 1.864
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 1.904,
+          "end": 1.924
+        },
+        {
+          "phoneme": "/d/",
+          "start": 1.964,
+          "end": 1.984
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 2.005,
+          "end": 2.025
+        },
+        {
+          "phoneme": "/m/",
+          "start": 2.145,
+          "end": 2.166
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 2.206,
+          "end": 2.226
+        },
+        {
+          "phoneme": "/s/",
+          "start": 2.367,
+          "end": 2.387
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 2.488,
+          "end": 2.508
+        },
+        {
+          "phoneme": "/l/",
+          "start": 2.608,
+          "end": 2.629
+        },
+        {
+          "phoneme": "/f/",
+          "start": 2.669,
+          "end": 2.689
+        },
+        {
+          "phoneme": "/h/",
+          "start": 2.749,
+          "end": 2.769
+        },
+        {
+          "phoneme": "/ɑːɹ/",
+          "start": 2.83,
+          "end": 2.85
+        },
+        {
+          "phoneme": "/d/",
+          "start": 3.011,
+          "end": 3.031
+        },
+        {
+          "phoneme": "/w/",
+          "start": 3.112,
+          "end": 3.132
+        },
+        {
+          "phoneme": "/ɜː/",
+          "start": 3.152,
+          "end": 3.172
+        },
+        {
+          "phoneme": "/k/",
+          "start": 3.313,
+          "end": 3.333
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 3.394,
+          "end": 3.414
+        },
+        {
+          "phoneme": "/ŋ/",
+          "start": 3.494,
+          "end": 3.514
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 3.675,
+          "end": 3.695
+        },
+        {
+          "phoneme": "/n/",
+          "start": 3.736,
+          "end": 3.756
+        },
+        {
+          "phoneme": "/d/",
+          "start": 3.756,
+          "end": 3.776
+        },
+        {
+          "phoneme": "/ɐ/",
+          "start": 3.776,
+          "end": 3.796
+        },
+        {
+          "phoneme": "/k/",
+          "start": 3.897,
+          "end": 3.917
+        },
+        {
+          "phoneme": "/w/",
+          "start": 3.957,
+          "end": 3.977
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 3.977,
+          "end": 3.997
+        },
+        {
+          "phoneme": "/k/",
+          "start": 4.098,
+          "end": 4.118
+        },
+        {
+          "phoneme": "/l/",
+          "start": 4.179,
+          "end": 4.199
+        },
+        {
+          "phoneme": "/ɜː/",
+          "start": 4.239,
+          "end": 4.259
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 4.42,
+          "end": 4.44
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 4.922,
+          "end": 4.942
+        },
+        {
+          "phoneme": "/k/",
+          "start": 5.023,
+          "end": 5.043
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 5.063,
+          "end": 5.083
+        },
+        {
+          "phoneme": "/n/",
+          "start": 5.123,
+          "end": 5.143
+        },
+        {
+          "phoneme": "/p/",
+          "start": 5.264,
+          "end": 5.284
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 5.284,
+          "end": 5.304
+        },
+        {
+          "phoneme": "/f/",
+          "start": 5.404,
+          "end": 5.424
+        },
+        {
+          "phoneme": "/ɔːɹ/",
+          "start": 5.484,
+          "end": 5.504
+        },
+        {
+          "phoneme": "/m/",
+          "start": 5.665,
+          "end": 5.685
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 5.766,
+          "end": 5.786
+        },
+        {
+          "phoneme": "/n/",
+          "start": 5.826,
+          "end": 5.846
+        },
+        {
+          "phoneme": "/k/",
+          "start": 5.926,
+          "end": 5.946
+        },
+        {
+          "phoneme": "/l/",
+          "start": 5.986,
+          "end": 6.007
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 6.007,
+          "end": 6.027
+        },
+        {
+          "phoneme": "/n/",
+          "start": 6.087,
+          "end": 6.107
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 6.127,
+          "end": 6.147
+        },
+        {
+          "phoneme": "/k/",
+          "start": 6.207,
+          "end": 6.227
+        },
+        {
+          "phoneme": "/əl/",
+          "start": 6.227,
+          "end": 6.248
+        },
+        {
+          "phoneme": "/l/",
+          "start": 6.288,
+          "end": 6.308
+        },
+        {
+          "phoneme": "/t/",
+          "start": 6.388,
+          "end": 6.408
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 6.448,
+          "end": 6.488
+        },
+        {
+          "phoneme": "/aɪ/",
+          "start": 6.509,
+          "end": 6.529
+        },
+        {
+          "phoneme": "/əl/",
+          "start": 6.75,
+          "end": 6.77
+        },
+        {
+          "phoneme": "/z/",
+          "start": 6.93,
+          "end": 6.95
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 7.011,
+          "end": 7.031
+        },
+        {
+          "phoneme": "/n/",
+          "start": 7.071,
+          "end": 7.091
+        },
+        {
+          "phoneme": "/d/",
+          "start": 7.091,
+          "end": 7.111
+        },
+        {
+          "phoneme": "/k/",
+          "start": 7.171,
+          "end": 7.191
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 7.211,
+          "end": 7.232
+        },
+        {
+          "phoneme": "/n/",
+          "start": 7.272,
+          "end": 7.292
+        },
+        {
+          "phoneme": "/ɐ/",
+          "start": 7.352,
+          "end": 7.372
+        },
+        {
+          "phoneme": "/d/",
+          "start": 7.452,
+          "end": 7.473
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 7.513,
+          "end": 7.533
+        },
+        {
+          "phoneme": "/p/",
+          "start": 7.653,
+          "end": 7.673
+        },
+        {
+          "phoneme": "/t/",
+          "start": 7.693,
+          "end": 7.713
+        },
+        {
+          "phoneme": "/t/",
+          "start": 7.734,
+          "end": 7.754
+        },
+        {
+          "phoneme": "/ʊ/",
+          "start": 7.774,
+          "end": 7.794
+        },
+        {
+          "phoneme": "/ɛ/",
+          "start": 7.914,
+          "end": 7.934
+        },
+        {
+          "phoneme": "/n/",
+          "start": 8.015,
+          "end": 8.035
+        },
+        {
+          "phoneme": "/i/",
+          "start": 8.055,
+          "end": 8.075
+        },
+        {
+          "phoneme": "/ɹ/",
+          "start": 8.155,
+          "end": 8.195
+        },
+        {
+          "phoneme": "/uː/",
+          "start": 8.216,
+          "end": 8.236
+        },
+        {
+          "phoneme": "/l/",
+          "start": 8.396,
+          "end": 8.416
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 8.497,
+          "end": 8.517
+        },
+        {
+          "phoneme": "/n/",
+          "start": 8.557,
+          "end": 8.577
+        },
+        {
+          "phoneme": "/ð/",
+          "start": 8.577,
+          "end": 8.597
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 8.617,
+          "end": 8.637
+        },
+        {
+          "phoneme": "/f/",
+          "start": 8.697,
+          "end": 8.718
+        },
+        {
+          "phoneme": "/ɑːɹ/",
+          "start": 8.778,
+          "end": 8.798
+        },
+        {
+          "phoneme": "/m/",
+          "start": 8.918,
+          "end": 8.938
+        },
+        {
+          "phoneme": "/ɚ/",
+          "start": 8.959,
+          "end": 8.979
+        },
+        {
+          "phoneme": "/ɪ/",
+          "start": 9.059,
+          "end": 9.079
+        },
+        {
+          "phoneme": "/n/",
+          "start": 9.099,
+          "end": 9.119
+        },
+        {
+          "phoneme": "/d/",
+          "start": 9.159,
+          "end": 9.179
+        },
+        {
+          "phoneme": "/ʌ/",
+          "start": 9.2,
+          "end": 9.22
+        },
+        {
+          "phoneme": "/k/",
+          "start": 9.685,
+          "end": 9.705
+        },
+        {
+          "phoneme": "/æ/",
+          "start": 9.746,
+          "end": 9.766
+        },
+        {
+          "phoneme": "/t/",
+          "start": 9.847,
+          "end": 9.868
+        },
+        {
+          "phoneme": "/s/",
+          "start": 9.868,
+          "end": 9.888
+        },
+        {
+          "phoneme": "/ɔː/",
+          "start": 9.949,
+          "end": 9.969
+        },
+        {
+          "phoneme": "/l/",
+          "start": 10.071,
+          "end": 10.092
+        },
+        {
+          "phoneme": "/ə/",
+          "start": 10.112,
+          "end": 10.132
+        },
+        {
+          "phoneme": "/b/",
+          "start": 10.193,
+          "end": 10.214
+        },
+        {
+          "phoneme": "/aʊ/",
+          "start": 10.234,
+          "end": 10.254
+        },
+        {
+          "phoneme": "/t/",
+          "start": 10.417,
+          "end": 10.437
+        },
+        {
+          "phoneme": "/m/",
+          "start": 10.519,
+          "end": 10.539
+        },
+        {
+          "phoneme": "/y5/",
+          "start": 10.542,
+          "end": 10.563
+        },
+        {
+          "phoneme": "/f/",
+          "start": 10.687,
+          "end": 10.707
+        },
+        {
+          "phoneme": "/a5/",
+          "start": 10.769,
+          "end": 10.79
+        },
+        {
+          "phoneme": "/n/",
+          "start": 10.852,
+          "end": 10.873
+        },
+        {
+          "phoneme": "/k/",
+          "start": 10.955,
+          "end": 10.976
+        },
+        {
+          "phoneme": "/y5/",
+          "start": 11.038,
+          "end": 11.059
+        }
+      ],
+      "mispronounced_words": [
+        {
+          "word": "consider",
+          "severity": "low",
+          "start": 1.5,
+          "end": 1.74
+        },
+        {
+          "word": "learner",
+          "severity": "medium",
+          "start": 3.96,
+          "end": 4.3
+        },
+        {
+          "word": "i",
+          "severity": "low",
+          "start": 1.4,
+          "end": 1.5
+        },
+        {
+          "word": "trials",
+          "severity": "low",
+          "start": 6.119999999999999,
+          "end": 6.66
+        },
+        {
+          "word": "role",
+          "severity": "low",
+          "start": 8.0,
+          "end": 8.28
+        },
+        {
+          "word": "the",
+          "severity": "low",
+          "start": 8.5,
+          "end": 8.58
+        },
+        {
+          "word": "pharma",
+          "severity": "high",
+          "start": 8.58,
+          "end": 8.86
+        },
+        {
+          "word": "that's",
+          "severity": "medium",
+          "start": 9.5,
+          "end": 9.84
+        },
+        {
+          "word": "about",
+          "severity": "low",
+          "start": 9.94,
+          "end": 10.22
+        },
+        {
+          "word": "me",
+          "severity": "low",
+          "start": 10.22,
+          "end": 10.5
+        },
+        {
+          "word": "thank",
+          "severity": "high",
+          "start": 10.58,
+          "end": 10.76
+        },
+        {
+          "word": "you",
+          "severity": "medium",
+          "start": 10.76,
+          "end": 11.0
+        }
+      ],
+      "stress_errors": [],
+      "rhythm_issues": [],
+      "overall_observations": [
+        "Overall pronunciation is strong.",
+        "2 word(s) show significant mispronunciation: pharma, thank."
+      ]
+    },
+    "mti": {
+      "overall_mti_score": 81,
+      "clarity_impact": "medium",
+      "summary": {
+        "vowel_pattern_issues": 2,
+        "consonant_pattern_issues": 3,
+        "stress_transfer_issues": 0
+      },
+      "vowel_patterns": [
+        {
+          "word": "consider",
+          "timestamp": {
+            "start": 1.5,
+            "end": 1.74
+          },
+          "issue": "vowel_substitution",
+          "expected": "/ə/",
+          "detected": "/ʌ/",
+          "severity": "low"
+        },
+        {
+          "word": "role",
+          "timestamp": {
+            "start": 8.0,
+            "end": 8.28
+          },
+          "issue": "vowel_substitution",
+          "expected": "/oʊ/",
+          "detected": "/uː/",
+          "severity": "low"
+        }
+      ],
+      "consonant_patterns": [
+        {
+          "word": "that's",
+          "timestamp": {
+            "start": 9.5,
+            "end": 9.84
+          },
+          "issue": "consonant_substitution",
+          "expected": "/ð/",
+          "detected": "/k/",
+          "severity": "medium"
+        },
+        {
+          "word": "thank",
+          "timestamp": {
+            "start": 10.58,
+            "end": 10.76
+          },
+          "issue": "consonant_substitution",
+          "expected": "/k/",
+          "detected": "/n/",
+          "severity": "medium"
+        },
+        {
+          "word": "you",
+          "timestamp": {
+            "start": 10.76,
+            "end": 11.0
+          },
+          "issue": "consonant_substitution",
+          "expected": "/j/",
+          "detected": "/k/",
+          "severity": "medium"
+        }
+      ],
+      "stress_transfer": [],
+      "speech_statistics": {
+        "total_words_analyzed": 30,
+        "affected_words": 5,
+        "affected_percentage": 16.7
+      },
+      "patterns_detected": [
+        "vowel substitution",
+        "consonant substitution"
+      ],
+      "top_recurring_issue": "consonant substitution",
+      "clarity_risk_words": [],
+      "overall_observations": [
+        "Overall clarity impact from native-language speech patterns is medium.",
+        "Most common pattern: consonant substitution."
+      ]
+    },
+    "intonation": {
+      "intonation_score": 96,
+      "delivery_label": "Expressive",
+      "pitch_variation": {
+        "pitch_score": 82,
+        "average_pitch": 171.0,
+        "min_pitch": 74.6,
+        "max_pitch": 207.2,
+        "pitch_range": 132.6,
+        "observations": [
+          "Pitch variation is healthy."
+        ]
+      },
+      "energy_variation": {
+        "energy_score": 100,
+        "low_energy_sections": [],
+        "observations": [
+          "Energy builds over the course of the answer."
+        ]
+      },
+      "monotonicity": {
+        "monotonicity_score": 100,
+        "monotone_sections": [],
+        "observations": [
+          "No sustained monotone sections detected."
+        ]
+      },
+      "emphasis": {
+        "emphasis_score": 100,
+        "under_emphasized_words": [],
+        "observations": [
+          "Important words receive adequate vocal emphasis."
+        ]
+      },
+      "overall_observations": [
+        "Overall delivery: Expressive.",
+        "No major delivery issues detected."
+      ]
+    },
+    "engagement": {
+      "engagement_score": 97,
+      "engagement_level": "highly_engaging",
+      "strengths": [
+        "Good vocal variation — pitch moves naturally and delivery stays lively",
+        "Consistent energy throughout the response",
+        "Smooth flow with no disruptive pauses"
+      ],
+      "improvement_areas": [
+        "Speaking pace is too fast",
+        "Clarity issues on key word(s): pharma, thank"
+      ],
+      "timeline": [
+        {
+          "start": 0,
+          "end": 12,
+          "engagement": "high"
+        }
+      ],
+      "energy_patterns": {
+        "energy_engagement_score": 100,
+        "low_energy_segments": [],
+        "observations": [
+          "Energy stays consistent, reading as steady enthusiasm."
+        ]
+      },
+      "pause_patterns": {
+        "pause_engagement_score": 100,
+        "disengaging_pauses": [],
+        "hesitation_clusters": [],
+        "observations": [
+          "No significant disengaging pauses detected."
+        ]
+      },
+      "speaking_dynamics": {
+        "dynamics_score": 96,
+        "strengths": [
+          "Good vocal variation — pitch moves naturally and delivery stays lively"
+        ],
+        "issues": [
+          "Speaking pace is too fast"
+        ],
+        "observations": [
+          "Speech delivery reads as animated and expressive."
+        ]
+      }
+    }
+  },
+  "processing_metadata": {
+    "analyzer_durations_seconds": {
+      "fluency": 0.0,
+      "intonation": 1.387,
+      "pronunciation": 7.34,
+      "mti": 0.0,
+      "engagement": 0.0
+    },
+    "parallel_execution": true
+  }
+}

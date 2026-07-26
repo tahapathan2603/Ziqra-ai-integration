@@ -1,0 +1,190 @@
+{
+  "n_samples": 2000,
+  "duplicates": {
+    "exact_duplicate_rows": 0,
+    "near_duplicate_score_signatures": 0,
+    "max_identical_signature_frequency": 1
+  },
+  "feature_summary": {
+    "duration": {
+      "mean": 42.171,
+      "std": 16.875,
+      "min": 6.897,
+      "max": 123.607
+    },
+    "n_words": {
+      "mean": 79.722,
+      "std": 26.952,
+      "min": 22,
+      "max": 150
+    },
+    "wpm": {
+      "mean": 118.538,
+      "std": 27.456,
+      "min": 43,
+      "max": 209
+    },
+    "filler_count": {
+      "mean": 1.28,
+      "std": 1.581,
+      "min": 0,
+      "max": 10
+    },
+    "filler_rate": {
+      "mean": 1.837,
+      "std": 2.234,
+      "min": 0.0,
+      "max": 17.4
+    },
+    "total_pauses": {
+      "mean": 78.722,
+      "std": 26.952,
+      "min": 21,
+      "max": 149
+    },
+    "dead_air": {
+      "mean": 0.936,
+      "std": 1.225,
+      "min": 0,
+      "max": 9
+    },
+    "pronunciation_score": {
+      "mean": 88.634,
+      "std": 9.486,
+      "min": 57,
+      "max": 100
+    },
+    "phoneme_accuracy": {
+      "mean": 0.836,
+      "std": 0.09,
+      "min": 0.57,
+      "max": 1.0
+    },
+    "rhythm_score": {
+      "mean": 0.937,
+      "std": 0.152,
+      "min": 0.52,
+      "max": 1.0
+    },
+    "n_mispronounced": {
+      "mean": 5.389,
+      "std": 2.774,
+      "min": 0,
+      "max": 14
+    },
+    "mti_score": {
+      "mean": 64.811,
+      "std": 22.716,
+      "min": 0,
+      "max": 100
+    },
+    "n_mti_patterns": {
+      "mean": 6.921,
+      "std": 4.021,
+      "min": 0,
+      "max": 23
+    },
+    "intonation_score": {
+      "mean": 77.524,
+      "std": 10.836,
+      "min": 23,
+      "max": 96
+    },
+    "n_monotone": {
+      "mean": 0.436,
+      "std": 0.962,
+      "min": 0,
+      "max": 8
+    },
+    "engagement_score": {
+      "mean": 67.826,
+      "std": 16.134,
+      "min": 10,
+      "max": 97
+    },
+    "composite": {
+      "mean": 74.698,
+      "std": 10.167,
+      "min": 33,
+      "max": 97
+    }
+  },
+  "correlations": {
+    "filler_rate__vs__engagement_score": -0.149,
+    "phoneme_accuracy__vs__pronunciation_score": 0.61,
+    "n_monotone__vs__engagement_score": -0.514,
+    "intonation_score__vs__engagement_score": 0.665,
+    "mti_score__vs__engagement_score": 0.233,
+    "dead_air__vs__engagement_score": -0.664,
+    "theta__vs__composite": 0.553
+  },
+  "coverage": {
+    "engagement_band": {
+      "average": 590,
+      "exceptional": 324,
+      "poor": 284,
+      "strong": 675,
+      "very_poor": 127
+    },
+    "composite_band": {
+      "average": 520,
+      "exceptional": 333,
+      "poor": 70,
+      "strong": 1075,
+      "very_poor": 2
+    },
+    "engagement_level": {
+      "highly_engaging": 316,
+      "low_engagement": 295,
+      "moderately_engaging": 654,
+      "needs_improvement": 735
+    },
+    "speed_class": {
+      "fast": 124,
+      "ideal": 789,
+      "slow": 738,
+      "too_fast": 25,
+      "very_slow": 324
+    },
+    "delivery_label": {
+      "Expressive": 464,
+      "Flat": 70,
+      "Moderately expressive": 1262,
+      "Somewhat flat": 204
+    },
+    "mti_clarity": {
+      "high": 736,
+      "low": 404,
+      "medium": 860
+    },
+    "tier": {
+      "average": 520,
+      "exceptional": 300,
+      "poor": 440,
+      "strong": 440,
+      "very_poor": 300
+    },
+    "persona": {
+      "average_pron": 105,
+      "balanced": 106,
+      "confident": 105,
+      "disengaged": 105,
+      "excellent_pron": 105,
+      "expressive": 105,
+      "fast_speaker": 105,
+      "flat": 105,
+      "highly_engaging": 105,
+      "loses_energy": 106,
+      "moderately_fluent": 105,
+      "mti_heavy": 106,
+      "mti_light": 106,
+      "mti_moderate": 106,
+      "nervous": 105,
+      "pron_issues": 105,
+      "slow_speaker": 105,
+      "technical_word_mistakes": 105,
+      "very_fluent": 105
+    }
+  },
+  "validation_warnings": []
+}
