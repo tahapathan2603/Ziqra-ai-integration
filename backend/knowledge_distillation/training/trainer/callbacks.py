@@ -150,8 +150,7 @@ class RichTrainingCallback(TrainerCallback):
     def on_train_end(
         self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs
     ) -> None:
-        if self._live is not None:
-            self._live.stop()
+        self.stop()
         elapsed = time.time() - self._start_time if self._start_time else 0.0
         summary = Table.grid(padding=(0, 2))
         summary.add_row("Total steps:", str(state.global_step))
@@ -162,6 +161,23 @@ class RichTrainingCallback(TrainerCallback):
         )
         summary.add_row("Best checkpoint:", state.best_model_checkpoint or "-")
         self._console.print(Panel(summary, title="Training Complete", border_style="green"))
+
+    def stop(self) -> None:
+        """Stop the Live display, if it's running. Idempotent -- safe to
+        call more than once, and safe to call even if training never got
+        as far as `on_train_begin`.
+
+        `on_train_end` is Trainer's *success* hook: if `trainer.train()`
+        raises partway through (a crash inside a training step, for
+        example), Trainer does not reliably call it, and the Live
+        display's background refresh thread keeps redrawing the full
+        status panel indefinitely -- interleaving badly with the
+        exception traceback as it prints, independently of whatever
+        actually crashed. train.py calls this explicitly in a `finally`
+        block around `trainer.train()` so a crash always gets a clean
+        traceback, not a wall of repeated panels."""
+        if self._live is not None and self._live.is_started:
+            self._live.stop()
 
     # -- rendering --------------------------------------------------------
     def _stage_label(self, state: TrainerState) -> str:

@@ -42,7 +42,7 @@ from rich.table import Table
 from transformers import Trainer, TrainingArguments
 
 from . import PROJECT_ROOT, ConfigError, TrainingConfig, load_config
-from .callbacks import build_callbacks
+from .callbacks import RichTrainingCallback, build_callbacks
 from .dataset import ConversationDataCollator, DatasetBuildError, build_datasets
 from .model_loader import load_model_and_tokenizer, select_device
 
@@ -167,7 +167,19 @@ def main() -> None:
         callbacks=callbacks,
     )
 
-    trainer.train()
+    # Trainer's on_train_end callback hook (which normally stops the Rich
+    # Live display) only fires on successful completion -- not reliably on
+    # a crash inside a training step. Without this, a mid-training
+    # exception leaves the Live display's background refresh thread
+    # running, redrawing the full status panel on top of the traceback as
+    # it prints. Stopping it explicitly here guarantees a clean traceback
+    # regardless of how training ends.
+    rich_callback = next((cb for cb in callbacks if isinstance(cb, RichTrainingCallback)), None)
+    try:
+        trainer.train()
+    finally:
+        if rich_callback is not None:
+            rich_callback.stop()
 
     adapter_dir = output_dir / "adapters"
     adapter_dir.mkdir(parents=True, exist_ok=True)
