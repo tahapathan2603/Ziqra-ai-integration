@@ -1,0 +1,97 @@
+# =============================================================================
+# Articulation Coach — Student Training Configuration
+#
+# Student model: Gemma (~3B-class), LoRA fine-tuned on the Articulation
+# rubrics (Pronunciation, MTI) via backend.knowledge_distillation.training.
+#
+# This file is config data only -- no trainer reads it yet (see this
+# package's parent docstring). See README.md in this directory for a full
+# explanation of every field below.
+# =============================================================================
+
+model:
+  # Gemma does not ship an exact 3B checkpoint; 4B is the nearest publicly
+  # available instruction-tuned size to the requested "~3B" class. Swap
+  # for whichever Gemma checkpoint you have local weights/license for.
+  model_name: "google/gemma-3-4b-it"
+  tokenizer_name: null      # null = derive from model_name at load time
+  trust_remote_code: false  # Gemma is natively supported in recent transformers
+  torch_dtype: "bfloat16"   # Gemma is trained/released in bf16; halves memory vs fp32
+
+  # Ollama tag for the SAME model, used only as a local-presence check/pull
+  # convenience (see trainer/model_loader.py's docstring for why this is a
+  # separate field from model_name -- Ollama's GGUF blobs are not what
+  # actually gets loaded for training). Set to null to skip the check
+  # entirely. Confirm the exact tag with `ollama list` / the Ollama
+  # library page before relying on it.
+  ollama_model_name: "gemma3:4b"
+
+quantization:
+  # Optional 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA
+  # GPU -- silently ignored (falls back to unquantized) on CPU/MPS, since
+  # bitsandbytes doesn't support them. Off by default: this project's
+  # reference dev machine is Apple Silicon (MPS), where this has no effect.
+  enabled: false
+  load_in_4bit: true
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+
+dataset:
+  # Which coach's rows to select -- train/validation/test.jsonl are a
+  # single combined file across both coaches (see
+  # training/data/split_dataset.py), tagged per-row with a "coach" field.
+  coach: "articulation"
+  train_file: "backend/knowledge_distillation/training/data/datasets/splits/train.jsonl"
+  validation_file: "backend/knowledge_distillation/training/data/datasets/splits/validation.jsonl"
+  test_file: "backend/knowledge_distillation/training/data/datasets/splits/test.jsonl"
+
+lora:
+  # Placeholders for the not-yet-implemented trainer -- no PEFT/LoRA code
+  # exists yet. Values are conventional defaults for a ~3B model.
+  enabled: true
+  rank: 16
+  alpha: 32          # commonly set to 2x rank
+  dropout: 0.05
+  target_modules:    # standard attention + MLP projections for Gemma's transformer blocks
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+training:
+  epochs: 3
+  learning_rate: 2.0e-4              # LoRA tolerates a higher LR than full fine-tuning
+  batch_size: 4                      # per-device; tune to fit available VRAM
+  gradient_accumulation_steps: 4     # effective batch size = batch_size * this = 16
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  max_sequence_length: 4096          # covers the full dataset via the real chat template (p99 ~3493, max ~3602 tokens; see README)
+
+  # Caps how many eval batches of raw logits Trainer holds in memory
+  # before offloading to CPU -- keeps validation from spiking memory on
+  # top of training. null = accumulate everything (fine for this dataset's
+  # small eval sets; lower this first if evaluation OOMs on a larger one).
+  eval_accumulation_steps: null
+
+  # Stop training if validation loss hasn't improved for this many
+  # evaluation calls. null disables early stopping entirely.
+  early_stopping_patience: 3
+
+checkpointing:
+  # Root directory for this run's outputs; the trainer creates
+  # {output_dir}/checkpoints, {output_dir}/adapters, and
+  # {output_dir}/logs underneath it -- intermediate checkpoints and the
+  # final LoRA adapter are always kept separate (see trainer/train.py).
+  output_dir: "backend/knowledge_distillation/training/outputs/articulation"
+  save_strategy: "epoch"    # "epoch" | "steps"
+  save_steps: 500           # only used when save_strategy is "steps"
+  logging_steps: 20
+  evaluation_strategy: "epoch"  # "epoch" | "steps"
+  eval_steps: 500           # only used when evaluation_strategy is "steps"
+
+randomness:
+  seed: 42   # matches training/data/split_dataset.py's default seed
