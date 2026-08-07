@@ -106,14 +106,19 @@ def _tokenize_conversation(
         labels[i] = -100
 
     # token_type_ids: all-zero, since every example here is plain text (no
-    # image tokens -- Gemma3's own convention is 1=image, 0=text). Recent
-    # transformers versions (confirmed on a real Kaggle run, unpinned pip
-    # install) make Gemma3's forward *require* this input during training --
-    # it raises ValueError otherwise, even for a text-only checkpoint like
-    # google/gemma-3-4b-it. Qwen2's forward has no token_type_ids parameter
-    # but accepts and silently ignores it via its **kwargs catch-all, so
-    # this is safe to include unconditionally for both coaches rather than
-    # branching on which model is loaded.
+    # image tokens -- Gemma3's own convention is 1=image, 0=text).
+    #
+    # No longer strictly required, but deliberately kept. It was added
+    # because Gemma3's MULTIMODAL forward raises
+    # "`token_type_ids` is required as a model input when training" without
+    # it (confirmed on a real Kaggle run). model_loader.py now narrows
+    # multimodal checkpoints to their text tower, and Gemma3TextModel has no
+    # such requirement -- verified directly: forward+backward with and
+    # without this key produce an identical loss, since the text-only
+    # class absorbs it via **kwargs and ignores it, exactly as Qwen2 does.
+    # Emitting it unconditionally costs ~8 bytes/token and keeps this
+    # collator correct for either loading path, rather than coupling the
+    # dataset to which model class the loader happened to pick.
     return {
         "input_ids": full_ids,
         "attention_mask": [1] * len(full_ids),

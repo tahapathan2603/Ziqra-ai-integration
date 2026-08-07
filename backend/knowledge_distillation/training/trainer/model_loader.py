@@ -35,7 +35,13 @@ from typing import Optional, Tuple
 
 import torch
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel, PreTrainedTokenizerBase
+from transformers import (
+    AutoConfig,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizerBase,
+)
 
 from . import LoRAConfig as LoRAConfigSpec
 from . import ModelConfig as ModelConfigSpec
@@ -230,11 +236,58 @@ def load_tokenizer(model_cfg: ModelConfigSpec) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
+def resolve_text_only_config(model_cfg: ModelConfigSpec):
+    """The text-tower config for a multimodal checkpoint, or None if the
+    checkpoint is already text-only.
+
+    This project trains text-only students, but some checkpoints are
+    multimodal: `google/gemma-3-4b-it` carries a SigLIP vision tower, and
+    plain `AutoModelForCausalLM.from_pretrained` on it builds
+    `Gemma3ForConditionalGeneration` -- costing memory twice over on a 16GB
+    T4, confirmed by a real OOM:
+
+      1. 453M vision-tower parameters are loaded and never used (the model
+         is 4.333B params as a multimodal model vs 3.880B text-only).
+      2. Much worse, `Gemma3ForConditionalGeneration.forward` runs its own
+         loss rather than the shared `ForCausalLMLoss`, and that path makes
+         a THIRD full copy of the logits:
+             logits.float()                              # fp32 copy
+             shift_logits[shift_attention_mask != 0].contiguous()  # another
+         With Gemma-3's 262,208-token vocabulary that extra copy is
+         seq * 262208 * 4 bytes -- 3.75 GB at a ~3570-token example, which
+         is exactly the allocation that failed. `Gemma3ForCausalLM` calls
+         `self.loss_function(...)` instead and never makes it. Note the
+         gather is pure waste here regardless: at batch_size 1 there is no
+         padding, so the mask is all ones and it copies the whole tensor to
+         select all of it.
+
+    Passing this config to `from_pretrained` makes the Auto class resolve to
+    the text-only architecture (`Gemma3TextConfig` -> `Gemma3ForCausalLM`),
+    which loads the checkpoint's `language_model.*` tensors cleanly -- its
+    `base_model_prefix` is already "language_model", and every parameter
+    name matches with nothing missing or left over (verified against the
+    real checkpoint index).
+
+    Detection is generic rather than a Gemma special case: `get_text_config()`
+    returns a *different* object for a composite/multimodal config and
+    `self` for an already-text-only one, so Qwen2.5 (delivery) takes the
+    unchanged path.
+    """
+    config = AutoConfig.from_pretrained(
+        model_cfg.model_name, trust_remote_code=model_cfg.trust_remote_code
+    )
+    text_config = config.get_text_config()
+    if text_config is config:
+        return None
+    return text_config
+
+
 def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpec) -> PreTrainedModel:
     """Load the base causal-LM from the Hugging Face Hub (or a local
     path), at `model_cfg.torch_dtype` (hardware-adjusted -- see
     resolve_effective_dtype), optionally quantized, moved to the best
-    available device."""
+    available device. Multimodal checkpoints are narrowed to their text
+    tower -- see resolve_text_only_config."""
     dtype = resolve_effective_dtype(model_cfg.torch_dtype)
     quantization_config = _build_quantization_config(quant_cfg)
 
@@ -242,6 +295,16 @@ def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpe
     if quantization_config is not None:
         load_kwargs["quantization_config"] = quantization_config
         load_kwargs["device_map"] = "auto"  # required by bitsandbytes-quantized loading
+
+    text_config = resolve_text_only_config(model_cfg)
+    if text_config is not None:
+        logger.info(
+            "%s is a multimodal checkpoint; loading its text tower only "
+            "(drops the unused vision encoder and avoids the multimodal loss path's "
+            "extra full-size logits copy).",
+            model_cfg.model_name,
+        )
+        load_kwargs["config"] = text_config
 
     model = AutoModelForCausalLM.from_pretrained(model_cfg.model_name, **load_kwargs)
 
@@ -342,5 +405,6 @@ __all__ = [
     "load_model_and_tokenizer",
     "load_tokenizer",
     "resolve_effective_dtype",
+    "resolve_text_only_config",
     "select_device",
 ]

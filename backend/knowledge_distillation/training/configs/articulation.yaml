@@ -13,6 +13,13 @@ model:
   # Gemma does not ship an exact 3B checkpoint; 4B is the nearest publicly
   # available instruction-tuned size to the requested "~3B" class. Swap
   # for whichever Gemma checkpoint you have local weights/license for.
+  #
+  # This is a MULTIMODAL checkpoint (it carries a SigLIP vision tower).
+  # trainer/model_loader.py's resolve_text_only_config() narrows it to its
+  # text tower automatically -- 3.880B params instead of 4.333B, and, far
+  # more importantly, it avoids the multimodal loss path's extra full-size
+  # logits copy that OOM'd a 16GB T4. Nothing to configure; see that
+  # function's docstring for the detail.
   model_name: "google/gemma-3-4b-it"
   tokenizer_name: null      # null = derive from model_name at load time
   trust_remote_code: false  # Gemma is natively supported in recent transformers
