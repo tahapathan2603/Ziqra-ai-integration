@@ -41,8 +41,8 @@ Optional 4-bit (QLoRA-style) loading via `bitsandbytes`. Requires a CUDA GPU —
 
 | Field | Meaning |
 |---|---|
-| `coach` | Which coach's rows to use. `train_file`/`validation_file`/`test_file` are a **single combined file across both coaches** (see `training/data/split_dataset.py`), so this field is how a coach-specific config selects its subset — filter rows where `row["coach"] == dataset.coach`. |
-| `train_file` / `validation_file` / `test_file` | Paths to the split JSONL files produced by `training/data/prepare_dataset.py` + `split_dataset.py`. Given as repo-root-relative paths; resolve them against the project root, not the config file's own location. |
+| `coach` | Which coach this config is for. `train_file`/`validation_file`/`test_file` are already single-coach files (`training/data/student_dataset.py` writes one per coach), so this isn't a filter — the trainer asserts every record's own `"coach"` field matches it, catching a wrong-file-wired-to-wrong-config mistake early. |
+| `train_file` / `validation_file` / `test_file` | Paths to the split JSONL files produced by `training/data/student_dataset.py`. Each record is `{"session_id", "coach", "input": {"level1", "level2"}, "target": {evaluation_analysis, scores, score_reasoning, coach_output, reasoning_trace}}` — the trainer builds a chat-format conversation from it via `training.prompts.build_conversation_from_student_record`. Given as repo-root-relative paths; resolve them against the project root, not the config file's own location. |
 
 ## `lora`
 

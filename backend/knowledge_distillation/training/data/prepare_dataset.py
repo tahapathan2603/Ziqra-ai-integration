@@ -2,6 +2,16 @@
 Converts the knowledge-distillation dataset into HF-style conversational
 JSONL for supervised fine-tuning (Part 8, stage 2).
 
+NOT what training.trainer.dataset.py reads. That module reads
+training.data.student_dataset's output directly (one already-split file
+per coach, {"input": {"level1", "level2"}, "target": {...}}) -- this
+module's combined-across-coaches conversations.jsonl/splits/ output is no
+longer anything downstream consumes. It's kept because it's a valid,
+independently useful representation (HF chat-format, all coaches in one
+file) and deleting a working, tested module wasn't asked for -- but if
+you're looking for what actually feeds a training run, that's
+student_dataset.py, not this file.
+
 Formatting itself is delegated entirely to training.prompts.build_conversation()
 -- the coach-template-based formatter (Part 9) -- rather than duplicated
 here. That used not to be true: this module briefly had its own parallel

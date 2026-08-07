@@ -4,57 +4,63 @@ Dataset construction for student training (Part 10).
 Independent from model loading: everything here takes an already-built
 tokenizer and never imports model_loader.py.
 
-Integrates training.data with training.prompts rather than picking one:
+Reads training.data.student_dataset's output directly -- one coach's
+already-split, already-validated {"input": {"level1", "level2"},
+"target": {...}} records -- as the sole source:
 
-    training/data/datasets/splits/{train,validation}.jsonl
-            |  (read ONLY for session_id/coach -- which split a session
-            |   belongs to; NOT for their baked-in `messages` field)
+    training/data/datasets/student_dataset/{coach}/{train,validation}.jsonl
+            |
             v
-    training.data.load_coach_samples(coach)     -- re-fetch each full
-            |                                       DistillationSample
-            v
-    training.prompts.build_conversation(sample)  -- format fresh, from
-            |                                       the CURRENT templates
+    training.prompts.build_conversation_from_student_record(record)
+            |  -- fills the coach template from the record's own
+            |     already-split level1/level2 and formats its target into
+            |     the assistant turn; produces byte-identical `messages`
+            |     content to building fresh from a DistillationSample
+            |     (verified: see training.data.student_dataset's own
+            |     verification, not re-asserted here)
             v
     tokenize (chat template) -> truncate -> mask prompt tokens out of the
     loss -> ConversationDataset
 
-Rebuilding conversations fresh (instead of trusting the split files'
-baked-in `messages`) means editing articulation_template.txt or
-delivery_template.txt takes effect immediately, without re-running
-prepare_dataset.py/split_dataset.py first. The split files remain the
-single source of truth for train/validation/test *membership* -- that
-partitioning is deliberately not redone here.
+This module used to re-derive conversations by cross-referencing a
+combined split file (for session_id/coach membership only) against
+training.data.load_coach_samples (for full content) -- two files, two
+lookups, for what training.data.student_dataset now already hands over as
+one file with everything in it. Reading it directly removes that
+cross-referencing entirely and drops this module's dependency on
+training.data down to nothing -- it depends only on files on disk plus
+training.prompts' formatter.
 """
 
 import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizerBase
 
-from ..data import load_coach_samples
-from ..prompts import build_conversation
+from ..prompts import build_conversation_from_student_record
 
 logger = logging.getLogger(__name__)
 
 
 class DatasetBuildError(Exception):
-    """A split file is missing, or a coach's split has zero usable
-    examples after tokenization."""
+    """A student_dataset file is missing or malformed, a record's coach
+    doesn't match the config it was loaded under, or a coach's split has
+    zero usable examples after tokenization."""
 
 
-def _read_split_session_ids(path: Path, coach: str) -> Set[str]:
-    """Which session_ids belong to `coach` in one split file. Only
-    `session_id`/`coach` are read -- see module docstring for why the
-    file's own `messages` field is deliberately ignored."""
+def _read_student_records(path: Path, expected_coach: str) -> List[Dict[str, Any]]:
+    """Read one training.data.student_dataset split file. Asserts every
+    record's "coach" matches `expected_coach` -- student_dataset writes
+    one file per coach, so a mismatch means the wrong file is wired to
+    this config, not a data problem to silently tolerate."""
     if not path.exists():
-        raise DatasetBuildError(f"Split file not found: {path}. Run training/data/split_dataset.py first.")
-    ids: Set[str] = set()
+        raise DatasetBuildError(f"Student dataset file not found: {path}. Run training/data/student_dataset.py first.")
+    records: List[Dict[str, Any]] = []
     with path.open(encoding="utf-8") as f:
         for lineno, line in enumerate(f, start=1):
             line = line.strip()
@@ -64,9 +70,13 @@ def _read_split_session_ids(path: Path, coach: str) -> Set[str]:
                 record = json.loads(line)
             except json.JSONDecodeError as e:
                 raise DatasetBuildError(f"{path}:{lineno}: invalid JSON ({e})") from e
-            if record.get("coach") == coach and record.get("session_id"):
-                ids.add(record["session_id"])
-    return ids
+            if record.get("coach") != expected_coach:
+                raise DatasetBuildError(
+                    f"{path}:{lineno}: record's coach={record.get('coach')!r} does not match "
+                    f"expected coach {expected_coach!r} -- wrong file wired to this config?"
+                )
+            records.append(record)
+    return records
 
 
 def _tokenize_conversation(
@@ -183,44 +193,28 @@ class ConversationDataCollator:
         }
 
 
-def _build_conversations_for_split(coach: str, session_ids: Set[str]) -> List[Dict[str, Any]]:
-    """One pass over `load_coach_samples(coach)`, building a fresh
-    conversation (via training.prompts) for every sample whose
-    session_id is in `session_ids`."""
-    conversations = []
-    for sample in load_coach_samples(coach):
-        if sample.session_id in session_ids:
-            conversations.append(build_conversation(sample))
-    return conversations
-
-
 def build_datasets(
     dataset_cfg,
     tokenizer: PreTrainedTokenizerBase,
     max_sequence_length: int,
     project_root: Path,
 ) -> Tuple[ConversationDataset, ConversationDataset]:
-    """Build (train_dataset, validation_dataset) for `dataset_cfg.coach`.
+    """Build (train_dataset, validation_dataset) for `dataset_cfg.coach`
+    directly from training.data.student_dataset's output.
 
     Raises:
-        DatasetBuildError: a split file is missing/malformed, or a split
+        DatasetBuildError: a student_dataset file is missing/malformed, a
+            record's coach doesn't match `dataset_cfg.coach`, or a split
             ends up with zero usable examples.
     """
     train_path = project_root / dataset_cfg.train_file
     val_path = project_root / dataset_cfg.validation_file
 
-    train_ids = _read_split_session_ids(train_path, dataset_cfg.coach)
-    val_ids = _read_split_session_ids(val_path, dataset_cfg.coach)
+    train_records = _read_student_records(train_path, dataset_cfg.coach)
+    val_records = _read_student_records(val_path, dataset_cfg.coach)
 
-    # Single pass over the coach's samples serves both splits at once,
-    # rather than re-joining packet+raw_response data twice.
-    train_conversations: List[Dict[str, Any]] = []
-    val_conversations: List[Dict[str, Any]] = []
-    for sample in load_coach_samples(dataset_cfg.coach):
-        if sample.session_id in train_ids:
-            train_conversations.append(build_conversation(sample))
-        elif sample.session_id in val_ids:
-            val_conversations.append(build_conversation(sample))
+    train_conversations = [build_conversation_from_student_record(r) for r in train_records]
+    val_conversations = [build_conversation_from_student_record(r) for r in val_records]
 
     if not train_conversations:
         raise DatasetBuildError(f"No training examples found for coach '{dataset_cfg.coach}' in {train_path}")

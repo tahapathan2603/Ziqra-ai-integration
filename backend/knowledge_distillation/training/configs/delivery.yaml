@@ -37,13 +37,17 @@ quantization:
   bnb_4bit_use_double_quant: true
 
 dataset:
-  # Which coach's rows to select -- train/validation/test.jsonl are a
-  # single combined file across both coaches (see
-  # training/data/split_dataset.py), tagged per-row with a "coach" field.
+  # train/validation/test.jsonl come from training/data/student_dataset.py
+  # -- one already-split, already-validated file per coach, each record
+  # {"input": {"level1", "level2"}, "target": {evaluation_analysis,
+  # scores, score_reasoning, coach_output, reasoning_trace}}. `coach` is
+  # a sanity check (the trainer asserts every record's own "coach" field
+  # matches this value), not a filter -- the file itself is already
+  # single-coach.
   coach: "delivery"
-  train_file: "backend/knowledge_distillation/training/data/datasets/splits/train.jsonl"
-  validation_file: "backend/knowledge_distillation/training/data/datasets/splits/validation.jsonl"
-  test_file: "backend/knowledge_distillation/training/data/datasets/splits/test.jsonl"
+  train_file: "backend/knowledge_distillation/training/data/datasets/student_dataset/delivery/train.jsonl"
+  validation_file: "backend/knowledge_distillation/training/data/datasets/student_dataset/delivery/validation.jsonl"
+  test_file: "backend/knowledge_distillation/training/data/datasets/student_dataset/delivery/test.jsonl"
 
 lora:
   # Placeholders for the not-yet-implemented trainer -- no PEFT/LoRA code

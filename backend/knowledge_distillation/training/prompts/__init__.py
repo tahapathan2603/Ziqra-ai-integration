@@ -1,15 +1,26 @@
 """
 Prompt templates for student training (Part 9).
 
-Turns a training.data.DistillationSample into a complete Hugging Face
-chat-format training conversation, via a coach-specific instruction
-template (`{coach}_template.txt` in this directory) plus that sample's own
-evidence and teacher output. See prompt_builder.py's docstring for the
-full Sample -> conversation pipeline.
+Turns evidence + teacher output into a complete Hugging Face chat-format
+training conversation, via a coach-specific instruction template
+(`{coach}_template.txt` in this directory). Two entry points, both ending
+in the same {"session_id", "coach", "messages": [...]} shape:
 
-Independent of the (not-yet-implemented) trainer: nothing here imports
-torch, transformers, or peft -- only training.data and the standard
-library.
+    build_conversation(sample)               -- from a training.data
+                                                 DistillationSample; derives
+                                                 the Level 1/Level 2 split
+                                                 fresh via split_evidence()
+    build_conversation_from_student_record(r) -- from a training.data.
+                                                 student_dataset record,
+                                                 which already has that
+                                                 split precomputed
+
+training.trainer.dataset.py uses the second: it reads
+training.data.student_dataset's *.jsonl files directly rather than
+re-joining coach packets and raw responses itself.
+
+Independent of the trainer: nothing here imports torch, transformers, or
+peft -- only training.data and the standard library.
 
 Usage:
     from backend.knowledge_distillation.training.prompts import build_conversations
@@ -22,6 +33,7 @@ from .prompt_builder import (
     PromptBuildError,
     build_assistant_turn,
     build_conversation,
+    build_conversation_from_student_record,
     build_conversations,
     build_user_turn,
     load_template,
@@ -32,6 +44,7 @@ __all__ = [
     "PromptBuildError",
     "build_assistant_turn",
     "build_conversation",
+    "build_conversation_from_student_record",
     "build_conversations",
     "build_user_turn",
     "load_template",

@@ -133,30 +133,44 @@ def load_template(coach: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def build_user_turn(sample: DistillationSample) -> str:
-    """Fill `sample`'s coach template with its Level 1 Timeline / Level 2
-    Analytics evidence, both as verbatim indented JSON."""
-    template = load_template(sample.coach)
-    timeline, analytics = split_evidence(sample.input)
+def _fill_template(coach: str, level1_timeline: Dict[str, Any], level2_analytics: Dict[str, Any]) -> str:
+    """Fill `coach`'s template with already-split Level 1 Timeline / Level
+    2 Analytics evidence, both as verbatim indented JSON. The one place
+    that actually does the substitution -- build_user_turn (which derives
+    the split fresh via split_evidence) and
+    build_conversation_from_student_record (which reads it already-split
+    from a training.data.student_dataset record) both call this instead
+    of duplicating the substitution."""
+    template = load_template(coach)
     return template.replace(
-        _LEVEL1_PLACEHOLDER, json.dumps(timeline, indent=2, ensure_ascii=False)
+        _LEVEL1_PLACEHOLDER, json.dumps(level1_timeline, indent=2, ensure_ascii=False)
     ).replace(
-        _LEVEL2_PLACEHOLDER, json.dumps(analytics, indent=2, ensure_ascii=False)
+        _LEVEL2_PLACEHOLDER, json.dumps(level2_analytics, indent=2, ensure_ascii=False)
     )
 
 
-def build_assistant_turn(sample: DistillationSample) -> str:
-    """The teacher's complete supervision package, each section as
-    verbatim JSON -- nothing summarized, reformatted, or dropped. Section
-    order matches the causal chain the teacher produced it in: Evaluation
-    Analysis (the teacher's read of the evidence, before scoring) ->
-    Scores -> Score Reasoning (why each score, and not one band off) ->
-    Coach Output -> Reasoning Trace."""
-    evaluation_analysis = json.dumps(sample.teacher_output.get("evaluation_analysis"), indent=2, ensure_ascii=False)
-    scores = json.dumps(sample.teacher_output.get("scores"), indent=2, ensure_ascii=False)
-    score_reasoning = json.dumps(sample.teacher_output.get("score_reasoning"), indent=2, ensure_ascii=False)
-    coach_output = json.dumps(sample.teacher_output.get("coach_output"), indent=2, ensure_ascii=False)
-    reasoning_trace = json.dumps(sample.teacher_output.get("reasoning_trace"), indent=2, ensure_ascii=False)
+def build_user_turn(sample: DistillationSample) -> str:
+    """Fill `sample`'s coach template with its Level 1 Timeline / Level 2
+    Analytics evidence, split fresh via split_evidence()."""
+    timeline, analytics = split_evidence(sample.input)
+    return _fill_template(sample.coach, timeline, analytics)
+
+
+def _format_target(target: Dict[str, Any]) -> str:
+    """A teacher_output/target dict's complete supervision package, each
+    section as verbatim JSON -- nothing summarized, reformatted, or
+    dropped. Section order matches the causal chain the teacher produced
+    it in: Evaluation Analysis (the teacher's read of the evidence,
+    before scoring) -> Scores -> Score Reasoning (why each score, and not
+    one band off) -> Coach Output -> Reasoning Trace. The one place that
+    actually formats this -- build_assistant_turn (DistillationSample
+    path) and build_conversation_from_student_record (student_dataset
+    path) both call this instead of duplicating the formatting."""
+    evaluation_analysis = json.dumps(target.get("evaluation_analysis"), indent=2, ensure_ascii=False)
+    scores = json.dumps(target.get("scores"), indent=2, ensure_ascii=False)
+    score_reasoning = json.dumps(target.get("score_reasoning"), indent=2, ensure_ascii=False)
+    coach_output = json.dumps(target.get("coach_output"), indent=2, ensure_ascii=False)
+    reasoning_trace = json.dumps(target.get("reasoning_trace"), indent=2, ensure_ascii=False)
     return (
         f"Evaluation Analysis:\n{evaluation_analysis}\n\n"
         f"Scores:\n{scores}\n\n"
@@ -164,6 +178,11 @@ def build_assistant_turn(sample: DistillationSample) -> str:
         f"Coach Output:\n{coach_output}\n\n"
         f"Reasoning Trace:\n{reasoning_trace}"
     )
+
+
+def build_assistant_turn(sample: DistillationSample) -> str:
+    """The teacher's complete supervision package for one DistillationSample."""
+    return _format_target(sample.teacher_output)
 
 
 def build_conversation(sample: DistillationSample) -> Dict[str, Any]:
@@ -174,6 +193,35 @@ def build_conversation(sample: DistillationSample) -> Dict[str, Any]:
         "messages": [
             {"role": "user", "content": build_user_turn(sample)},
             {"role": "assistant", "content": build_assistant_turn(sample)},
+        ],
+    }
+
+
+def build_conversation_from_student_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    """One training.data.student_dataset record -- {"session_id", "coach",
+    "input": {"level1", "level2"}, "target": {...}} -- -> one HF
+    chat-format training record.
+
+    Unlike build_conversation (which takes a DistillationSample and
+    derives the Level 1/Level 2 split fresh via split_evidence()), this
+    reads it already-split from record["input"]["level1"/"level2"] --
+    exactly what training.data.student_dataset.build_student_record()
+    already computed via the same split_evidence() call, so nothing is
+    re-derived. Produces byte-identical `messages` content to
+    build_conversation() for the same underlying session -- this is what
+    lets training.trainer.dataset.py read the student_dataset directly as
+    its sole source, rather than re-joining coach packets and raw
+    responses itself.
+    """
+    coach = record["coach"]
+    level1 = record["input"]["level1"]
+    level2 = record["input"]["level2"]
+    return {
+        "session_id": record["session_id"],
+        "coach": coach,
+        "messages": [
+            {"role": "user", "content": _fill_template(coach, level1, level2)},
+            {"role": "assistant", "content": _format_target(record["target"])},
         ],
     }
 
@@ -198,6 +246,7 @@ __all__ = [
     "PromptBuildError",
     "build_assistant_turn",
     "build_conversation",
+    "build_conversation_from_student_record",
     "build_conversations",
     "build_user_turn",
     "load_template",

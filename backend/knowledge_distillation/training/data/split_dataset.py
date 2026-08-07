@@ -2,6 +2,11 @@
 Deterministic train / validation / test split of the prepared
 conversational dataset (Part 8, stage 3).
 
+NOT what training.trainer.dataset.py reads -- see prepare_dataset.py's
+docstring (this module splits ITS output). training.data.student_dataset.py
+does its own splitting directly against the distillation dataset, one file
+per coach, and that's what actually feeds a training run.
+
 Splits each coach's records independently by the same ratios, then
 combines and shuffles the three splits -- this is what "preserves coach
 balance": if the input is 2000 articulation + 2000 delivery records at an
