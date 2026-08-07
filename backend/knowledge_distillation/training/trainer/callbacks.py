@@ -14,9 +14,32 @@ its full callback list, including early stopping (`transformers`' own
 `EarlyStoppingCallback` -- reimplementing that logic here would just
 duplicate a well-tested library feature) when
 `training.early_stopping_patience` is set.
+
+## Plain-log fallback (ZIQRA_TRAINER_PLAIN_LOG)
+
+`rich.live.Live`'s in-place redraw works by writing cursor-movement/
+clear-line ANSI escape codes and relying on the terminal to interpret
+them -- it decides whether to do this via `console.is_terminal`
+(`sys.stdout.isatty()`). Confirmed on a real Kaggle T4x2 run: `!python -m
+...`'s subprocess stdout reports `isatty() == True` there (Kaggle's shell-
+escape allocates a pty), so Rich attempts cursor-based redraw -- but
+Kaggle's notebook output panel doesn't render those escape codes, so every
+~0.25s refresh (`refresh_per_second=4`) appears as a brand new panel
+instead of overwriting the last one, producing a wall of duplicated
+panels. `is_terminal` alone can't distinguish "real terminal" from "reports
+isatty()=True but the consumer won't honor cursor movement", so this can't
+be auto-detected reliably -- `ZIQRA_TRAINER_PLAIN_LOG=1` is an explicit
+opt-out: `RichTrainingCallback` then skips `Live`/`Progress` entirely and
+prints one plain line per already-throttled event (`on_log` at
+`logging_steps` cadence, `on_evaluate`, `on_save`, `on_epoch_end`) instead
+of continuously redrawing a panel -- inherently spam-free since it relies
+on Trainer's own logging cadence, not a fixed-rate refresh loop, to decide
+when to print. Local dev and Colab are unaffected (the env var is unset
+there); see train_on_kaggle.ipynb's Cell 6 for where Kaggle sets it.
 """
 
 import logging
+import os
 import time
 from typing import List, Optional
 
@@ -54,7 +77,11 @@ def _gpu_info() -> str:
 
 
 class RichTrainingCallback(TrainerCallback):
-    """Live Rich terminal UI for one `trainer.train()` run.
+    """Rich-backed terminal UI for one `trainer.train()` run -- a
+    continuously redrawn Live panel by default, or a plain scrolling log
+    (one line per already-throttled Trainer event) when
+    `ZIQRA_TRAINER_PLAIN_LOG=1` is set. See this module's docstring for
+    why the fallback exists and can't be auto-detected.
 
     Holds only display state (last-seen loss/LR/checkpoint/etc.) -- it
     never influences training itself. Trainer's own `TrainerState` is the
@@ -68,6 +95,9 @@ class RichTrainingCallback(TrainerCallback):
         self._model_name = model_name
 
         self._console = Console()
+        self._use_live = os.environ.get("ZIQRA_TRAINER_PLAIN_LOG", "").strip().lower() not in (
+            "1", "true", "yes",
+        )
         self._progress: Optional[Progress] = None
         self._live: Optional[Live] = None
         self._task_id = None
@@ -84,6 +114,14 @@ class RichTrainingCallback(TrainerCallback):
         self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs
     ) -> None:
         self._start_time = time.time()
+        if not self._use_live:
+            self._console.print(
+                f"[bold]Starting training[/] -- {self._model_name} ({self._coach}), "
+                f"{max(state.max_steps, 1)} total steps, {self._total_epochs} epoch(s). "
+                f"Plain log mode (ZIQRA_TRAINER_PLAIN_LOG=1) -- progress prints at each "
+                f"logging/eval/save/epoch event instead of a continuously redrawn panel."
+            )
+            return
         self._progress = Progress(
             TextColumn("[bold blue]{task.fields[stage]}"),
             BarColumn(),
@@ -103,9 +141,13 @@ class RichTrainingCallback(TrainerCallback):
     def on_step_end(
         self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs
     ) -> None:
+        # Always updated -- on_log's plain-mode line (below) reads this even
+        # though this hook fires on every step regardless of display mode.
         self._samples_processed = (
             state.global_step * args.per_device_train_batch_size * args.gradient_accumulation_steps
         )
+        if not self._use_live:
+            return  # no per-step output in plain mode -- see on_log
         if self._progress is not None:
             self._progress.update(self._task_id, completed=state.global_step, stage=self._stage_label(state))
         self._refresh()
@@ -119,6 +161,19 @@ class RichTrainingCallback(TrainerCallback):
             self._train_loss = logs["loss"]
         if "learning_rate" in logs:
             self._learning_rate = logs["learning_rate"]
+        if not self._use_live:
+            # The one per-step-ish print in plain mode -- but only as often
+            # as Trainer itself calls on_log (every `logging_steps`), not
+            # every step, so this can't spam regardless of how long a step
+            # takes.
+            loss_str = f"{self._train_loss:.4f}" if self._train_loss is not None else "-"
+            lr_str = f"{self._learning_rate:.2e}" if self._learning_rate is not None else "-"
+            self._console.print(
+                f"step {state.global_step}/{max(state.max_steps, 1)} "
+                f"({self._stage_label(state)}) | loss={loss_str} | lr={lr_str} | "
+                f"samples={self._samples_processed}"
+            )
+            return
         self._refresh()
 
     def on_evaluate(
@@ -127,6 +182,11 @@ class RichTrainingCallback(TrainerCallback):
         if metrics and "eval_loss" in metrics:
             self._eval_loss = metrics["eval_loss"]
             is_best = state.best_metric is not None and self._eval_loss <= state.best_metric
+            if not self._use_live:
+                # Live mode already shows Val loss in the panel; plain mode
+                # has no panel, so print it here every time, not just on a
+                # new best (that print, below, still fires either way).
+                self._console.print(f"eval_loss={self._eval_loss:.4f}")
             if is_best:
                 self._console.log(f"[bold green]New best validation loss: {self._eval_loss:.4f}[/]")
         self._refresh()
