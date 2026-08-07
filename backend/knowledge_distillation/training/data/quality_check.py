@@ -25,7 +25,10 @@ from . import COACHES, DatasetLoadError, DistillationSample, _load_jsonl, load_c
 
 logger = logging.getLogger(__name__)
 
-REQUIRED_TEACHER_OUTPUT_KEYS: tuple = ("scores", "coach_output", "reasoning_trace")
+REQUIRED_TEACHER_OUTPUT_KEYS: tuple = ("evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace")
+REQUIRED_SCORE_REASONING_KEYS: tuple = (
+    "justification", "level1_evidence", "level2_evidence", "patterns_considered", "why_not_higher", "why_not_lower",
+)
 VALID_SCORE_VALUES = {1, 2, 3, 4, 5}
 MAX_SCHEMA_EXAMPLES = 10  # cap how many bad-sample examples the report keeps in full
 
@@ -55,6 +58,19 @@ def _validate_sample(sample: DistillationSample, rubrics: tuple) -> List[str]:
             issues.append(f"scores.{rubric}.score={entry.get('score')!r} not in {sorted(VALID_SCORE_VALUES)}")
         if not entry.get("reasoning"):
             issues.append(f"scores.{rubric}.reasoning is empty")
+
+    if not sample.teacher_output.get("evaluation_analysis"):
+        issues.append("evaluation_analysis is missing/empty")
+
+    score_reasoning = sample.teacher_output.get("score_reasoning") or {}
+    for rubric in rubrics:
+        entry = score_reasoning.get(rubric)
+        if entry is None:
+            issues.append(f"score_reasoning is missing rubric '{rubric}'")
+            continue
+        missing_fields = [k for k in REQUIRED_SCORE_REASONING_KEYS if not entry.get(k)]
+        if missing_fields:
+            issues.append(f"score_reasoning.{rubric} missing/empty field(s): {missing_fields}")
 
     if not sample.teacher_output.get("coach_output"):
         issues.append("coach_output is missing/empty")
@@ -93,6 +109,8 @@ def check_coach(coach: str) -> Dict[str, Any]:
 
     score_distributions: Dict[str, Counter] = {r: Counter() for r in cfg.rubrics}
     generated_by = Counter()
+    missing_evaluation_analysis = 0
+    missing_score_reasoning = 0
     missing_coach_output = 0
     missing_reasoning_trace = 0
     schema_issues: Dict[str, List[str]] = {}
@@ -105,6 +123,10 @@ def check_coach(coach: str) -> Dict[str, Any]:
         if issues:
             schema_issues[sample.session_id] = issues
 
+        if not sample.teacher_output.get("evaluation_analysis"):
+            missing_evaluation_analysis += 1
+        if not sample.teacher_output.get("score_reasoning"):
+            missing_score_reasoning += 1
         if not sample.teacher_output.get("coach_output"):
             missing_coach_output += 1
         trace = sample.teacher_output.get("reasoning_trace")
@@ -128,6 +150,8 @@ def check_coach(coach: str) -> Dict[str, Any]:
         "join_errors": join_errors,
         "invalid_schema_count": len(schema_issues),
         "invalid_schema_examples": dict(list(schema_issues.items())[:MAX_SCHEMA_EXAMPLES]),
+        "missing_evaluation_analysis": missing_evaluation_analysis,
+        "missing_score_reasoning": missing_score_reasoning,
         "missing_coach_output": missing_coach_output,
         "missing_reasoning_trace": missing_reasoning_trace,
         "generated_by": dict(generated_by),
@@ -166,6 +190,8 @@ def _print_report(report: Dict[str, Any]) -> None:
     for session_id, issues in list(report["invalid_schema_examples"].items())[:5]:
         print(f"    - {session_id}: {issues}")
 
+    print(f"  Missing evaluation_analysis: {report['missing_evaluation_analysis']}")
+    print(f"  Missing score_reasoning:     {report['missing_score_reasoning']}")
     print(f"  Missing coach_output:     {report['missing_coach_output']}")
     print(f"  Missing reasoning_trace:  {report['missing_reasoning_trace']}")
     print(f"  Avg reasoning_trace entries: {report['avg_reasoning_trace_entries']}")

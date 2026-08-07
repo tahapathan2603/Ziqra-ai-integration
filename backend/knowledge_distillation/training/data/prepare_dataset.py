@@ -2,18 +2,17 @@
 Converts the knowledge-distillation dataset into HF-style conversational
 JSONL for supervised fine-tuning (Part 8, stage 2).
 
-Each DistillationSample (see this package's __init__.py) becomes one
-two-turn conversation:
-
-    user:      which coach, plus the full coach packet (Level 1 Timeline +
-               Level 2 Analytics) as verbatim JSON -- exactly the evidence
-               that coach's teacher model was shown.
-    assistant: the teacher's Scores, Coach Output, and Reasoning Trace, each
-               as verbatim JSON.
-
-Every field from `input` and `teacher_output` is dumped through
-json.dumps(..., indent=2) -- nothing is summarized, reformatted, or
-dropped, so no information is lost converting to this format.
+Formatting itself is delegated entirely to training.prompts.build_conversation()
+-- the coach-template-based formatter (Part 9) -- rather than duplicated
+here. That used not to be true: this module briefly had its own parallel
+inline formatter, which meant every new teacher_output field (most
+recently evaluation_analysis and score_reasoning) had to be added in two
+places or silently go stale in one of them. Given training.prompts already
+existed as the more principled, template-file-based formatter, keeping a
+second implementation here served no purpose but drift risk -- so this
+module is now a thin loop: DistillationSample in, build_conversation() out,
+written to JSONL. See training.prompts.prompt_builder's docstring for
+exactly what a conversation contains.
 
 Usage:
     python -m backend.knowledge_distillation.training.data.prepare_dataset
@@ -25,42 +24,19 @@ import argparse
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
-from . import COACHES, PREPARED_DATASET_PATH, DistillationSample, load_coach_samples
+from . import COACHES, PREPARED_DATASET_PATH, load_coach_samples
+from ..prompts import build_conversation
 
 logger = logging.getLogger(__name__)
 
 _LOG_EVERY = 500
 
-
-def _format_user_turn(sample: DistillationSample) -> str:
-    evidence = json.dumps(sample.input, indent=2, ensure_ascii=False)
-    return f"Coach: {sample.coach.title()}\n\nEvidence (Level 1 Timeline + Level 2 Analytics):\n{evidence}"
-
-
-def _format_assistant_turn(sample: DistillationSample) -> str:
-    scores = json.dumps(sample.teacher_output.get("scores"), indent=2, ensure_ascii=False)
-    coach_output = json.dumps(sample.teacher_output.get("coach_output"), indent=2, ensure_ascii=False)
-    reasoning_trace = json.dumps(sample.teacher_output.get("reasoning_trace"), indent=2, ensure_ascii=False)
-    return f"Scores:\n{scores}\n\nCoach Output:\n{coach_output}\n\nReasoning Trace:\n{reasoning_trace}"
-
-
-def to_conversation(sample: DistillationSample) -> Dict[str, Any]:
-    """One DistillationSample -> one Hugging Face chat-format training
-    record: {"messages": [{"role": ..., "content": ...}, ...]}, the
-    standard shape for `tokenizer.apply_chat_template()` / TRL's
-    SFTTrainer. `session_id`/`coach` ride alongside for traceability and
-    for split_dataset.py's coach-stratified splitting; a trainer that only
-    wants "messages" simply ignores the rest."""
-    return {
-        "session_id": sample.session_id,
-        "coach": sample.coach,
-        "messages": [
-            {"role": "user", "content": _format_user_turn(sample)},
-            {"role": "assistant", "content": _format_assistant_turn(sample)},
-        ],
-    }
+# Re-exported for backward compatibility -- callers that imported
+# to_conversation directly from this module (rather than from
+# training.prompts, its new home) keep working unchanged.
+to_conversation = build_conversation
 
 
 def prepare(coaches: Optional[List[str]] = None, output_path: Path = PREPARED_DATASET_PATH) -> int:

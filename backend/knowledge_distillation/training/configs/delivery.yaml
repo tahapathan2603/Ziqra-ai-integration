@@ -68,7 +68,7 @@ training:
   gradient_accumulation_steps: 4     # effective batch size = batch_size * this = 16
   warmup_ratio: 0.03
   weight_decay: 0.01
-  max_sequence_length: 4096          # covers the full dataset via the real chat template (p99 ~3493, max ~3602 tokens; see README)
+  max_sequence_length: 6144          # covers the full dataset via the real chat template (p99 ~5012, max ~5284 tokens; see README)
 
   # Caps how many eval batches of raw logits Trainer holds in memory
   # before offloading to CPU -- keeps validation from spiking memory on

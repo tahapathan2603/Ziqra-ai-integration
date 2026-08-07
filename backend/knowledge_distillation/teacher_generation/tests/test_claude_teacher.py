@@ -109,10 +109,57 @@ class ExtractSessionAndEvidenceTests(unittest.TestCase):
             _extract_session_and_evidence("not a prompt_builder prompt at all")
 
 
+_SCORE_REASONING_FIELDS = {"justification", "level1_evidence", "level2_evidence", "patterns_considered", "why_not_higher", "why_not_lower"}
+
+
 class SynthesizeArticulationTests(unittest.TestCase):
-    def test_output_has_the_three_top_level_keys(self):
+    def test_output_has_the_five_top_level_keys_in_order(self):
         result = synthesize_articulation(CLEAN_ARTICULATION_PACKET, "session_1")
-        self.assertEqual(set(result.keys()), {"scores", "coach_output", "reasoning_trace"})
+        self.assertEqual(
+            list(result.keys()),
+            ["evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace"],
+        )
+
+    def test_evaluation_analysis_has_articulation_dimensions(self):
+        result = synthesize_articulation(CLEAN_ARTICULATION_PACKET, "session_1")
+        self.assertEqual(
+            set(result["evaluation_analysis"].keys()),
+            {"speech_behavior_summary", "pronunciation_quality", "mti_characteristics"},
+        )
+        for text in result["evaluation_analysis"].values():
+            self.assertTrue(text.strip())
+
+    def test_evaluation_analysis_varies_with_evidence(self):
+        clean = synthesize_articulation(CLEAN_ARTICULATION_PACKET, "session_1")
+        issue = synthesize_articulation(ISSUE_ARTICULATION_PACKET, "session_1")
+        self.assertNotEqual(
+            clean["evaluation_analysis"]["pronunciation_quality"], issue["evaluation_analysis"]["pronunciation_quality"]
+        )
+        self.assertNotEqual(
+            clean["evaluation_analysis"]["mti_characteristics"], issue["evaluation_analysis"]["mti_characteristics"]
+        )
+
+    def test_score_reasoning_covers_every_rubric_with_the_right_shape(self):
+        result = synthesize_articulation(ISSUE_ARTICULATION_PACKET, "session_1")
+        self.assertEqual(set(result["score_reasoning"].keys()), {"pronunciation", "mti"})
+        for rubric_reasoning in result["score_reasoning"].values():
+            self.assertEqual(set(rubric_reasoning.keys()), _SCORE_REASONING_FIELDS)
+            self.assertTrue(rubric_reasoning["justification"])
+            self.assertTrue(rubric_reasoning["level1_evidence"])
+            self.assertTrue(rubric_reasoning["level2_evidence"])
+            self.assertTrue(rubric_reasoning["why_not_higher"])
+            self.assertTrue(rubric_reasoning["why_not_lower"])
+
+    def test_score_reasoning_ceiling_and_floor_language_matches_the_score(self):
+        clean = synthesize_articulation(CLEAN_ARTICULATION_PACKET, "session_1")  # pronunciation/mti both score 5
+        self.assertIn("top band", clean["score_reasoning"]["pronunciation"]["why_not_higher"])
+        self.assertIn("top band", clean["score_reasoning"]["mti"]["why_not_higher"])
+
+    def test_reasoning_trace_includes_evaluation_analysis_entries(self):
+        result = synthesize_articulation(CLEAN_ARTICULATION_PACKET, "session_1")
+        conclusions = [entry["conclusion"] for entry in result["reasoning_trace"]]
+        self.assertIn("evaluation_analysis: pronunciation_quality", conclusions)
+        self.assertIn("evaluation_analysis: mti_characteristics", conclusions)
 
     def test_scores_are_in_range_for_both_rubrics(self):
         result = synthesize_articulation(ISSUE_ARTICULATION_PACKET, "session_1")
@@ -148,9 +195,47 @@ class SynthesizeArticulationTests(unittest.TestCase):
 
 
 class SynthesizeDeliveryTests(unittest.TestCase):
-    def test_output_has_the_three_top_level_keys(self):
+    def test_output_has_the_five_top_level_keys_in_order(self):
         result = synthesize_delivery(CLEAN_DELIVERY_PACKET, "session_2")
-        self.assertEqual(set(result.keys()), {"scores", "coach_output", "reasoning_trace"})
+        self.assertEqual(
+            list(result.keys()),
+            ["evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace"],
+        )
+
+    def test_evaluation_analysis_has_delivery_dimensions(self):
+        result = synthesize_delivery(CLEAN_DELIVERY_PACKET, "session_2")
+        self.assertEqual(
+            set(result["evaluation_analysis"].keys()),
+            {
+                "speech_behavior_summary", "fluency_patterns", "rhythm", "intonation",
+                "confidence_indicators", "engagement_patterns", "speaking_consistency",
+            },
+        )
+        for text in result["evaluation_analysis"].values():
+            self.assertTrue(text.strip())
+
+    def test_evaluation_analysis_varies_with_evidence(self):
+        clean = synthesize_delivery(CLEAN_DELIVERY_PACKET, "session_2")
+        issue = synthesize_delivery(ISSUE_DELIVERY_PACKET, "session_2")
+        self.assertNotEqual(clean["evaluation_analysis"]["fluency_patterns"], issue["evaluation_analysis"]["fluency_patterns"])
+        self.assertNotEqual(clean["evaluation_analysis"]["engagement_patterns"], issue["evaluation_analysis"]["engagement_patterns"])
+
+    def test_score_reasoning_covers_every_rubric_with_the_right_shape(self):
+        result = synthesize_delivery(ISSUE_DELIVERY_PACKET, "session_2")
+        self.assertEqual(set(result["score_reasoning"].keys()), {"fluency", "intonation", "engagement"})
+        for rubric_reasoning in result["score_reasoning"].values():
+            self.assertEqual(set(rubric_reasoning.keys()), _SCORE_REASONING_FIELDS)
+            self.assertTrue(rubric_reasoning["justification"])
+            self.assertTrue(rubric_reasoning["level1_evidence"])
+            self.assertTrue(rubric_reasoning["level2_evidence"])
+            self.assertTrue(rubric_reasoning["why_not_higher"])
+            self.assertTrue(rubric_reasoning["why_not_lower"])
+
+    def test_reasoning_trace_includes_evaluation_analysis_entries(self):
+        result = synthesize_delivery(CLEAN_DELIVERY_PACKET, "session_2")
+        conclusions = [entry["conclusion"] for entry in result["reasoning_trace"]]
+        for dim in ("fluency_patterns", "rhythm", "intonation", "confidence_indicators", "engagement_patterns"):
+            self.assertIn(f"evaluation_analysis: {dim}", conclusions)
 
     def test_scores_are_in_range_for_all_three_rubrics(self):
         result = synthesize_delivery(ISSUE_DELIVERY_PACKET, "session_2")
@@ -188,14 +273,14 @@ class ClaudeTeacherProviderTests(unittest.TestCase):
         prompt = build_articulation_prompt(ISSUE_ARTICULATION_PACKET, "session_1")
         raw = ClaudeTeacherProvider().generate_articulation(prompt)
         parsed = json.loads(raw)
-        self.assertEqual(set(parsed.keys()), {"scores", "coach_output", "reasoning_trace"})
+        self.assertEqual(set(parsed.keys()), {"evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace"})
         self.assertEqual(parsed["coach_output"]["session_id"], "session_1")
 
     def test_generate_delivery_returns_valid_json_matching_the_contract(self):
         prompt = build_delivery_prompt(ISSUE_DELIVERY_PACKET, "session_2")
         raw = ClaudeTeacherProvider().generate_delivery(prompt)
         parsed = json.loads(raw)
-        self.assertEqual(set(parsed.keys()), {"scores", "coach_output", "reasoning_trace"})
+        self.assertEqual(set(parsed.keys()), {"evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace"})
         self.assertEqual(parsed["coach_output"]["session_id"], "session_2")
 
     def test_drop_in_compatible_with_teacher_runner(self):

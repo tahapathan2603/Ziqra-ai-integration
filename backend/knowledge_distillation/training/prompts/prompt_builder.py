@@ -146,12 +146,24 @@ def build_user_turn(sample: DistillationSample) -> str:
 
 
 def build_assistant_turn(sample: DistillationSample) -> str:
-    """The teacher's Scores, Coach Output, and Reasoning Trace, each as
-    verbatim JSON -- nothing summarized, reformatted, or dropped."""
+    """The teacher's complete supervision package, each section as
+    verbatim JSON -- nothing summarized, reformatted, or dropped. Section
+    order matches the causal chain the teacher produced it in: Evaluation
+    Analysis (the teacher's read of the evidence, before scoring) ->
+    Scores -> Score Reasoning (why each score, and not one band off) ->
+    Coach Output -> Reasoning Trace."""
+    evaluation_analysis = json.dumps(sample.teacher_output.get("evaluation_analysis"), indent=2, ensure_ascii=False)
     scores = json.dumps(sample.teacher_output.get("scores"), indent=2, ensure_ascii=False)
+    score_reasoning = json.dumps(sample.teacher_output.get("score_reasoning"), indent=2, ensure_ascii=False)
     coach_output = json.dumps(sample.teacher_output.get("coach_output"), indent=2, ensure_ascii=False)
     reasoning_trace = json.dumps(sample.teacher_output.get("reasoning_trace"), indent=2, ensure_ascii=False)
-    return f"Scores:\n{scores}\n\nCoach Output:\n{coach_output}\n\nReasoning Trace:\n{reasoning_trace}"
+    return (
+        f"Evaluation Analysis:\n{evaluation_analysis}\n\n"
+        f"Scores:\n{scores}\n\n"
+        f"Score Reasoning:\n{score_reasoning}\n\n"
+        f"Coach Output:\n{coach_output}\n\n"
+        f"Reasoning Trace:\n{reasoning_trace}"
+    )
 
 
 def build_conversation(sample: DistillationSample) -> Dict[str, Any]:

@@ -78,8 +78,19 @@ class ArticulationPromptTests(unittest.TestCase):
 
     def test_output_contract_keys_present_in_order(self):
         prompt = build_articulation_prompt(ARTICULATION_PACKET, "session_1")
-        self.assertLess(prompt.index('"scores"'), prompt.index('"coach_output"'))
-        self.assertLess(prompt.index('"coach_output"'), prompt.index('"reasoning_trace"'))
+        keys = ("evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace")
+        indices = [prompt.index(f'"{key}"') for key in keys]
+        self.assertEqual(indices, sorted(indices), f"expected {keys} in that exact order")
+
+    def test_evaluation_analysis_schema_keys_present(self):
+        prompt = build_articulation_prompt(ARTICULATION_PACKET, "session_1")
+        for key in ("speech_behavior_summary", "pronunciation_quality", "mti_characteristics"):
+            self.assertIn(key, prompt)
+
+    def test_score_reasoning_schema_present(self):
+        prompt = build_articulation_prompt(ARTICULATION_PACKET, "session_1")
+        for key in ("justification", "level1_evidence", "level2_evidence", "patterns_considered", "why_not_higher", "why_not_lower"):
+            self.assertIn(key, prompt)
 
     def test_coach_output_schema_keys_present(self):
         prompt = build_articulation_prompt(ARTICULATION_PACKET, "session_1")
@@ -120,8 +131,20 @@ class DeliveryPromptTests(unittest.TestCase):
 
     def test_output_contract_keys_present_in_order(self):
         prompt = build_delivery_prompt(DELIVERY_PACKET, "session_2")
-        self.assertLess(prompt.index('"scores"'), prompt.index('"coach_output"'))
-        self.assertLess(prompt.index('"coach_output"'), prompt.index('"reasoning_trace"'))
+        keys = ("evaluation_analysis", "scores", "score_reasoning", "coach_output", "reasoning_trace")
+        indices = [prompt.index(f'"{key}"') for key in keys]
+        self.assertEqual(indices, sorted(indices), f"expected {keys} in that exact order")
+
+    def test_evaluation_analysis_schema_keys_present(self):
+        prompt = build_delivery_prompt(DELIVERY_PACKET, "session_2")
+        for key in ("speech_behavior_summary", "fluency_patterns", "rhythm", "intonation",
+                    "confidence_indicators", "engagement_patterns", "speaking_consistency"):
+            self.assertIn(key, prompt)
+
+    def test_score_reasoning_schema_present(self):
+        prompt = build_delivery_prompt(DELIVERY_PACKET, "session_2")
+        for key in ("justification", "level1_evidence", "level2_evidence", "patterns_considered", "why_not_higher", "why_not_lower"):
+            self.assertIn(key, prompt)
 
     def test_coach_output_schema_keys_present(self):
         prompt = build_delivery_prompt(DELIVERY_PACKET, "session_2")

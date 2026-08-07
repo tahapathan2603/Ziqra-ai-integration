@@ -48,6 +48,7 @@ job a real teacher model would also have to do here.
 
 import json
 import re
+from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
 from ...feature_extractors.audio.phoneme_patterns import severity_rank
@@ -207,6 +208,163 @@ def _score_mti(mti: Dict[str, Any]) -> Tuple[int, str]:
 
 
 # ---------------------------------------------------------------------------
+# Articulation: evaluation_analysis + score_reasoning
+#
+# These mirror the exact thresholds _score_pronunciation/_score_mti already
+# use (repeated here, not imported from a shared table, because the two
+# scoring functions' branching is the tested, shipped source of truth --
+# see each function's own docstring/comments for why cap-not-subtract
+# matters). Consistency between a score and its explanation is verified by
+# test_claude_teacher.py, not merely asserted here.
+# ---------------------------------------------------------------------------
+def _build_articulation_evaluation_analysis(pronunciation: Dict[str, Any], mti: Dict[str, Any]) -> Dict[str, str]:
+    """The teacher's analytical read of the evidence -- NOT coaching, no
+    recommendations -- produced before scores are assigned. Every sentence
+    is grounded in a specific evidence value, so it varies with the
+    evidence the same way coach_output already does."""
+    accuracy = pronunciation.get("phoneme_accuracy_pct") or 0
+    words = pronunciation.get("mispronounced_words", [])
+    patterns = mti.get("patterns", [])
+
+    if not words and not patterns:
+        speech_behavior_summary = (
+            f"Clean articulation throughout: {accuracy}% phoneme accuracy with no mispronunciations or "
+            f"mother-tongue-influence patterns logged."
+        )
+    else:
+        speech_behavior_summary = (
+            f"Articulation shows {len(words)} mispronunciation(s) and {len(patterns)} mother-tongue-influence "
+            f"pattern(s) against a {accuracy}% phoneme accuracy baseline."
+        )
+
+    if not words:
+        pronunciation_quality = f"Phoneme accuracy sits at {accuracy}%, with zero words flagged as mispronounced."
+    else:
+        high = sum(1 for w in words if w.get("severity") == "high")
+        pronunciation_quality = (
+            f"Phoneme accuracy is {accuracy}% across the response, with {len(words)} mispronounced word(s) "
+            f"logged ({high} at high severity)."
+        )
+
+    if not patterns:
+        mti_characteristics = "No mother-tongue-influence patterns were detected -- consonant and vowel substitutions consistent with L1 interference are absent from this response."
+    else:
+        issue_counts = Counter(p.get("issue", "substitution") for p in patterns)
+        dominant_issue, dominant_count = issue_counts.most_common(1)[0]
+        mti_characteristics = (
+            f"{len(patterns)} mother-tongue-influence pattern(s) detected; the dominant type is "
+            f"{dominant_issue.replace('_', ' ')} ({dominant_count} of {len(patterns)}), indicating "
+            f"{'a consistent, recurring' if dominant_count >= 2 else 'an isolated'} interference pattern rather than random error."
+        )
+
+    return {
+        "speech_behavior_summary": speech_behavior_summary,
+        "pronunciation_quality": pronunciation_quality,
+        "mti_characteristics": mti_characteristics,
+    }
+
+
+def _reason_pronunciation(pronunciation: Dict[str, Any], score: int) -> Dict[str, Any]:
+    """Structured, evidence-backed explanation for the pronunciation score --
+    built from the exact fields _score_pronunciation reads, so this can
+    never cite evidence the score itself didn't actually use."""
+    accuracy = pronunciation.get("phoneme_accuracy_pct") or 0
+    words = pronunciation.get("mispronounced_words", [])
+    high_count = sum(1 for w in words if w.get("severity") == "high")
+    worst = sorted(words, key=lambda w: severity_rank(w.get("severity", "")), reverse=True)[:5]
+
+    level1_evidence = [
+        f"'{w['word']}' mispronounced at {_fmt_time(w.get('start'))} ({w.get('severity')} severity)" for w in worst
+    ] or ["no entries in pronunciation.mispronounced_words"]
+    level2_evidence = [f"phoneme_accuracy_pct = {accuracy}%"]
+    if high_count:
+        level2_evidence.append(f"{high_count} of {len(words)} mispronounced word(s) at high severity")
+
+    if words:
+        severity_counts = Counter(w.get("severity") for w in words)
+        patterns_considered = [
+            "severity mix: " + ", ".join(
+                f"{c} {s}" for s, c in sorted(severity_counts.items(), key=lambda kv: severity_rank(kv[0]), reverse=True)
+            )
+        ]
+    else:
+        patterns_considered = ["no mispronunciation pattern present -- clean response"]
+
+    accuracy_bands = {5: 95, 4: 85, 3: 70, 2: 55, 1: 0}
+    if score == 5:
+        why_not_higher = "Already at the top band: 95%+ accuracy with no more than one high-severity mispronunciation is this rubric's ceiling."
+    else:
+        next_threshold = accuracy_bands[score + 1]
+        why_not_higher = f"The next band up requires phoneme_accuracy_pct >= {next_threshold}%; this response measured {accuracy}%."
+        if high_count >= 2:
+            why_not_higher += f" {high_count} high-severity mispronunciation(s) would also cap the score at {min(score, 2 if high_count < 4 else 1)} regardless of accuracy."
+
+    if score == 1:
+        why_not_lower = "This is already the floor score."
+    else:
+        floor_threshold = accuracy_bands[score]
+        why_not_lower = f"This band requires phoneme_accuracy_pct >= {floor_threshold}%; this response measured {accuracy}%, clearing that floor"
+        why_not_lower += f", and only {high_count} high-severity mispronunciation(s) were present -- not enough to cap the score lower." if high_count else ", with no high-severity mispronunciations to cap it lower."
+
+    return {
+        "justification": f"Scored {score}/5 primarily on phoneme_accuracy_pct ({accuracy}%), capped -- never lowered further by subtraction -- by high-severity mispronunciation count ({high_count}).",
+        "level1_evidence": level1_evidence,
+        "level2_evidence": level2_evidence,
+        "patterns_considered": patterns_considered,
+        "why_not_higher": why_not_higher,
+        "why_not_lower": why_not_lower,
+    }
+
+
+def _reason_mti(mti: Dict[str, Any], score: int) -> Dict[str, Any]:
+    """Structured, evidence-backed explanation for the MTI score -- built
+    from the exact fields _score_mti reads."""
+    patterns = mti.get("patterns", [])
+    high_count = sum(1 for p in patterns if p.get("severity") == "high")
+    total = len(patterns)
+    worst = sorted(patterns, key=lambda p: severity_rank(p.get("severity", "")), reverse=True)[:5]
+
+    level1_evidence = [
+        f"{_issue_label(p.get('issue'))} on '{p['word']}' at {_fmt_time(p.get('start'))} "
+        f"({p.get('expected_phoneme')}→{p.get('detected_phoneme')}, {p.get('severity')})"
+        for p in worst
+    ] or ["no entries in mti.patterns"]
+    level2_evidence = [f"{total} total MTI pattern(s) detected", f"{high_count} at high severity"]
+
+    if patterns:
+        issue_counts = Counter(p.get("issue", "substitution") for p in patterns)
+        patterns_considered = [
+            f"{issue.replace('_', ' ')}: {count} instance(s)"
+            for issue, count in sorted(issue_counts.items(), key=lambda kv: kv[1], reverse=True)
+        ]
+    else:
+        patterns_considered = ["no recurring pattern -- zero MTI detections"]
+
+    # total-count staircase mirrors _score_mti exactly: 0->5, 1->4, 2-3->3, 4->2, >=5->1
+    total_ceiling = {5: 0, 4: 1, 3: 3, 2: 4, 1: None}
+    if score == 5:
+        why_not_higher = "Already at the top band: zero MTI patterns detected is this rubric's ceiling."
+    else:
+        why_not_higher = f"The next band up requires a total pattern count of at most {total_ceiling[score + 1]}; this response had {total}."
+        if high_count >= 2:
+            why_not_higher += f" {high_count} high-severity pattern(s) would also cap the score regardless of total count."
+
+    if score == 1:
+        why_not_lower = "This is already the floor score."
+    else:
+        why_not_lower = f"Total pattern count ({total}) stayed within this band's range (<= {total_ceiling[score]}), and {high_count} high-severity pattern(s) were not enough to cap the score any lower."
+
+    return {
+        "justification": f"Scored {score}/5 primarily on total MTI pattern count ({total}), capped -- never loosened -- by high-severity pattern count ({high_count}).",
+        "level1_evidence": level1_evidence,
+        "level2_evidence": level2_evidence,
+        "patterns_considered": patterns_considered,
+        "why_not_higher": why_not_higher,
+        "why_not_lower": why_not_lower,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Articulation: coach_output + reasoning_trace assembly
 # ---------------------------------------------------------------------------
 def _build_articulation_coach_output(
@@ -357,9 +515,17 @@ def _build_articulation_coach_output(
 
 
 def _build_articulation_reasoning_trace(
+    evaluation_analysis: Dict[str, str],
     pron_score: int, pron_reasoning: str, mti_score: int, mti_reasoning: str, coach_output: Dict[str, Any]
 ) -> List[Dict[str, Any]]:
+    # Chain order matches the causal flow this teacher_output now
+    # documents: Level 1 Timeline -> Level 2 Analytics -> Evaluation
+    # Analysis -> Rubric Scores -> Coach Output. Evaluation-analysis
+    # entries come first, establishing the interpretation the scores below
+    # are then grounded in.
     trace = [
+        {"conclusion": "evaluation_analysis: pronunciation_quality", "evidence_cited": ["phoneme_accuracy_pct", "mispronounced_words"], "reasoning": evaluation_analysis["pronunciation_quality"]},
+        {"conclusion": "evaluation_analysis: mti_characteristics", "evidence_cited": ["mti.patterns"], "reasoning": evaluation_analysis["mti_characteristics"]},
         {"conclusion": "pronunciation rubric score", "evidence_cited": ["phoneme_accuracy_pct", "mispronounced_words"], "reasoning": pron_reasoning},
         {"conclusion": "mti rubric score", "evidence_cited": ["mti.patterns"], "reasoning": mti_reasoning},
     ]
@@ -379,23 +545,41 @@ def _build_articulation_reasoning_trace(
 
 
 def synthesize_articulation(evidence: Dict[str, Any], session_id: str) -> Dict[str, Any]:
-    """Produce the {scores, coach_output, reasoning_trace} document an
-    Articulation teacher (MiniMax M3, or here, Claude) would return for
-    this evidence packet."""
+    """Produce the {evaluation_analysis, scores, score_reasoning,
+    coach_output, reasoning_trace} document an Articulation teacher
+    (MiniMax M3, or here, Claude) would return for this evidence packet.
+
+    Key order matches the causal chain: evaluation_analysis is the
+    teacher's read of the evidence BEFORE scoring, scores follow from
+    that reading, score_reasoning explains each score in detail,
+    coach_output translates scores into recommendations, and
+    reasoning_trace ties the whole chain back to specific evidence.
+    """
     pronunciation = evidence.get("pronunciation", {})
     mti = evidence.get("mti", {})
+
+    evaluation_analysis = _build_articulation_evaluation_analysis(pronunciation, mti)
 
     pron_score, pron_reasoning = _score_pronunciation(pronunciation)
     mti_score, mti_reasoning = _score_mti(mti)
 
+    score_reasoning = {
+        "pronunciation": _reason_pronunciation(pronunciation, pron_score),
+        "mti": _reason_mti(mti, mti_score),
+    }
+
     coach_output = _build_articulation_coach_output(session_id, pronunciation, mti, pron_score, mti_score)
-    reasoning_trace = _build_articulation_reasoning_trace(pron_score, pron_reasoning, mti_score, mti_reasoning, coach_output)
+    reasoning_trace = _build_articulation_reasoning_trace(
+        evaluation_analysis, pron_score, pron_reasoning, mti_score, mti_reasoning, coach_output
+    )
 
     return {
+        "evaluation_analysis": evaluation_analysis,
         "scores": {
             "pronunciation": {"score": pron_score, "reasoning": pron_reasoning},
             "mti": {"score": mti_score, "reasoning": mti_reasoning},
         },
+        "score_reasoning": score_reasoning,
         "coach_output": coach_output,
         "reasoning_trace": reasoning_trace,
     }
@@ -559,6 +743,272 @@ def _score_engagement(fluency: Dict[str, Any], intonation: Dict[str, Any], rhyth
         f"{pauses.get('hesitation_count', 0)} hesitation), {rhythm_pct}% rhythm, and {wpm} wpm as secondary caps."
     )
     return score, reasoning
+
+
+# ---------------------------------------------------------------------------
+# Delivery: evaluation_analysis + score_reasoning
+#
+# Same relationship to _score_fluency/_score_intonation/_score_engagement
+# as the articulation reasoning functions have to theirs: thresholds are
+# repeated here (not shared via import) because the scoring functions'
+# branching is the tested, shipped source of truth. Consistency is
+# verified by test_claude_teacher.py.
+# ---------------------------------------------------------------------------
+def _build_delivery_evaluation_analysis(
+    fluency: Dict[str, Any], intonation: Dict[str, Any], rhythm: Dict[str, Any]
+) -> Dict[str, str]:
+    """The teacher's analytical read of the delivery evidence -- NOT
+    coaching -- produced before scores are assigned."""
+    wpm = fluency.get("speaking_speed", {}).get("words_per_minute") or 0
+    filler_count = fluency.get("filler_usage", {}).get("count", 0)
+    filler_per_min = fluency.get("filler_usage", {}).get("per_minute", 0.0)
+    pauses = fluency.get("pauses", {})
+    pitch = intonation.get("pitch", {})
+    range_hz = pitch.get("range_hz") or 0
+    flat_sections = intonation.get("flat_sections", [])
+    low_energy_sections = [s for s in flat_sections if s.get("kind") == "low_energy"]
+    rhythm_pct = rhythm.get("score_pct") or 0
+
+    pace_read = "within" if 110 <= wpm <= 160 else ("near" if 90 <= wpm <= 180 else "outside")
+    speech_behavior_summary = (
+        f"Delivery runs at {wpm} wpm ({pace_read} the 120-150 wpm comfortable range) with {filler_count} filler(s) "
+        f"and a {range_hz} Hz pitch range."
+    )
+
+    fluency_patterns = (
+        f"Speaking speed is {wpm} wpm with {filler_count} filler(s) ({filler_per_min}/min), "
+        f"{pauses.get('dead_air_count', 0)} dead-air pause(s) and {pauses.get('long_pause_count', 0)} long pause(s)."
+    )
+
+    rhythm_text = f"Rhythm regularity scored {rhythm_pct}%" + (
+        ", reading as metronomic/uniform rather than naturally varied." if rhythm_pct > 95
+        else ", reading as erratic/inconsistent timing." if rhythm_pct < 40
+        else ", within a natural variability range."
+    )
+
+    if not flat_sections:
+        intonation_text = f"Pitch range is {range_hz} Hz with no flat or low-energy sections flagged."
+    else:
+        monotone = sum(1 for s in flat_sections if s.get("kind") == "monotone")
+        intonation_text = (
+            f"Pitch range is {range_hz} Hz, with {monotone} monotone and {len(low_energy_sections)} low-energy "
+            f"section(s) flagged across the response."
+        )
+
+    # "Confidence" has no direct field in this packet -- pause/filler burden
+    # is the same proxy signal _score_engagement's pause_burden already
+    # relies on, read here as an interpretive (not scoring) observation.
+    pause_burden = 2.0 * pauses.get("dead_air_count", 0) + 1.5 * pauses.get("long_pause_count", 0) + 1.0 * pauses.get("hesitation_count", 0)
+    if pause_burden == 0 and filler_per_min == 0:
+        confidence_indicators = "No hesitation markers (pauses or fillers) were logged, consistent with a confident, uninterrupted delivery."
+    else:
+        confidence_indicators = (
+            f"Hesitation markers present: {pauses.get('hesitation_count', 0)} hesitation(s), "
+            f"{pauses.get('dead_air_count', 0)} dead-air pause(s), {filler_count} filler(s) -- "
+            f"a combined pause burden of {pause_burden:.1f}, which may read as reduced confidence to a listener."
+        )
+
+    if not low_energy_sections:
+        engagement_patterns = "No low-energy sections were flagged, the primary engagement signal available in this packet."
+    else:
+        high = sum(1 for s in low_energy_sections if s.get("severity") == "high")
+        engagement_patterns = f"{len(low_energy_sections)} low-energy section(s) flagged ({high} at high severity), the primary engagement signal available in this packet."
+
+    speaking_consistency = (
+        f"Pace and rhythm together suggest "
+        + ("consistent, steady delivery" if 40 <= rhythm_pct <= 95 and 70 <= wpm <= 200 else "variable delivery")
+        + f" ({rhythm_pct}% rhythm, {wpm} wpm)."
+    )
+
+    return {
+        "speech_behavior_summary": speech_behavior_summary,
+        "fluency_patterns": fluency_patterns,
+        "rhythm": rhythm_text,
+        "intonation": intonation_text,
+        "confidence_indicators": confidence_indicators,
+        "engagement_patterns": engagement_patterns,
+        "speaking_consistency": speaking_consistency,
+    }
+
+
+def _reason_fluency(fluency: Dict[str, Any], score: int) -> Dict[str, Any]:
+    """Structured, evidence-backed explanation for the fluency score --
+    built from the exact fields _score_fluency reads. Fluency's score is
+    two-stage (a pace band, then a penalty subtracted for fillers/pauses),
+    unlike the other rubrics' cap-only pattern, so both stages are
+    explained separately."""
+    wpm = fluency.get("speaking_speed", {}).get("words_per_minute") or 0
+    filler_count = fluency.get("filler_usage", {}).get("count", 0)
+    filler_per_min = fluency.get("filler_usage", {}).get("per_minute", 0.0)
+    pauses = fluency.get("pauses", {})
+    dead_air = pauses.get("dead_air_count", 0)
+    long_pauses = pauses.get("long_pause_count", 0)
+
+    if 110 <= wpm <= 160:
+        pace_score = 5
+    elif 90 <= wpm <= 180:
+        pace_score = 4
+    elif 70 <= wpm <= 200:
+        pace_score = 3
+    else:
+        pace_score = 2
+
+    penalty = 0
+    if filler_per_min >= 10:
+        penalty += 2
+    elif filler_per_min >= 5:
+        penalty += 1
+    if dead_air > 0:
+        penalty += 1
+    if long_pauses >= 2:
+        penalty += 1
+
+    level1_evidence = []
+    if filler_count:
+        level1_evidence.append(f"{filler_count} filler word(s) logged ({filler_per_min}/min)")
+    if dead_air:
+        level1_evidence.append(f"{dead_air} dead-air pause(s)")
+    if long_pauses:
+        level1_evidence.append(f"{long_pauses} long pause(s)")
+    if not level1_evidence:
+        level1_evidence = ["no fillers or flagged pauses logged"]
+    level2_evidence = [f"words_per_minute = {wpm}", f"pace_score (pre-penalty) = {pace_score}", f"penalty applied = {penalty}"]
+
+    patterns_considered = [f"pace band: {'within' if pace_score == 5 else 'near' if pace_score == 4 else 'outside'} the 120-150 wpm comfortable range"]
+    if penalty:
+        patterns_considered.append(f"penalty breakdown: filler_per_min={filler_per_min} (+{2 if filler_per_min >= 10 else 1 if filler_per_min >= 5 else 0}), dead_air={dead_air} (+{1 if dead_air > 0 else 0}), long_pauses={long_pauses} (+{1 if long_pauses >= 2 else 0})")
+
+    if score == 5:
+        why_not_higher = "Already at the top band: pace within 120-150 wpm with zero filler/pause penalty is this rubric's ceiling."
+    elif pace_score - penalty < 1:
+        why_not_higher = f"The pace band itself scored {pace_score}, but a penalty of {penalty} (fillers/pauses) pushed the floor to 1."
+    else:
+        why_not_higher = f"Pace band scored {pace_score}/5, and a penalty of {penalty} was subtracted for filler/pause evidence, landing on {score}."
+
+    if score == 1:
+        why_not_lower = "This is already the floor score."
+    else:
+        why_not_lower = f"Pace band ({pace_score}) minus penalty ({penalty}) landed at {score}, not lower -- fillers and pauses did not accumulate enough penalty to drop it further."
+
+    return {
+        "justification": f"Scored {score}/5 as pace_score ({pace_score}, from {wpm} wpm) minus a penalty ({penalty}) for filler rate and pause counts.",
+        "level1_evidence": level1_evidence,
+        "level2_evidence": level2_evidence,
+        "patterns_considered": patterns_considered,
+        "why_not_higher": why_not_higher,
+        "why_not_lower": why_not_lower,
+    }
+
+
+def _reason_intonation(intonation: Dict[str, Any], score: int) -> Dict[str, Any]:
+    """Structured, evidence-backed explanation for the intonation score --
+    built from the exact fields _score_intonation reads."""
+    pitch = intonation.get("pitch", {})
+    range_hz = pitch.get("range_hz") or 0
+    flat_sections = intonation.get("flat_sections", [])
+    monotone_sections = [s for s in flat_sections if s.get("kind") == "monotone"]
+    low_energy_count = sum(1 for s in flat_sections if s.get("kind") == "low_energy")
+    high_severity_monotone = any(s.get("severity") == "high" for s in monotone_sections)
+
+    level1_evidence = [
+        f"{s.get('kind')} section at {_fmt_time(s.get('start'))}-{_fmt_time(s.get('end'))} ({s.get('severity')} severity)"
+        for s in flat_sections[:5]
+    ] or ["no flat_sections entries"]
+    level2_evidence = [f"pitch.range_hz = {range_hz}", f"pitch.average_hz = {pitch.get('average_hz')}"]
+
+    patterns_considered = [f"{len(monotone_sections)} monotone section(s), {low_energy_count} low-energy section(s)"]
+
+    range_bands = {5: 96, 4: 76, 3: 58, 2: 42, 1: 0}
+    if score == 5:
+        why_not_higher = "Already at the top band: 96+ Hz pitch range with no high-severity monotone section is this rubric's ceiling."
+    else:
+        next_threshold = range_bands[score + 1]
+        why_not_higher = f"The next band up requires pitch range_hz >= {next_threshold}; this response measured {range_hz} Hz."
+        if high_severity_monotone:
+            why_not_higher += " A high-severity monotone section also caps the score at 2 regardless of range."
+
+    if score == 1:
+        why_not_lower = "This is already the floor score."
+    else:
+        floor_threshold = range_bands[score]
+        why_not_lower = f"This band requires pitch range_hz >= {floor_threshold}; this response measured {range_hz} Hz, clearing that floor"
+        why_not_lower += ", with no high-severity monotone section to cap it lower." if not high_severity_monotone else "."
+
+    return {
+        "justification": f"Scored {score}/5 primarily on pitch.range_hz ({range_hz}), capped by high-severity monotone sections ({'present' if high_severity_monotone else 'absent'}) and low-energy section count ({low_energy_count}).",
+        "level1_evidence": level1_evidence,
+        "level2_evidence": level2_evidence,
+        "patterns_considered": patterns_considered,
+        "why_not_higher": why_not_higher,
+        "why_not_lower": why_not_lower,
+    }
+
+
+def _reason_engagement(fluency: Dict[str, Any], intonation: Dict[str, Any], rhythm: Dict[str, Any], score: int) -> Dict[str, Any]:
+    """Structured, evidence-backed explanation for the engagement score --
+    built from the exact fields _score_engagement reads."""
+    flat_sections = intonation.get("flat_sections", [])
+    low_energy_sections = [s for s in flat_sections if s.get("kind") == "low_energy"]
+    low_energy_count = len(low_energy_sections)
+    high_severity_count = sum(1 for s in low_energy_sections if s.get("severity") == "high")
+
+    wpm = fluency.get("speaking_speed", {}).get("words_per_minute") or 0
+    pauses = fluency.get("pauses", {})
+    pause_burden = 2.0 * pauses.get("dead_air_count", 0) + 1.5 * pauses.get("long_pause_count", 0) + 1.0 * pauses.get("hesitation_count", 0)
+    rhythm_pct = rhythm.get("score_pct") or 0
+
+    level1_evidence = [
+        f"low-energy section at {_fmt_time(s.get('start'))}-{_fmt_time(s.get('end'))} ({s.get('severity')} severity)"
+        for s in low_energy_sections[:5]
+    ] or ["no low-energy flat_sections entries"]
+    level2_evidence = [
+        f"low_energy_count = {low_energy_count}", f"pause_burden = {pause_burden:.1f}",
+        f"rhythm.score_pct = {rhythm_pct}", f"words_per_minute = {wpm}",
+    ]
+    patterns_considered = [f"{high_severity_count} of {low_energy_count} low-energy section(s) at high severity"]
+    if rhythm_pct > 95 or rhythm_pct < 40:
+        patterns_considered.append(f"rhythm.score_pct ({rhythm_pct}%) is outside the 40-95% natural-variability range")
+    if not (70 <= wpm <= 200):
+        patterns_considered.append(f"words_per_minute ({wpm}) is outside the 70-200 comfortable range")
+
+    staircase = {5: 0, 4: 1, 3: 2, 2: 3, 1: None}
+    caps_applied = []
+    if high_severity_count >= 2:
+        caps_applied.append(f"{high_severity_count} high-severity low-energy sections cap the score at 2")
+    elif high_severity_count == 1:
+        caps_applied.append("1 high-severity low-energy section caps the score at 3")
+    if pause_burden >= 6:
+        caps_applied.append(f"pause_burden {pause_burden:.1f} caps the score at 2")
+    elif pause_burden >= 4:
+        caps_applied.append(f"pause_burden {pause_burden:.1f} caps the score at 3")
+    elif pause_burden >= 2.5:
+        caps_applied.append(f"pause_burden {pause_burden:.1f} caps the score at 4")
+    if rhythm_pct > 95 or rhythm_pct < 40:
+        caps_applied.append(f"rhythm.score_pct {rhythm_pct}% (metronomic or erratic) caps the score at 4")
+    if not (70 <= wpm <= 200):
+        caps_applied.append(f"words_per_minute {wpm} outside comfortable range caps the score at 4")
+
+    base_band = 5 - low_energy_count if low_energy_count <= 4 else 1
+    if score == 5:
+        why_not_higher = "Already at the top band: zero low-energy sections with no secondary caps triggered is this rubric's ceiling."
+    elif caps_applied:
+        why_not_higher = f"low_energy_count ({low_energy_count}) sets the base band at {base_band}; " + "; ".join(caps_applied) + "."
+    else:
+        why_not_higher = f"low_energy_count ({low_energy_count}) sets the base band at {base_band}, landing on {score} with no secondary caps triggered."
+
+    if score == 1:
+        why_not_lower = "This is already the floor score."
+    else:
+        why_not_lower = f"low_energy_count ({low_energy_count}) and the secondary caps present ({'; '.join(caps_applied) if caps_applied else 'none triggered'}) landed on {score}, not lower."
+
+    return {
+        "justification": f"Scored {score}/5 primarily on low-energy section count ({low_energy_count}), capped -- never loosened -- by high-severity section count, pause burden, rhythm extremity, and pace.",
+        "level1_evidence": level1_evidence,
+        "level2_evidence": level2_evidence,
+        "patterns_considered": patterns_considered,
+        "why_not_higher": why_not_higher,
+        "why_not_lower": why_not_lower,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -726,12 +1176,21 @@ def _build_delivery_coach_output(
 
 
 def _build_delivery_reasoning_trace(
+    evaluation_analysis: Dict[str, str],
     fluency_score: int, fluency_reasoning: str,
     intonation_score: int, intonation_reasoning: str,
     engagement_score: int, engagement_reasoning: str,
     coach_output: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
+    # Chain order matches the causal flow this teacher_output now
+    # documents: Level 1 Timeline -> Level 2 Analytics -> Evaluation
+    # Analysis -> Rubric Scores -> Coach Output.
     trace = [
+        {"conclusion": "evaluation_analysis: fluency_patterns", "evidence_cited": ["fluency.speaking_speed", "fluency.filler_usage", "fluency.pauses"], "reasoning": evaluation_analysis["fluency_patterns"]},
+        {"conclusion": "evaluation_analysis: rhythm", "evidence_cited": ["rhythm.score_pct"], "reasoning": evaluation_analysis["rhythm"]},
+        {"conclusion": "evaluation_analysis: intonation", "evidence_cited": ["intonation.pitch", "intonation.flat_sections"], "reasoning": evaluation_analysis["intonation"]},
+        {"conclusion": "evaluation_analysis: confidence_indicators", "evidence_cited": ["fluency.pauses", "fluency.filler_usage"], "reasoning": evaluation_analysis["confidence_indicators"]},
+        {"conclusion": "evaluation_analysis: engagement_patterns", "evidence_cited": ["intonation.flat_sections"], "reasoning": evaluation_analysis["engagement_patterns"]},
         {"conclusion": "fluency rubric score", "evidence_cited": ["fluency.speaking_speed", "fluency.filler_usage", "fluency.pauses"], "reasoning": fluency_reasoning},
         {"conclusion": "intonation rubric score", "evidence_cited": ["intonation.pitch", "intonation.flat_sections"], "reasoning": intonation_reasoning},
         {"conclusion": "engagement rubric score", "evidence_cited": ["fluency", "intonation", "rhythm"], "reasoning": engagement_reasoning},
@@ -751,31 +1210,43 @@ def _build_delivery_reasoning_trace(
 
 
 def synthesize_delivery(evidence: Dict[str, Any], session_id: str) -> Dict[str, Any]:
-    """Produce the {scores, coach_output, reasoning_trace} document a
-    Delivery teacher (MiMo-v2.5, or here, Claude) would return for this
-    evidence packet."""
+    """Produce the {evaluation_analysis, scores, score_reasoning,
+    coach_output, reasoning_trace} document a Delivery teacher (MiMo-v2.5,
+    or here, Claude) would return for this evidence packet. Key order and
+    causal chain match synthesize_articulation's -- see its docstring."""
     fluency = evidence.get("fluency", {})
     intonation = evidence.get("intonation", {})
     rhythm = evidence.get("rhythm", {})
+
+    evaluation_analysis = _build_delivery_evaluation_analysis(fluency, intonation, rhythm)
 
     fluency_score, fluency_reasoning = _score_fluency(fluency)
     intonation_score, intonation_reasoning = _score_intonation(intonation)
     engagement_score, engagement_reasoning = _score_engagement(fluency, intonation, rhythm)
 
+    score_reasoning = {
+        "fluency": _reason_fluency(fluency, fluency_score),
+        "intonation": _reason_intonation(intonation, intonation_score),
+        "engagement": _reason_engagement(fluency, intonation, rhythm, engagement_score),
+    }
+
     coach_output = _build_delivery_coach_output(
         session_id, fluency, intonation, rhythm, fluency_score, intonation_score, engagement_score
     )
     reasoning_trace = _build_delivery_reasoning_trace(
+        evaluation_analysis,
         fluency_score, fluency_reasoning, intonation_score, intonation_reasoning,
         engagement_score, engagement_reasoning, coach_output,
     )
 
     return {
+        "evaluation_analysis": evaluation_analysis,
         "scores": {
             "fluency": {"score": fluency_score, "reasoning": fluency_reasoning},
             "intonation": {"score": intonation_score, "reasoning": intonation_reasoning},
             "engagement": {"score": engagement_score, "reasoning": engagement_reasoning},
         },
+        "score_reasoning": score_reasoning,
         "coach_output": coach_output,
         "reasoning_trace": reasoning_trace,
     }
