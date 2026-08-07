@@ -26,11 +26,20 @@ model:
   ollama_model_name: "qwen2.5:3b"
 
 quantization:
-  # Optional 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA
-  # GPU -- silently ignored (falls back to unquantized) on CPU/MPS, since
-  # bitsandbytes doesn't support them. Off by default: this project's
-  # reference dev machine is Apple Silicon (MPS), where this has no effect.
-  enabled: false
+  # 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA GPU --
+  # silently ignored (falls back to unquantized, with a warning) on CPU/MPS,
+  # since bitsandbytes doesn't support them, so this stays harmless on this
+  # project's Apple Silicon dev machine.
+  #
+  # Kept in step with articulation.yaml so both coaches train under the same
+  # numerics. Delivery is the easier of the two -- Qwen2.5-3B is smaller
+  # (~6.2 GB fp16 vs Gemma's 8.6 GB) and its vocabulary is 151,936 vs
+  # Gemma's 262,208, which roughly halves the dominant logits term -- so it
+  # would likely fit on a T4 unquantized where articulation provably does
+  # not. It is quantized anyway for consistency: comparing two students
+  # trained under different weight precision would confound any quality
+  # difference between them with a precision artifact.
+  enabled: true
   load_in_4bit: true
   bnb_4bit_compute_dtype: "bfloat16"
   bnb_4bit_quant_type: "nf4"
@@ -69,16 +78,30 @@ training:
   epochs: 3
   learning_rate: 2.0e-4              # LoRA tolerates a higher LR than full fine-tuning
   # Per-device. effective_batch_size = batch_size * gradient_accumulation_steps * num_gpus.
-  # Single GPU (Colab, local): 4 * 4 * 1 = 16. Under `accelerate launch
-  # --num_processes=2` (e.g. Kaggle T4x2) this SAME config yields 4 * 4 * 2 = 32
-  # -- DDP doesn't change batch_size, it runs `num_gpus` copies of it in
-  # parallel. Lower gradient_accumulation_steps to 2 if you want to hold
-  # effective_batch_size at 16 under 2 GPUs instead of doubling it.
-  batch_size: 4
-  gradient_accumulation_steps: 4
+  # Single GPU: 1 * 16 * 1 = 16. Under `accelerate launch --num_processes=2`
+  # this SAME config yields 1 * 16 * 2 = 32 -- DDP doesn't change batch_size,
+  # it runs `num_gpus` copies of it in parallel. Halve
+  # gradient_accumulation_steps to 8 to hold effective_batch_size at 16 under
+  # 2 GPUs instead of doubling it.
+  #
+  # Held at 1 to match articulation.yaml. Delivery has more headroom than
+  # articulation (Qwen is smaller, and its 151,936-token vocabulary roughly
+  # halves the dominant logits term vs Gemma's 262,208), so batch_size 2
+  # would probably fit here -- but effective_batch_size must stay comparable
+  # across the two students for their results to be comparable, and an
+  # untested raise is not worth re-running a multi-hour job over.
+  batch_size: 1
+  gradient_accumulation_steps: 16
   warmup_ratio: 0.03
   weight_decay: 0.01
-  max_sequence_length: 6144          # covers the full dataset via the real chat template (p99 ~5012, max ~5284 tokens; see README)
+  # Truncation cap only -- it does NOT drive memory. ConversationDataCollator
+  # pads dynamically to each batch's own longest example, so the real cost is
+  # the actual token count, not this ceiling. Measured with the actual Qwen2.5
+  # tokenizer over all 1600 delivery train rows: p50=3594, p95=4011, p99=4117,
+  # max=4309 -- nothing is truncated at 6144. (An earlier comment here cited
+  # "p99 ~5012, max ~5284" from a Llama-family tokenizer, which was never
+  # measured against either model actually being trained.)
+  max_sequence_length: 6144
 
   # GPU memory: recompute activations during backward instead of storing
   # them (~20-30% slower per step, large activation-memory cut). This is

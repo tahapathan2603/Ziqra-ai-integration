@@ -27,11 +27,13 @@ differ. Everything below applies to either file.
 
 ## `quantization`
 
-Optional 4-bit (QLoRA-style) loading via `bitsandbytes`. Requires a CUDA GPU — the trainer detects its absence and falls back to unquantized loading with a warning (this project's reference dev machine is Apple Silicon/MPS, where these fields have no effect).
+4-bit (QLoRA-style) loading via `bitsandbytes`. Requires a CUDA GPU — the trainer detects its absence and falls back to unquantized loading with a warning (this project's reference dev machine is Apple Silicon/MPS, where these fields have no effect).
+
+**This is required, not optional, on a 16GB T4.** Gemma-3's vocabulary is 262,208 tokens, and `transformers`' causal-LM loss does an unchunked `logits.float()`, so an fp16 logits tensor *and* its fp32 copy are alive simultaneously — `batch × seq × 262208 × 6 bytes`. At the longest real training example (4176 tokens) that is 6.6 GB of logits by itself. Unquantized fp16 weights are another 8.6 GB, totalling ~16.3 GB against the T4's 14.56 GiB — it OOM'd. 4-bit brings the weights to ~3.4 GB and the peak to ~11.1 GB.
 
 | Field | Meaning |
 |---|---|
-| `enabled` | Whether to load the base model 4-bit-quantized. `false` by default. |
+| `enabled` | Whether to load the base model 4-bit-quantized. `true` in both configs — see above. When it actually engages (CUDA present *and* bitsandbytes installed), `trainer/model_loader.py` additionally runs `peft.prepare_model_for_kbit_training()`, which casts layernorms/embeddings back to fp32 so the frozen 4-bit base is stable to backprop through. That call is gated on the loaded model's own `is_loaded_in_4bit` flag rather than this field, because this field can be `true` while quantization silently declined on an unsupported host. |
 | `load_in_4bit` | Passed to `BitsAndBytesConfig`. |
 | `bnb_4bit_compute_dtype` | Precision used for the actual matmuls even though weights are stored 4-bit. |
 | `bnb_4bit_quant_type` | `"nf4"` (NormalFloat4, the standard QLoRA choice) or `"fp4"`. |
@@ -62,12 +64,12 @@ Placeholders for the LoRA/PEFT setup the (not-yet-built) trainer will use.
 |---|---|
 | `epochs` | Full passes over `train_file`. |
 | `learning_rate` | Peak LR after warmup. `2e-4` is a conventional LoRA rate — noticeably higher than the `~2e-5` typical of full fine-tuning, since only the small adapter matrices are being trained. |
-| `batch_size` | Per-device batch size. Lower this first if you hit an out-of-memory error. Under multi-GPU (DDP — see below), this is the batch size *each* GPU processes; it does not change based on GPU count. |
-| `gradient_accumulation_steps` | Batches accumulated before an optimizer step. Effective batch size = `batch_size * gradient_accumulation_steps * num_gpus` — 16 on one GPU with the defaults, 32 under `accelerate launch --num_processes=2` with the same config. Lower this to 2 if you want to hold the effective batch at 16 under two GPUs instead of doubling it. |
+| `batch_size` | Per-device batch size. **Must stay 1 on a 16GB T4** — the logits term described under `quantization` scales linearly with it, so `batch_size: 2` adds another ~6.6 GB and OOMs even with 4-bit weights. The original `4` was the direct cause of the observed crash (it needed ~25 GB of logits alone). Under multi-GPU (DDP — see below), this is the batch size *each* GPU processes; it does not change based on GPU count. |
+| `gradient_accumulation_steps` | Batches accumulated before an optimizer step. Effective batch size = `batch_size * gradient_accumulation_steps * num_gpus` — 16 on one GPU with the defaults, 32 under `accelerate launch --num_processes=2` with the same config. Raised 4 → 16 when `batch_size` dropped 4 → 1, so the effective batch (and therefore the training dynamics) is unchanged at 16. Halve it to 8 if you move to two GPUs and want to hold the effective batch at 16 rather than doubling it. |
 | `warmup_ratio` | Fraction of total training steps spent linearly ramping the LR up from 0 to `learning_rate`. |
 | `weight_decay` | L2 regularization coefficient for the optimizer. |
-| `max_sequence_length` | Token cap per training example (prompt + response). 6144 was chosen by tokenizing the *actual* rendered chat template (`trainer/dataset.py`'s own tokenization path, not a char-count estimate) over all 4000 samples with a real Llama-family tokenizer: p99 ≈ 5012 tokens, max ≈ 5284. Re-measure this (`AutoTokenizer.apply_chat_template` + `training.prompts.build_conversation`) if the prompt templates or `teacher_output` schema change — the jump from 4096 came from adding `evaluation_analysis`/`score_reasoning` to every teacher_output, which nearly doubled the assistant turn's length. |
-| `gradient_checkpointing` | Recomputes activations during backward instead of storing them — roughly 20-30% slower per step, but a large activation-memory cut (this is what makes `batch_size: 4` at `max_sequence_length: 6144` actually fit on a 16GB T4; the identical config OOM'd without it). `true` by default. Requires no other action — `trainer/model_loader.py` handles the LoRA-specific prerequisite (`enable_input_require_grads()`) automatically. |
+| `max_sequence_length` | Truncation cap per training example (prompt + response). **It does not drive memory** — `ConversationDataCollator` pads dynamically to each batch's own longest example, so the real cost is the actual token count, not this ceiling. Measured with each model's *own* tokenizer over all 1600 train rows per coach: articulation/Gemma p50 2830, p95 3954, **max 4176**; delivery/Qwen p50 3594, p95 4011, **max 4309**. Nothing is truncated at 6144, which is kept as free headroom. (An earlier version of this row cited "p99 ≈ 5012, max ≈ 5284" measured with a Llama-family tokenizer — neither model actually being trained — overstating the requirement by ~25%.) Re-measure (`AutoTokenizer.apply_chat_template` + `training.prompts.build_conversation_from_student_record`) if the prompt templates or `teacher_output` schema change. |
+| `gradient_checkpointing` | Recomputes activations during backward instead of storing them — roughly 20-30% slower per step, in exchange for a large activation-memory cut. `true` by default. Requires no other action — `trainer/model_loader.py` handles the LoRA-specific prerequisite (`enable_input_require_grads()`) automatically. Necessary but **not sufficient** on a 16GB T4: it only shrinks the per-layer activation term, and the binding constraint here is the logits tensor (see `quantization`), which checkpointing does not touch. An earlier version of this row claimed checkpointing was what made `batch_size: 4` fit on a T4 — it was not, and that configuration OOM'd with checkpointing enabled. |
 | `dataloader_num_workers` / `dataloader_persistent_workers` / `dataloader_prefetch_factor` | Background data-loading workers, whether they persist across epochs (avoids respawning), and how many batches each stages ahead of GPU compute. The benefit is modest for this dataset specifically — tokenization happens once, eagerly, at dataset-construction time (`trainer/dataset.py`), so there's little per-batch CPU work left to overlap with GPU compute. `persistent_workers`/`prefetch_factor` are automatically ignored (not passed to `TrainingArguments`) if `dataloader_num_workers` is 0. |
 | `eval_accumulation_steps` | How many eval batches of raw logits Trainer holds on-device before offloading to CPU. `null` accumulates everything, which is fine for this dataset's small (~200-sample) eval sets; set a small integer if evaluation ever OOMs on a larger one. |
 | `early_stopping_patience` | Stop training if validation loss hasn't improved for this many evaluation calls in a row. `null` disables early stopping. |
@@ -77,7 +79,10 @@ Placeholders for the LoRA/PEFT setup the (not-yet-built) trainer will use.
 Nothing in this config changes for multi-GPU — the same YAML drives both a single-GPU and a multi-GPU run. What changes is how `train.py` is *launched*:
 
 ```bash
-# single GPU / CPU / MPS -- one process
+# single GPU / CPU / MPS -- one process.
+# CUDA_VISIBLE_DEVICES=0 is REQUIRED on any host with more than one GPU, and
+# must be set in the environment BEFORE python starts -- see below.
+CUDA_VISIBLE_DEVICES=0 \
 python -m backend.knowledge_distillation.training.trainer.train --config training/configs/articulation.yaml
 
 # two GPUs -- data-parallel via Hugging Face Accelerate (DistributedDataParallel
@@ -88,9 +93,17 @@ accelerate launch --multi_gpu --num_processes=2 \
 
 `transformers.Trainer` detects the multi-process launch automatically and wraps the model in DDP itself — nothing in this codebase manually constructs a `DistributedDataParallel`. Each process gets a full model replica and a different batch slice; gradients sync after each backward pass. This is a **throughput** optimization — it requires the full model to already fit on one GPU, which is what `gradient_checkpointing` (above) and a hardware-appropriate `torch_dtype` (see `model` section — T4 has no bf16 tensor cores, so bf16 requests silently fall back to fp16 on it) are for. Two T4s does **not** mean 32GB of usable model memory; each GPU still needs the model to fit in its own 16GB.
 
-Every print and file write in `train.py`/`callbacks.py` is already guarded to run on the main process only (rank 0), so a multi-GPU run doesn't produce duplicated terminal output or racing writes to the same adapter directory — this is handled automatically, not something you need to configure.
+### Running single-process on a multi-GPU host — you must set `CUDA_VISIBLE_DEVICES`
 
-**Running the single-GPU command on a multi-GPU host is also handled automatically.** Confirmed on a real Kaggle T4×2 run: launched with the plain single-process command above, `transformers.Trainer` silently wraps the model in the legacy `torch.nn.DataParallel` the moment it sees more than one visible CUDA device — the exact thing this multi-GPU support exists to avoid, and it crashed training on step 0 (DataParallel's per-replica input splitting doesn't satisfy Gemma3's forward requirements). `train.py`'s `_prevent_accidental_data_parallel()` now pins `CUDA_VISIBLE_DEVICES=0` for this case (single process, >1 GPU visible, quantization off) before anything touches `torch.cuda` — a no-op on a single-GPU host, and automatically skipped when launched via `accelerate launch` (it reads `WORLD_SIZE` to tell the two cases apart) or when `quantization.enabled` is `true` (that path's `device_map="auto"` legitimately wants every visible GPU).
+`transformers.Trainer` silently wraps the model in the legacy `torch.nn.DataParallel` the moment more than one CUDA device is visible to a single, non-distributed process — the exact thing this multi-GPU support exists to avoid. It multiplies the effective batch size by the GPU count and gathers every replica's outputs onto GPU 0.
+
+**This cannot be fixed from inside the training process, and an earlier attempt to do so failed silently.** `torch.cuda.device_count()` caches its result in a module global as soon as CUDA is initialised and never re-reads the environment afterwards — and CUDA is already initialised during *imports* (the bitsandbytes/torchao banner prints before `train.py`'s first log line). Setting `CUDA_VISIBLE_DEVICES` inside `main()` is therefore too late. On two live Kaggle T4×2 runs the "pinning" log line printed and DataParallel engaged anyway; the tell was the step count — 1600 rows at effective batch 16 over 3 epochs is **300** steps on one GPU, but both runs reported **150**, i.e. Trainer had doubled `train_batch_size` across two GPUs.
+
+So `train.py` now *asserts* rather than fixes: `_assert_not_data_parallel()` raises `MultiGPUConfigurationError` up front (before the multi-GB model download) if more than one GPU is visible outside a distributed launch. Set the variable in the environment before starting Python — `CUDA_VISIBLE_DEVICES=0 python -m ...`, or `%env CUDA_VISIBLE_DEVICES=0` in a notebook cell, as `notebooks/train_on_kaggle.ipynb` Cell 6 does. Under `accelerate launch` the assertion skips itself (it reads `WORLD_SIZE`), and you must *not* pin the variable there — each process needs its own GPU.
+
+**Step count is the quickest check that it worked:** 300, not 150.
+
+Every print and file write in `train.py` is already guarded to the main process (rank 0), so a multi-GPU run doesn't duplicate terminal output or race on the adapter directory.
 
 ## `checkpointing`
 

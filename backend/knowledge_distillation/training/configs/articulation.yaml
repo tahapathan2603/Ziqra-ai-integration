@@ -27,11 +27,22 @@ model:
   ollama_model_name: "gemma3:4b"
 
 quantization:
-  # Optional 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA
-  # GPU -- silently ignored (falls back to unquantized) on CPU/MPS, since
-  # bitsandbytes doesn't support them. Off by default: this project's
-  # reference dev machine is Apple Silicon (MPS), where this has no effect.
-  enabled: false
+  # 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA GPU --
+  # silently ignored (falls back to unquantized, with a warning) on CPU/MPS,
+  # since bitsandbytes doesn't support them, so this stays harmless on this
+  # project's Apple Silicon dev machine.
+  #
+  # REQUIRED, not optional, for a 16GB T4: Gemma-3's vocabulary is 262,208
+  # tokens and transformers' loss does an unchunked logits.float(), keeping
+  # an fp16 logits tensor AND its fp32 copy alive at once
+  # (batch * seq * 262208 * 6 bytes). At the longest real training example
+  # (4176 tokens, measured -- see max_sequence_length below) that is 6.6 GB
+  # of logits alone. Unquantized fp16 weights are another 8.6 GB, totalling
+  # ~16.3 GB against the T4's 14.56 GiB -- it OOM'd. 4-bit drops the weights
+  # to ~3.4 GB, bringing the peak to ~11.1 GB with room to spare.
+  # See trainer/model_loader.py's load_model_and_tokenizer for the
+  # prepare_model_for_kbit_training step this switch turns on.
+  enabled: true
   load_in_4bit: true
   bnb_4bit_compute_dtype: "bfloat16"
   bnb_4bit_quant_type: "nf4"
@@ -70,16 +81,34 @@ training:
   epochs: 3
   learning_rate: 2.0e-4              # LoRA tolerates a higher LR than full fine-tuning
   # Per-device. effective_batch_size = batch_size * gradient_accumulation_steps * num_gpus.
-  # Single GPU (Colab, local): 4 * 4 * 1 = 16. Under `accelerate launch
-  # --num_processes=2` (e.g. Kaggle T4x2) this SAME config yields 4 * 4 * 2 = 32
-  # -- DDP doesn't change batch_size, it runs `num_gpus` copies of it in
-  # parallel. Lower gradient_accumulation_steps to 2 if you want to hold
-  # effective_batch_size at 16 under 2 GPUs instead of doubling it.
-  batch_size: 4
-  gradient_accumulation_steps: 4
+  # Single GPU: 1 * 16 * 1 = 16. Under `accelerate launch --num_processes=2`
+  # this SAME config yields 1 * 16 * 2 = 32 -- DDP doesn't change batch_size,
+  # it runs `num_gpus` copies of it in parallel. Halve
+  # gradient_accumulation_steps to 8 to hold effective_batch_size at 16 under
+  # 2 GPUs instead of doubling it.
+  #
+  # batch_size MUST stay 1 on a 16GB T4. The logits tensor (see the
+  # quantization block above) scales linearly with batch_size: at 4176 tokens
+  # it is 6.6 GB per sample, so batch_size 2 alone adds another 6.6 GB and
+  # OOMs even with 4-bit weights. This was the direct cause of the observed
+  # crash -- the previous 4 * 4 config needed ~25 GB of logits.
+  # gradient_accumulation_steps is raised 4 -> 16 to compensate, leaving
+  # effective_batch_size unchanged at 16, so training dynamics are identical.
+  batch_size: 1
+  gradient_accumulation_steps: 16
   warmup_ratio: 0.03
   weight_decay: 0.01
-  max_sequence_length: 6144          # covers the full dataset via the real chat template (p99 ~5012, max ~5284 tokens; see README)
+  # Truncation cap only -- it does NOT drive memory. ConversationDataCollator
+  # pads dynamically to each batch's own longest example, so the real cost is
+  # the actual token count, not this ceiling. Measured with the actual Gemma
+  # tokenizer over all 1600 articulation train rows: p50=2830, p95=3954,
+  # max=4176 -- nothing is truncated at 6144. (An earlier comment here cited
+  # "p99 ~5012, max ~5284"; that was measured with a Llama-family tokenizer,
+  # not Gemma's, and overstated the requirement by ~25%.) Left at 6144 rather
+  # than tightened to ~4352 because the headroom is free -- it changes no
+  # memory and no compute, and only matters if the prompt templates or
+  # teacher_output schema grow later.
+  max_sequence_length: 6144
 
   # GPU memory: recompute activations during backward instead of storing
   # them (~20-30% slower per step, large activation-memory cut). This is

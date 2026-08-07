@@ -61,13 +61,14 @@ unguarded prints/writes would duplicate N-ways or race on the same file.
 Checkpoint saving during training is already rank-safe -- that's Trainer's
 own, unmodified internal behavior, not something this codebase adds.
 
-`main()` also calls `_prevent_accidental_data_parallel()` first thing: run
+`main()` also calls `_assert_not_data_parallel()` first thing: run
 single-process (no `accelerate launch`) on a host with more than one GPU
 visible (e.g. Kaggle's T4x2) and, left alone, `transformers.Trainer` wraps
-the model in the legacy `torch.nn.DataParallel` instead -- confirmed on a
-real Kaggle run, where it also produced a confusing unrelated-looking crash
-inside Gemma3's forward. See that function's own docstring for the guard
-and its scoping.
+the model in the legacy `torch.nn.DataParallel` instead. That must be
+prevented by setting `CUDA_VISIBLE_DEVICES` in the environment *before*
+python starts -- this process cannot fix it from the inside, for reasons
+that function's docstring spells out in detail. It raises rather than
+silently continuing.
 """
 
 import argparse
@@ -81,7 +82,7 @@ from rich.table import Table
 from transformers import Trainer, TrainingArguments
 
 from . import PROJECT_ROOT, ConfigError, TrainingConfig, load_config
-from .callbacks import RichTrainingCallback, build_callbacks
+from .callbacks import build_callbacks
 from .dataset import ConversationDataCollator, DatasetBuildError, build_datasets
 from .model_loader import load_model_and_tokenizer, resolve_effective_dtype, select_device
 
@@ -89,51 +90,71 @@ logger = logging.getLogger(__name__)
 console = Console()
 
 
-def _prevent_accidental_data_parallel(config: TrainingConfig) -> None:
-    """Guards against a real failure mode, confirmed on a live Kaggle T4x2
-    run: `transformers.Trainer` automatically wraps the model in the legacy
-    `torch.nn.DataParallel` whenever more than one CUDA device is visible to
-    a single, non-distributed process -- exactly what this codebase's
-    multi-GPU support (Accelerate/DDP, see this module's docstring) exists
-    to avoid, and something nothing downstream (Trainer construction,
-    TrainingArguments) can undo once it happens. On that Kaggle run it also
-    surfaced as a confusing secondary crash (Gemma3's forward raising over
-    a missing `token_type_ids` input) that had nothing to do with the real
-    problem -- DataParallel's per-replica input splitting is a separate,
-    known-broken path for models with custom forward-signature requirements.
+class MultiGPUConfigurationError(RuntimeError):
+    """More than one CUDA device is visible to a single, non-distributed
+    process, which makes `transformers.Trainer` silently fall back to the
+    legacy `torch.nn.DataParallel`. See `_assert_not_data_parallel`."""
 
-    Fix: restrict this process to CUDA_VISIBLE_DEVICES=0 -- but only when
-    that's safe and not already decided elsewhere:
-      - multi-process launch (`accelerate launch`/`torchrun` set WORLD_SIZE
-        > 1): skip. That's the intended multi-GPU path (DDP); each process
-        should keep whatever device visibility the launcher gave it.
-      - `quantization.enabled`: skip. model_loader.py's device_map="auto"
-        path legitimately wants every visible GPU, for memory-pooling
-        model-parallel sharding -- a different technique with different
-        intent (see this module's docstring).
-      - CUDA_VISIBLE_DEVICES already set: skip. An explicit choice already
-        made by the caller shouldn't be silently overridden.
 
-    Must run before anything in this process touches `torch.cuda` --
-    device visibility is fixed at first CUDA context init and ignores any
-    later env var change. This is why `main()` calls it immediately after
-    loading the config, before `load_model_and_tokenizer`.
+def _assert_not_data_parallel(visible_gpu_count: int) -> None:
+    """Fail loudly if this process is about to be wrapped in
+    `torch.nn.DataParallel`.
+
+    `transformers.Trainer` wraps the model in DataParallel whenever
+    `args.n_gpu > 1` outside a distributed launch -- the legacy,
+    single-process parallelism this codebase's multi-GPU support (DDP, see
+    this module's docstring) exists to avoid. It is also actively harmful
+    here: DataParallel multiplies the effective batch by the GPU count,
+    replicates the model every step, and gathers every replica's outputs
+    onto GPU 0.
+
+    An earlier version of this function tried to *prevent* that by setting
+    `os.environ["CUDA_VISIBLE_DEVICES"] = "0"` here. That does not work,
+    and the failure was silent. `torch.cuda.device_count()` caches its
+    result in a module global (`torch.cuda._cached_device_count`) as soon
+    as CUDA is initialized and never re-reads the environment afterwards --
+    and CUDA is already initialized during *imports* (the bitsandbytes /
+    torchao import chain prints its own banner before this module's first
+    log line). Setting the variable from inside `main()` is therefore too
+    late to change anything.
+
+    Confirmed on two live Kaggle T4x2 runs: the "pinning" message printed
+    and DataParallel engaged anyway. The tell was the step count --
+    1600 train samples at batch_size=4, grad_accum=4, 3 epochs is
+    1600/(4*4)*3 = 300 steps on one GPU, but both runs reported 150,
+    i.e. Trainer had doubled `train_batch_size` to 4*n_gpu with n_gpu=2.
+
+    So this is now an assertion, not a fix. `CUDA_VISIBLE_DEVICES` must be
+    set in the environment *before* the process starts (the Kaggle
+    notebook's Cell 6 does this with `%env`), and this check turns a silent
+    2x batch inflation into an actionable error if it ever isn't.
+
+    `visible_gpu_count` is `torch.cuda.device_count()`, which is exactly what
+    `TrainingArguments` derives its own `n_gpu` from outside a distributed
+    launch -- so this can be (and is) checked up front in `main()`, before
+    the multi-GB model download, rather than after building
+    `TrainingArguments`.
+
+    Raises:
+        MultiGPUConfigurationError: >1 GPU visible without a distributed
+            launch.
     """
     if int(os.environ.get("WORLD_SIZE", 1)) > 1:
+        return  # real distributed launch (accelerate/torchrun) -- DDP, not DataParallel
+    if visible_gpu_count <= 1:
         return
-    if config.quantization.enabled:
-        return
-    if "CUDA_VISIBLE_DEVICES" in os.environ:
-        return
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    logger.info(
-        "Pinning CUDA_VISIBLE_DEVICES=0 for this single, non-distributed process "
-        "(harmless if only one GPU is present or none at all). This prevents "
-        "transformers.Trainer from silently wrapping the model in the legacy "
-        "torch.nn.DataParallel on any host with >1 GPU visible -- e.g. Kaggle's "
-        "T4x2. To train across multiple GPUs instead, launch with "
-        "`accelerate launch --multi_gpu --num_processes=N` (see this file's "
-        "module docstring)."
+    raise MultiGPUConfigurationError(
+        f"{visible_gpu_count} CUDA devices are visible to a single, non-distributed "
+        f"process. transformers.Trainer would wrap the model in the legacy "
+        f"torch.nn.DataParallel, which multiplies the effective batch size by "
+        f"{visible_gpu_count} and gathers every replica's outputs onto GPU 0.\n"
+        f"  Fix (single-GPU): set CUDA_VISIBLE_DEVICES=0 in the environment BEFORE "
+        f"starting python -- e.g. `CUDA_VISIBLE_DEVICES=0 python -m ...`, or `%env "
+        f"CUDA_VISIBLE_DEVICES=0` in a notebook cell. Setting it from inside this "
+        f"process does not work: torch caches the device count at CUDA init, which "
+        f"happens during imports.\n"
+        f"  Fix (use every GPU): launch with `accelerate launch --multi_gpu "
+        f"--num_processes={visible_gpu_count} -m ...` for real DDP."
     )
 
 
@@ -222,8 +243,13 @@ def build_training_arguments(config: TrainingConfig, output_dir: Path) -> Traini
         seed=config.randomness.seed,
         bf16=(effective_dtype == torch.bfloat16),
         fp16=(effective_dtype == torch.float16),
-        report_to=[],  # no wandb/tensorboard -- Rich (callbacks.py) is the terminal experience
-        disable_tqdm=True,  # replaced by callbacks.py's Rich progress display
+        report_to=[],  # no wandb/tensorboard -- stdout is the whole reporting surface
+        # Trainer's built-in ProgressCallback: a tqdm bar (step/total/elapsed/ETA)
+        # with each logged loss/learning-rate dict printed above it. This replaced a
+        # custom rich.live.Live display that rendered as a wall of duplicated panels
+        # on Kaggle -- see callbacks.py's module docstring for why tqdm is the
+        # portable choice and why the custom UI could not be salvaged.
+        disable_tqdm=False,
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
@@ -273,9 +299,11 @@ def main() -> None:
     project_root = args.project_root or PROJECT_ROOT
     is_main = _is_main_process()  # see this file's docstring -- guards duplicate N-way prints under multi-GPU
 
-    # Must happen before anything touches torch.cuda -- see the function's
-    # own docstring for why, and what real crash this fixes.
-    _prevent_accidental_data_parallel(config)
+    # Checked up front, before the multi-GB model download, so a
+    # misconfigured host fails in seconds rather than minutes. This is an
+    # assertion about the environment, NOT something this process can fix
+    # from here -- see the function's docstring.
+    _assert_not_data_parallel(torch.cuda.device_count())
 
     if is_main:
         console.print(f"[bold]Loading model and tokenizer for '{config.dataset.coach}'...[/]")
@@ -316,19 +344,13 @@ def main() -> None:
         callbacks=callbacks,
     )
 
-    # Trainer's on_train_end callback hook (which normally stops the Rich
-    # Live display) only fires on successful completion -- not reliably on
-    # a crash inside a training step. Without this, a mid-training
-    # exception leaves the Live display's background refresh thread
-    # running, redrawing the full status panel on top of the traceback as
-    # it prints. Stopping it explicitly here guarantees a clean traceback
-    # regardless of how training ends.
-    rich_callback = next((cb for cb in callbacks if isinstance(cb, RichTrainingCallback)), None)
-    try:
-        trainer.train()
-    finally:
-        if rich_callback is not None:
-            rich_callback.stop()
+    # No try/finally teardown needed here any more: this used to stop the
+    # custom Rich Live display, whose background refresh thread would
+    # otherwise keep repainting over a crash traceback (on_train_end is
+    # Trainer's success-only hook). tqdm needs no such cleanup -- it writes
+    # carriage returns from the calling thread, so an exception simply ends
+    # the bar mid-line.
+    trainer.train()
 
     # Rank-guarded: under multi-GPU every process reaches this line, and an
     # unguarded save would have N processes writing the same files

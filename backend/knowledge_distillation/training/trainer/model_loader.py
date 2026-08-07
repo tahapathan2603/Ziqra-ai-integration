@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import torch
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel, PreTrainedTokenizerBase
 
 from . import LoRAConfig as LoRAConfigSpec
@@ -307,6 +307,29 @@ def load_model_and_tokenizer(
 
     tokenizer = load_tokenizer(model_cfg)
     model = load_base_model(model_cfg, quant_cfg)
+
+    # QLoRA prerequisite. Gated on the model's OWN post-load flag rather
+    # than `quant_cfg.enabled`, because _build_quantization_config silently
+    # declines to quantize on a machine without CUDA or without bitsandbytes
+    # (both are logged warnings, not errors) -- so the config flag can be
+    # true while the loaded model is plain fp16/bf16, and calling this on an
+    # unquantized model would be wrong.
+    #
+    # What it does: casts layernorms and the embedding/output layers back to
+    # fp32 and makes the frozen 4-bit base safe to backprop through. Without
+    # it, QLoRA training is prone to silent instability (NaN/diverging loss)
+    # rather than a clean failure. It also calls enable_input_require_grads()
+    # -- attach_lora does the same immediately after, which is idempotent.
+    if getattr(model, "is_loaded_in_4bit", False) or getattr(model, "is_loaded_in_8bit", False):
+        logger.info("Quantized base detected; applying prepare_model_for_kbit_training (QLoRA).")
+        # use_gradient_checkpointing=False: Trainer owns that decision and
+        # calls gradient_checkpointing_enable() itself, driven by
+        # TrainingArguments.gradient_checkpointing (see train.py). Letting
+        # this helper also enable it would apply the default *reentrant*
+        # variant, silently overriding the use_reentrant=False that train.py
+        # deliberately sets for DDP compatibility.
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=False)
+
     model = attach_lora(model, lora_cfg)
     return model, tokenizer
 
