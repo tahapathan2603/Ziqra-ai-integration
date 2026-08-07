@@ -68,11 +68,32 @@ lora:
 training:
   epochs: 3
   learning_rate: 2.0e-4              # LoRA tolerates a higher LR than full fine-tuning
-  batch_size: 4                      # per-device; tune to fit available VRAM
-  gradient_accumulation_steps: 4     # effective batch size = batch_size * this = 16
+  # Per-device. effective_batch_size = batch_size * gradient_accumulation_steps * num_gpus.
+  # Single GPU (Colab, local): 4 * 4 * 1 = 16. Under `accelerate launch
+  # --num_processes=2` (e.g. Kaggle T4x2) this SAME config yields 4 * 4 * 2 = 32
+  # -- DDP doesn't change batch_size, it runs `num_gpus` copies of it in
+  # parallel. Lower gradient_accumulation_steps to 2 if you want to hold
+  # effective_batch_size at 16 under 2 GPUs instead of doubling it.
+  batch_size: 4
+  gradient_accumulation_steps: 4
   warmup_ratio: 0.03
   weight_decay: 0.01
   max_sequence_length: 6144          # covers the full dataset via the real chat template (p99 ~5012, max ~5284 tokens; see README)
+
+  # GPU memory: recompute activations during backward instead of storing
+  # them (~20-30% slower per step, large activation-memory cut). This is
+  # what makes batch_size=4 at max_sequence_length=6144 fit on a 16GB T4
+  # at all -- without it, this exact config OOM'd on a single T4 (Colab).
+  # See trainer/model_loader.py's attach_lora for the LoRA-specific
+  # prerequisite this pairs with.
+  gradient_checkpointing: true
+
+  # GPU DataLoader throughput -- see training/trainer/__init__.py's
+  # TrainingHyperparams docstring for what each does; benefit here is
+  # modest since tokenization already happens eagerly, not per-batch.
+  dataloader_num_workers: 2
+  dataloader_persistent_workers: true
+  dataloader_prefetch_factor: 2
 
   # Caps how many eval batches of raw logits Trainer holds in memory
   # before offloading to CPU -- keeps validation from spiking memory on

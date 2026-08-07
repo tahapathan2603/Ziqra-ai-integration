@@ -219,15 +219,27 @@ def build_early_stopping_callback(patience: Optional[int]) -> Optional[EarlyStop
     return EarlyStoppingCallback(early_stopping_patience=patience)
 
 
-def build_callbacks(config: TrainingConfig) -> List[TrainerCallback]:
-    """The full callback list train.py passes to `Trainer(callbacks=...)`."""
-    callbacks: List[TrainerCallback] = [
-        RichTrainingCallback(
+def build_callbacks(config: TrainingConfig, is_main_process: bool = True) -> List[TrainerCallback]:
+    """The full callback list train.py passes to `Trainer(callbacks=...)`.
+
+    `is_main_process` gates only the Rich display: under multi-GPU
+    (DDP), every process would otherwise open its own Live terminal
+    display and render the same panel N times, interleaved and garbled.
+    It's pure display with no bearing on the training loop's control
+    flow, so it's safe to attach on rank 0 only and skip entirely
+    elsewhere -- unlike early stopping (attached unconditionally, below):
+    that callback sets `control.should_training_stop`, which every rank
+    must agree on to keep the distributed training loop synchronized, so
+    it has to run identically on every process rather than being
+    rank-gated.
+    """
+    callbacks: List[TrainerCallback] = []
+    if is_main_process:
+        callbacks.append(RichTrainingCallback(
             total_epochs=config.training.epochs,
             coach=config.dataset.coach,
             model_name=config.model.model_name,
-        )
-    ]
+        ))
     early_stopping = build_early_stopping_callback(config.training.early_stopping_patience)
     if early_stopping is not None:
         callbacks.append(early_stopping)

@@ -109,6 +109,22 @@ class TrainingHyperparams:
     max_sequence_length: int
     eval_accumulation_steps: Optional[int] = None
     early_stopping_patience: Optional[int] = None
+    # GPU memory optimization: trades ~20-30% more compute time for a large
+    # cut in activation memory (recomputes activations during backward
+    # instead of storing them) -- see model_loader.attach_lora's comment
+    # for why this requires enable_input_require_grads() on a LoRA model.
+    gradient_checkpointing: bool = True
+    # GPU DataLoader throughput: workers > 0 lets batch collation happen on
+    # CPU while the GPU is still busy with the previous step, instead of
+    # the two waiting on each other serially. persistent_workers avoids
+    # respawning worker processes every epoch; prefetch_factor controls how
+    # many batches each worker stages ahead of time. See dataset.py's
+    # ConversationDataset docstring for why the benefit here is smaller
+    # than for on-the-fly (e.g. image/audio) datasets -- tokenization is
+    # already done eagerly, so there's little CPU work left to overlap.
+    dataloader_num_workers: int = 2
+    dataloader_persistent_workers: bool = True
+    dataloader_prefetch_factor: int = 2
 
 
 @dataclass(frozen=True)
@@ -208,6 +224,10 @@ def load_config(path: Path) -> TrainingConfig:
                 max_sequence_length=int(training_raw["max_sequence_length"]),
                 eval_accumulation_steps=training_raw.get("eval_accumulation_steps"),
                 early_stopping_patience=training_raw.get("early_stopping_patience"),
+                gradient_checkpointing=bool(training_raw.get("gradient_checkpointing", True)),
+                dataloader_num_workers=int(training_raw.get("dataloader_num_workers", 2)),
+                dataloader_persistent_workers=bool(training_raw.get("dataloader_persistent_workers", True)),
+                dataloader_prefetch_factor=int(training_raw.get("dataloader_prefetch_factor", 2)),
             ),
             checkpointing=CheckpointConfig(
                 output_dir=checkpoint_raw["output_dir"],

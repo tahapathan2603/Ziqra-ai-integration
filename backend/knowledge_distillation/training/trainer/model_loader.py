@@ -154,6 +154,37 @@ def _resolve_dtype(name: str) -> torch.dtype:
     return _DTYPE_BY_NAME[name]
 
 
+def resolve_effective_dtype(requested_name: str) -> torch.dtype:
+    """GPU-aware mixed-precision selection: bf16 if the active CUDA device's
+    tensor cores actually support it, fp16 otherwise -- "BF16 if supported,
+    otherwise FP16", decided from real hardware capability
+    (`torch.cuda.is_bf16_supported()`), not assumed from the config alone.
+
+    Concretely: NVIDIA T4 (Turing, compute capability 7.5 -- Kaggle's and
+    Colab's free-tier GPU) has no bf16 tensor cores; only Ampere and newer
+    (A100, RTX 30xx+, compute capability 8.0+) do. Requesting bf16 on a T4
+    doesn't error -- it silently runs unaccelerated, quietly losing the
+    speed half of "mixed precision" while keeping only the memory-layout
+    half. This function is called from both load_base_model (what dtype
+    the weights load in) and train.py's build_training_arguments (what
+    dtype TrainingArguments.bf16/fp16 tell Trainer's autocast to use) so
+    the two can never disagree about which precision is actually active.
+
+    Only overrides on CUDA -- Apple MPS and CPU have different (and, for
+    this project's Mac dev machine, already-verified-working) bf16
+    characteristics that this T4-specific check has no evidence about.
+    """
+    dtype = _resolve_dtype(requested_name)
+    if dtype is torch.bfloat16 and torch.cuda.is_available() and not torch.cuda.is_bf16_supported():
+        logger.warning(
+            "torch_dtype 'bfloat16' requested, but this CUDA device has no bf16 tensor-core "
+            "support (e.g. T4/Turing) -- falling back to float16 so mixed precision is actually "
+            "accelerated, not just memory-shaped."
+        )
+        return torch.float16
+    return dtype
+
+
 def select_device() -> str:
     """Best available device, in preference order: CUDA, Apple MPS, CPU."""
     if torch.cuda.is_available():
@@ -181,7 +212,7 @@ def _build_quantization_config(quant_cfg: QuantizationConfigSpec):
 
     return BitsAndBytesConfig(
         load_in_4bit=quant_cfg.load_in_4bit,
-        bnb_4bit_compute_dtype=_resolve_dtype(quant_cfg.bnb_4bit_compute_dtype),
+        bnb_4bit_compute_dtype=resolve_effective_dtype(quant_cfg.bnb_4bit_compute_dtype),  # same T4-vs-Ampere check as the base model dtype
         bnb_4bit_quant_type=quant_cfg.bnb_4bit_quant_type,
         bnb_4bit_use_double_quant=quant_cfg.bnb_4bit_use_double_quant,
     )
@@ -201,9 +232,10 @@ def load_tokenizer(model_cfg: ModelConfigSpec) -> PreTrainedTokenizerBase:
 
 def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpec) -> PreTrainedModel:
     """Load the base causal-LM from the Hugging Face Hub (or a local
-    path), at `model_cfg.torch_dtype`, optionally quantized, moved to the
-    best available device."""
-    dtype = _resolve_dtype(model_cfg.torch_dtype)
+    path), at `model_cfg.torch_dtype` (hardware-adjusted -- see
+    resolve_effective_dtype), optionally quantized, moved to the best
+    available device."""
+    dtype = resolve_effective_dtype(model_cfg.torch_dtype)
     quantization_config = _build_quantization_config(quant_cfg)
 
     load_kwargs = dict(trust_remote_code=model_cfg.trust_remote_code, dtype=dtype)
@@ -240,6 +272,22 @@ def attach_lora(model: PreTrainedModel, lora_cfg: LoRAConfigSpec) -> PreTrainedM
     )
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
+
+    # GPU memory optimization: required for gradient checkpointing to work
+    # correctly on a LoRA model, and harmless if checkpointing ends up
+    # disabled. With the base model frozen (requires_grad=False on every
+    # non-adapter parameter), gradient checkpointing's recompute-on-backward
+    # has no live tensor to hook a gradient onto at the checkpoint boundary
+    # unless the INPUT to the checkpointed segment is explicitly marked as
+    # requiring grad -- this call does exactly that (on the embedding
+    # output). Without it, checkpointing + LoRA can silently fail to
+    # backprop into the adapters at all (no error -- loss.backward() runs,
+    # LoRA gradients just stay None), rather than raise. Actual
+    # gradient_checkpointing_enable() is called by transformers.Trainer
+    # itself, driven by TrainingArguments.gradient_checkpointing (see
+    # train.py's build_training_arguments) -- not called here, since this
+    # module doesn't own the Trainer/TrainingArguments lifecycle.
+    model.enable_input_require_grads()
     return model
 
 
@@ -270,5 +318,6 @@ __all__ = [
     "load_base_model",
     "load_model_and_tokenizer",
     "load_tokenizer",
+    "resolve_effective_dtype",
     "select_device",
 ]

@@ -22,7 +22,7 @@ differ. Everything below applies to either file.
 | `model_name` | Hugging Face Hub id (or local path) of the base model to fine-tune. |
 | `tokenizer_name` | Hub id/path for the tokenizer, if it differs from `model_name`. `null` means "use `model_name`'s own tokenizer." |
 | `trust_remote_code` | Passed to `from_pretrained(...)`. `false` for both configs — Gemma and Qwen2.5 are natively supported by recent `transformers`, so no custom model code needs to be trusted/executed. |
-| `torch_dtype` | Weight/compute precision to load in. `bfloat16` roughly halves memory vs. `float32` and matches both models' native training precision. |
+| `torch_dtype` | Weight/compute precision to load in. `bfloat16` roughly halves memory vs. `float32` and matches both models' native training precision — *if* the GPU actually has bf16 tensor cores. `trainer/model_loader.py`'s `resolve_effective_dtype()` checks this at runtime (`torch.cuda.is_bf16_supported()`) and silently falls back to `float16` when it doesn't — concretely, NVIDIA T4 (Turing, Kaggle's and Colab's free-tier GPU) has no bf16 tensor cores; only Ampere and newer (A100, RTX 30xx+) do. Requesting bf16 on a T4 without this check wouldn't error, it would just run unaccelerated. This value is a request, not a guarantee — check the training run's logs for a fallback warning on unfamiliar hardware. |
 | `ollama_model_name` | The same model's Ollama tag (e.g. `"gemma3:4b"`), used **only** as a local-presence check/optional-pull convenience — not the source of the weights actually loaded for training. Ollama stores models as quantized GGUF blobs for its own llama.cpp runtime, which `transformers`/PEFT cannot load for gradient-based fine-tuning; the trainable weights always come from `model_name` via the Hugging Face Hub. See `trainer/model_loader.py`'s docstring. `null` skips the check entirely. |
 
 ## `quantization`
@@ -62,13 +62,33 @@ Placeholders for the LoRA/PEFT setup the (not-yet-built) trainer will use.
 |---|---|
 | `epochs` | Full passes over `train_file`. |
 | `learning_rate` | Peak LR after warmup. `2e-4` is a conventional LoRA rate — noticeably higher than the `~2e-5` typical of full fine-tuning, since only the small adapter matrices are being trained. |
-| `batch_size` | Per-device batch size. Lower this first if you hit an out-of-memory error. |
-| `gradient_accumulation_steps` | Batches accumulated before an optimizer step. Effective batch size = `batch_size * gradient_accumulation_steps` (16 by default). |
+| `batch_size` | Per-device batch size. Lower this first if you hit an out-of-memory error. Under multi-GPU (DDP — see below), this is the batch size *each* GPU processes; it does not change based on GPU count. |
+| `gradient_accumulation_steps` | Batches accumulated before an optimizer step. Effective batch size = `batch_size * gradient_accumulation_steps * num_gpus` — 16 on one GPU with the defaults, 32 under `accelerate launch --num_processes=2` with the same config. Lower this to 2 if you want to hold the effective batch at 16 under two GPUs instead of doubling it. |
 | `warmup_ratio` | Fraction of total training steps spent linearly ramping the LR up from 0 to `learning_rate`. |
 | `weight_decay` | L2 regularization coefficient for the optimizer. |
 | `max_sequence_length` | Token cap per training example (prompt + response). 6144 was chosen by tokenizing the *actual* rendered chat template (`trainer/dataset.py`'s own tokenization path, not a char-count estimate) over all 4000 samples with a real Llama-family tokenizer: p99 ≈ 5012 tokens, max ≈ 5284. Re-measure this (`AutoTokenizer.apply_chat_template` + `training.prompts.build_conversation`) if the prompt templates or `teacher_output` schema change — the jump from 4096 came from adding `evaluation_analysis`/`score_reasoning` to every teacher_output, which nearly doubled the assistant turn's length. |
+| `gradient_checkpointing` | Recomputes activations during backward instead of storing them — roughly 20-30% slower per step, but a large activation-memory cut (this is what makes `batch_size: 4` at `max_sequence_length: 6144` actually fit on a 16GB T4; the identical config OOM'd without it). `true` by default. Requires no other action — `trainer/model_loader.py` handles the LoRA-specific prerequisite (`enable_input_require_grads()`) automatically. |
+| `dataloader_num_workers` / `dataloader_persistent_workers` / `dataloader_prefetch_factor` | Background data-loading workers, whether they persist across epochs (avoids respawning), and how many batches each stages ahead of GPU compute. The benefit is modest for this dataset specifically — tokenization happens once, eagerly, at dataset-construction time (`trainer/dataset.py`), so there's little per-batch CPU work left to overlap with GPU compute. `persistent_workers`/`prefetch_factor` are automatically ignored (not passed to `TrainingArguments`) if `dataloader_num_workers` is 0. |
 | `eval_accumulation_steps` | How many eval batches of raw logits Trainer holds on-device before offloading to CPU. `null` accumulates everything, which is fine for this dataset's small (~200-sample) eval sets; set a small integer if evaluation ever OOMs on a larger one. |
 | `early_stopping_patience` | Stop training if validation loss hasn't improved for this many evaluation calls in a row. `null` disables early stopping. |
+
+### Multi-GPU (e.g. Kaggle T4×2)
+
+Nothing in this config changes for multi-GPU — the same YAML drives both a single-GPU and a multi-GPU run. What changes is how `train.py` is *launched*:
+
+```bash
+# single GPU / CPU / MPS -- one process
+python -m backend.knowledge_distillation.training.trainer.train --config training/configs/articulation.yaml
+
+# two GPUs -- data-parallel via Hugging Face Accelerate (DistributedDataParallel
+# under the hood, not the older, single-process DataParallel)
+accelerate launch --multi_gpu --num_processes=2 \
+    -m backend.knowledge_distillation.training.trainer.train --config training/configs/articulation.yaml
+```
+
+`transformers.Trainer` detects the multi-process launch automatically and wraps the model in DDP itself — nothing in this codebase manually constructs a `DistributedDataParallel`. Each process gets a full model replica and a different batch slice; gradients sync after each backward pass. This is a **throughput** optimization — it requires the full model to already fit on one GPU, which is what `gradient_checkpointing` (above) and a hardware-appropriate `torch_dtype` (see `model` section — T4 has no bf16 tensor cores, so bf16 requests silently fall back to fp16 on it) are for. Two T4s does **not** mean 32GB of usable model memory; each GPU still needs the model to fit in its own 16GB.
+
+Every print and file write in `train.py`/`callbacks.py` is already guarded to run on the main process only (rank 0), so a multi-GPU run doesn't produce duplicated terminal output or racing writes to the same adapter directory — this is handled automatically, not something you need to configure.
 
 ## `checkpointing`
 
