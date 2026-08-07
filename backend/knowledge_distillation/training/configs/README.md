@@ -90,6 +90,8 @@ accelerate launch --multi_gpu --num_processes=2 \
 
 Every print and file write in `train.py`/`callbacks.py` is already guarded to run on the main process only (rank 0), so a multi-GPU run doesn't produce duplicated terminal output or racing writes to the same adapter directory — this is handled automatically, not something you need to configure.
 
+**Running the single-GPU command on a multi-GPU host is also handled automatically.** Confirmed on a real Kaggle T4×2 run: launched with the plain single-process command above, `transformers.Trainer` silently wraps the model in the legacy `torch.nn.DataParallel` the moment it sees more than one visible CUDA device — the exact thing this multi-GPU support exists to avoid, and it crashed training on step 0 (DataParallel's per-replica input splitting doesn't satisfy Gemma3's forward requirements). `train.py`'s `_prevent_accidental_data_parallel()` now pins `CUDA_VISIBLE_DEVICES=0` for this case (single process, >1 GPU visible, quantization off) before anything touches `torch.cuda` — a no-op on a single-GPU host, and automatically skipped when launched via `accelerate launch` (it reads `WORLD_SIZE` to tell the two cases apart) or when `quantization.enabled` is `true` (that path's `device_map="auto"` legitimately wants every visible GPU).
+
 ## `checkpointing`
 
 | Field | Meaning |

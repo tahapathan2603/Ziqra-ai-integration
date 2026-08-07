@@ -60,6 +60,14 @@ guarded to run on the main process only (`_is_main_process()` /
 unguarded prints/writes would duplicate N-ways or race on the same file.
 Checkpoint saving during training is already rank-safe -- that's Trainer's
 own, unmodified internal behavior, not something this codebase adds.
+
+`main()` also calls `_prevent_accidental_data_parallel()` first thing: run
+single-process (no `accelerate launch`) on a host with more than one GPU
+visible (e.g. Kaggle's T4x2) and, left alone, `transformers.Trainer` wraps
+the model in the legacy `torch.nn.DataParallel` instead -- confirmed on a
+real Kaggle run, where it also produced a confusing unrelated-looking crash
+inside Gemma3's forward. See that function's own docstring for the guard
+and its scoping.
 """
 
 import argparse
@@ -79,6 +87,54 @@ from .model_loader import load_model_and_tokenizer, resolve_effective_dtype, sel
 
 logger = logging.getLogger(__name__)
 console = Console()
+
+
+def _prevent_accidental_data_parallel(config: TrainingConfig) -> None:
+    """Guards against a real failure mode, confirmed on a live Kaggle T4x2
+    run: `transformers.Trainer` automatically wraps the model in the legacy
+    `torch.nn.DataParallel` whenever more than one CUDA device is visible to
+    a single, non-distributed process -- exactly what this codebase's
+    multi-GPU support (Accelerate/DDP, see this module's docstring) exists
+    to avoid, and something nothing downstream (Trainer construction,
+    TrainingArguments) can undo once it happens. On that Kaggle run it also
+    surfaced as a confusing secondary crash (Gemma3's forward raising over
+    a missing `token_type_ids` input) that had nothing to do with the real
+    problem -- DataParallel's per-replica input splitting is a separate,
+    known-broken path for models with custom forward-signature requirements.
+
+    Fix: restrict this process to CUDA_VISIBLE_DEVICES=0 -- but only when
+    that's safe and not already decided elsewhere:
+      - multi-process launch (`accelerate launch`/`torchrun` set WORLD_SIZE
+        > 1): skip. That's the intended multi-GPU path (DDP); each process
+        should keep whatever device visibility the launcher gave it.
+      - `quantization.enabled`: skip. model_loader.py's device_map="auto"
+        path legitimately wants every visible GPU, for memory-pooling
+        model-parallel sharding -- a different technique with different
+        intent (see this module's docstring).
+      - CUDA_VISIBLE_DEVICES already set: skip. An explicit choice already
+        made by the caller shouldn't be silently overridden.
+
+    Must run before anything in this process touches `torch.cuda` --
+    device visibility is fixed at first CUDA context init and ignores any
+    later env var change. This is why `main()` calls it immediately after
+    loading the config, before `load_model_and_tokenizer`.
+    """
+    if int(os.environ.get("WORLD_SIZE", 1)) > 1:
+        return
+    if config.quantization.enabled:
+        return
+    if "CUDA_VISIBLE_DEVICES" in os.environ:
+        return
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    logger.info(
+        "Pinning CUDA_VISIBLE_DEVICES=0 for this single, non-distributed process "
+        "(harmless if only one GPU is present or none at all). This prevents "
+        "transformers.Trainer from silently wrapping the model in the legacy "
+        "torch.nn.DataParallel on any host with >1 GPU visible -- e.g. Kaggle's "
+        "T4x2. To train across multiple GPUs instead, launch with "
+        "`accelerate launch --multi_gpu --num_processes=N` (see this file's "
+        "module docstring)."
+    )
 
 
 def _is_main_process() -> bool:
@@ -216,6 +272,10 @@ def main() -> None:
         raise SystemExit(1)
     project_root = args.project_root or PROJECT_ROOT
     is_main = _is_main_process()  # see this file's docstring -- guards duplicate N-way prints under multi-GPU
+
+    # Must happen before anything touches torch.cuda -- see the function's
+    # own docstring for why, and what real crash this fixes.
+    _prevent_accidental_data_parallel(config)
 
     if is_main:
         console.print(f"[bold]Loading model and tokenizer for '{config.dataset.coach}'...[/]")

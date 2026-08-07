@@ -105,7 +105,21 @@ def _tokenize_conversation(
     for i in range(prompt_len):
         labels[i] = -100
 
-    return {"input_ids": full_ids, "attention_mask": [1] * len(full_ids), "labels": labels}
+    # token_type_ids: all-zero, since every example here is plain text (no
+    # image tokens -- Gemma3's own convention is 1=image, 0=text). Recent
+    # transformers versions (confirmed on a real Kaggle run, unpinned pip
+    # install) make Gemma3's forward *require* this input during training --
+    # it raises ValueError otherwise, even for a text-only checkpoint like
+    # google/gemma-3-4b-it. Qwen2's forward has no token_type_ids parameter
+    # but accepts and silently ignores it via its **kwargs catch-all, so
+    # this is safe to include unconditionally for both coaches rather than
+    # branching on which model is loaded.
+    return {
+        "input_ids": full_ids,
+        "attention_mask": [1] * len(full_ids),
+        "labels": labels,
+        "token_type_ids": [0] * len(full_ids),
+    }
 
 
 @dataclass(frozen=True)
@@ -115,6 +129,7 @@ class ConversationExample:
     input_ids: List[int]
     attention_mask: List[int]
     labels: List[int]
+    token_type_ids: List[int]
 
 
 class ConversationDataset(Dataset):
@@ -164,6 +179,7 @@ class ConversationDataset(Dataset):
             "input_ids": example.input_ids,
             "attention_mask": example.attention_mask,
             "labels": example.labels,
+            "token_type_ids": example.token_type_ids,
         }
 
 
@@ -179,17 +195,23 @@ class ConversationDataCollator:
         max_len = max(len(example["input_ids"]) for example in batch)
         pad_id = self.tokenizer.pad_token_id
 
-        input_ids, attention_mask, labels = [], [], []
+        input_ids, attention_mask, labels, token_type_ids = [], [], [], []
         for example in batch:
             pad_len = max_len - len(example["input_ids"])
             input_ids.append(example["input_ids"] + [pad_id] * pad_len)
             attention_mask.append(example["attention_mask"] + [0] * pad_len)
             labels.append(example["labels"] + [-100] * pad_len)
+            # Pad value doesn't matter semantically (padding is already
+            # masked out of the loss via labels=-100, and out of attention
+            # via attention_mask=0) -- 0 keeps it consistent with the "text"
+            # token type used everywhere else in this all-text dataset.
+            token_type_ids.append(example["token_type_ids"] + [0] * pad_len)
 
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
             "labels": torch.tensor(labels, dtype=torch.long),
+            "token_type_ids": torch.tensor(token_type_ids, dtype=torch.long),
         }
 
 
