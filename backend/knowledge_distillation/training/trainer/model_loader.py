@@ -31,7 +31,7 @@ import subprocess
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import torch
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
@@ -282,6 +282,96 @@ def resolve_text_only_config(model_cfg: ModelConfigSpec):
     return text_config
 
 
+def _gemma_text_only_key_mapping() -> Optional[Dict[str, str]]:
+    """Whether loading a multimodal-saved Gemma-3 checkpoint into the
+    text-only `Gemma3ForCausalLM` class needs an explicit `key_mapping` to
+    land the real language-model weights (vs. silently reinitializing
+    them) -- and what that mapping is, if so.
+
+    `google/gemma-3-4b-it`'s checkpoint stores every language-model tensor
+    under a `language_model.model.*` / `language_model.lm_head.*` prefix
+    (saved from the multimodal `Gemma3ForConditionalGeneration` class --
+    this is the exact legacy naming transformers' own
+    `Gemma3ForConditionalGeneration._checkpoint_conversion_mapping`
+    documents and corrects for that class). `Gemma3ForCausalLM`'s own real
+    attributes are flat -- `self.model` (`Gemma3TextModel`) and a
+    top-level `self.lm_head` -- so those checkpoint keys need translating
+    down to `model.*` / `lm_head.*` to match.
+
+    Whether `from_pretrained` does that translation AUTOMATICALLY (via its
+    own `base_model_prefix`-driven key-renaming, no `key_mapping` needed)
+    or requires one to be supplied explicitly is NOT stable across
+    transformers versions -- confirmed by actually running both against a
+    synthetic checkpoint reproducing the real prefix naming, not by
+    reading changelogs:
+
+      - transformers==4.57.6 (this project's own requirements.txt pin):
+        `Gemma3ForCausalLM.base_model_prefix == "language_model"`. The
+        automatic renaming already produces the correct `model.*` keys
+        with NO `key_mapping` -- passing one here actively BREAKS it: the
+        automatic step still runs afterward, tries to strip
+        `language_model.` a second time from keys that no longer have it,
+        and silently drops every one as missing/unexpected instead.
+      - transformers==5.0.0 (what Kaggle's `train_on_kaggle.ipynb` Cell 1
+        actually installs -- `!pip install -q transformers ...` is
+        unpinned, and this is what it resolved to as of 2026-08): the same
+        class's `base_model_prefix` is now `"model"` (an upstream fix
+        matching the real attribute name -- but one that flips which
+        automatic branch fires). The automatic path no longer produces the
+        right keys at all: every `language_model.*` key is reported
+        unexpected and every real `model.*`/`lm_head.*` key reported
+        missing, silently reinitializing the entire 3.88B-parameter
+        language model -- this is the exact "UNEXPECTED:
+        language_model.model.*" / "MISSING: model.*" / "This checkpoint
+        seem corrupted" failure observed on a real Kaggle T4x2 run. An
+        explicit `key_mapping` IS required here, and this exact one has
+        been verified (0 missing, 0 unexpected, every tensor bit-exact,
+        `device_map="auto"` included) against a synthetic checkpoint on a
+        real transformers==5.0.0 install.
+
+    Branching on the actually-installed `Gemma3ForCausalLM`'s own
+    `base_model_prefix` (not on `transformers.__version__`) means this
+    keeps working if some future release changes it again, rather than
+    hardcoding a version cutoff this project never pinned in the first
+    place -- Kaggle's install is deliberately unpinned (see that
+    notebook's Cell 1) and is not something this file controls.
+    """
+    from transformers import Gemma3ForCausalLM
+
+    if Gemma3ForCausalLM.base_model_prefix == "language_model":
+        return None  # verified: automatic renaming already handles this correctly (4.57.6)
+    return {"^language_model.model": "model", "^language_model.lm_head": "lm_head"}  # verified against 5.0.0
+
+
+def _assert_language_model_weights_loaded(loading_info: dict, model_name: str) -> None:
+    """Raise if a text-only-narrowed load left any real language-model
+    weight missing (i.e. reinitialized instead of loaded from the
+    checkpoint) -- see `_gemma_text_only_key_mapping`'s docstring for the
+    exact failure mode this catches. `unexpected_keys` (the skipped
+    vision_tower/multi_modal_projector tensors) are expected and fine --
+    only `missing_keys` under the text-only model's own `model.`/`lm_head.`
+    prefixes indicate weights that should have loaded but didn't.
+
+    A quiet reinitialization here is far worse than a loud failure: training
+    would proceed on a partially-random ~3.88B-parameter base model --
+    LoRA has nothing real to adapt, and results would be silently garbage
+    rather than an obvious crash.
+    """
+    missing = set(loading_info.get("missing_keys") or [])
+    substantial_missing = {k for k in missing if k.startswith("model.") or k.startswith("lm_head.")}
+    if substantial_missing:
+        raise RuntimeError(
+            f"Loading {model_name} as a text-only checkpoint left "
+            f"{len(substantial_missing)} language-model weight(s) missing "
+            f"(reinitialized instead of loaded from the checkpoint), e.g. "
+            f"{sorted(substantial_missing)[:5]}. This means "
+            f"_gemma_text_only_key_mapping's key_mapping no longer matches "
+            f"this checkpoint/transformers version -- do not proceed with "
+            f"training on a partially-random base model. See that "
+            f"function's docstring for the versions already verified."
+        )
+
+
 def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpec) -> PreTrainedModel:
     """Load the base causal-LM from the Hugging Face Hub (or a local
     path), at `model_cfg.torch_dtype` (hardware-adjusted -- see
@@ -305,8 +395,19 @@ def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpe
             model_cfg.model_name,
         )
         load_kwargs["config"] = text_config
+        key_mapping = _gemma_text_only_key_mapping()
+        if key_mapping is not None:
+            load_kwargs["key_mapping"] = key_mapping
 
-    model = AutoModelForCausalLM.from_pretrained(model_cfg.model_name, **load_kwargs)
+        # See _assert_language_model_weights_loaded's docstring: verify
+        # the real weights actually landed rather than trusting
+        # from_pretrained's version-dependent defaults silently.
+        model, loading_info = AutoModelForCausalLM.from_pretrained(
+            model_cfg.model_name, output_loading_info=True, **load_kwargs
+        )
+        _assert_language_model_weights_loaded(loading_info, model_cfg.model_name)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(model_cfg.model_name, **load_kwargs)
 
     if quantization_config is None:
         model = model.to(select_device())
