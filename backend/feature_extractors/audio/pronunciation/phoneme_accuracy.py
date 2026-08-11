@@ -65,12 +65,18 @@ _device = None
 
 def _resolve_device() -> torch.device:
     """
-    Prefer Apple Silicon GPU (MPS) over CPU — measured ~10x faster for this model
-    (batched CPU inference: ~36s for 30 words; MPS: ~4s for the same batch, plus
-    only ~6s to load and move the model). faster-whisper/ctranslate2 can't use
-    MPS (see preprocessing/speech_to_text.py), but plain PyTorch/transformers
-    models like this one can.
+    Prefer an accelerator over CPU — measured ~10x faster for this model on
+    Apple Silicon (batched CPU inference: ~36s for 30 words; MPS: ~4s for the
+    same batch, plus only ~6s to load and move the model); a CUDA GPU is
+    expected to be at least comparable. This project's reference dev machine
+    is Apple Silicon (no CUDA device), so the CUDA branch below is exercised
+    in deployment (e.g. Modal) but not on this dev machine — this is a plain
+    `transformers`/PyTorch model (unlike faster-whisper/ctranslate2 in
+    preprocessing/speech_to_text.py, which can't use MPS), so it runs
+    unmodified on whichever accelerator is actually present.
     """
+    if torch.cuda.is_available():
+        return torch.device("cuda")
     if torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
