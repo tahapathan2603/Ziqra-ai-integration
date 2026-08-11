@@ -31,12 +31,11 @@ import subprocess
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import torch
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from transformers import (
-    AutoConfig,
     AutoModelForCausalLM,
     AutoTokenizer,
     PreTrainedModel,
@@ -236,148 +235,33 @@ def load_tokenizer(model_cfg: ModelConfigSpec) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def resolve_text_only_config(model_cfg: ModelConfigSpec):
-    """The text-tower config for a multimodal checkpoint, or None if the
-    checkpoint is already text-only.
-
-    This project trains text-only students, but some checkpoints are
-    multimodal: `google/gemma-3-4b-it` carries a SigLIP vision tower, and
-    plain `AutoModelForCausalLM.from_pretrained` on it builds
-    `Gemma3ForConditionalGeneration` -- costing memory twice over on a 16GB
-    T4, confirmed by a real OOM:
-
-      1. 453M vision-tower parameters are loaded and never used (the model
-         is 4.333B params as a multimodal model vs 3.880B text-only).
-      2. Much worse, `Gemma3ForConditionalGeneration.forward` runs its own
-         loss rather than the shared `ForCausalLMLoss`, and that path makes
-         a THIRD full copy of the logits:
-             logits.float()                              # fp32 copy
-             shift_logits[shift_attention_mask != 0].contiguous()  # another
-         With Gemma-3's 262,208-token vocabulary that extra copy is
-         seq * 262208 * 4 bytes -- 3.75 GB at a ~3570-token example, which
-         is exactly the allocation that failed. `Gemma3ForCausalLM` calls
-         `self.loss_function(...)` instead and never makes it. Note the
-         gather is pure waste here regardless: at batch_size 1 there is no
-         padding, so the mask is all ones and it copies the whole tensor to
-         select all of it.
-
-    Passing this config to `from_pretrained` makes the Auto class resolve to
-    the text-only architecture (`Gemma3TextConfig` -> `Gemma3ForCausalLM`),
-    which loads the checkpoint's `language_model.*` tensors cleanly -- its
-    `base_model_prefix` is already "language_model", and every parameter
-    name matches with nothing missing or left over (verified against the
-    real checkpoint index).
-
-    Detection is generic rather than a Gemma special case: `get_text_config()`
-    returns a *different* object for a composite/multimodal config and
-    `self` for an already-text-only one, so Qwen2.5 (delivery) takes the
-    unchanged path.
-    """
-    config = AutoConfig.from_pretrained(
-        model_cfg.model_name, trust_remote_code=model_cfg.trust_remote_code
-    )
-    text_config = config.get_text_config()
-    if text_config is config:
-        return None
-    return text_config
-
-
-def _gemma_text_only_key_mapping() -> Optional[Dict[str, str]]:
-    """Whether loading a multimodal-saved Gemma-3 checkpoint into the
-    text-only `Gemma3ForCausalLM` class needs an explicit `key_mapping` to
-    land the real language-model weights (vs. silently reinitializing
-    them) -- and what that mapping is, if so.
-
-    `google/gemma-3-4b-it`'s checkpoint stores every language-model tensor
-    under a `language_model.model.*` / `language_model.lm_head.*` prefix
-    (saved from the multimodal `Gemma3ForConditionalGeneration` class --
-    this is the exact legacy naming transformers' own
-    `Gemma3ForConditionalGeneration._checkpoint_conversion_mapping`
-    documents and corrects for that class). `Gemma3ForCausalLM`'s own real
-    attributes are flat -- `self.model` (`Gemma3TextModel`) and a
-    top-level `self.lm_head` -- so those checkpoint keys need translating
-    down to `model.*` / `lm_head.*` to match.
-
-    Whether `from_pretrained` does that translation AUTOMATICALLY (via its
-    own `base_model_prefix`-driven key-renaming, no `key_mapping` needed)
-    or requires one to be supplied explicitly is NOT stable across
-    transformers versions -- confirmed by actually running both against a
-    synthetic checkpoint reproducing the real prefix naming, not by
-    reading changelogs:
-
-      - transformers==4.57.6 (this project's own requirements.txt pin):
-        `Gemma3ForCausalLM.base_model_prefix == "language_model"`. The
-        automatic renaming already produces the correct `model.*` keys
-        with NO `key_mapping` -- passing one here actively BREAKS it: the
-        automatic step still runs afterward, tries to strip
-        `language_model.` a second time from keys that no longer have it,
-        and silently drops every one as missing/unexpected instead.
-      - transformers==5.0.0 (what Kaggle's `train_on_kaggle.ipynb` Cell 1
-        actually installs -- `!pip install -q transformers ...` is
-        unpinned, and this is what it resolved to as of 2026-08): the same
-        class's `base_model_prefix` is now `"model"` (an upstream fix
-        matching the real attribute name -- but one that flips which
-        automatic branch fires). The automatic path no longer produces the
-        right keys at all: every `language_model.*` key is reported
-        unexpected and every real `model.*`/`lm_head.*` key reported
-        missing, silently reinitializing the entire 3.88B-parameter
-        language model -- this is the exact "UNEXPECTED:
-        language_model.model.*" / "MISSING: model.*" / "This checkpoint
-        seem corrupted" failure observed on a real Kaggle T4x2 run. An
-        explicit `key_mapping` IS required here, and this exact one has
-        been verified (0 missing, 0 unexpected, every tensor bit-exact,
-        `device_map="auto"` included) against a synthetic checkpoint on a
-        real transformers==5.0.0 install.
-
-    Branching on the actually-installed `Gemma3ForCausalLM`'s own
-    `base_model_prefix` (not on `transformers.__version__`) means this
-    keeps working if some future release changes it again, rather than
-    hardcoding a version cutoff this project never pinned in the first
-    place -- Kaggle's install is deliberately unpinned (see that
-    notebook's Cell 1) and is not something this file controls.
-    """
-    from transformers import Gemma3ForCausalLM
-
-    if Gemma3ForCausalLM.base_model_prefix == "language_model":
-        return None  # verified: automatic renaming already handles this correctly (4.57.6)
-    return {"^language_model.model": "model", "^language_model.lm_head": "lm_head"}  # verified against 5.0.0
-
-
-def _assert_language_model_weights_loaded(loading_info: dict, model_name: str) -> None:
-    """Raise if a text-only-narrowed load left any real language-model
-    weight missing (i.e. reinitialized instead of loaded from the
-    checkpoint) -- see `_gemma_text_only_key_mapping`'s docstring for the
-    exact failure mode this catches. `unexpected_keys` (the skipped
-    vision_tower/multi_modal_projector tensors) are expected and fine --
-    only `missing_keys` under the text-only model's own `model.`/`lm_head.`
-    prefixes indicate weights that should have loaded but didn't.
-
-    A quiet reinitialization here is far worse than a loud failure: training
-    would proceed on a partially-random ~3.88B-parameter base model --
-    LoRA has nothing real to adapt, and results would be silently garbage
-    rather than an obvious crash.
-    """
-    missing = set(loading_info.get("missing_keys") or [])
-    substantial_missing = {k for k in missing if k.startswith("model.") or k.startswith("lm_head.")}
-    if substantial_missing:
-        raise RuntimeError(
-            f"Loading {model_name} as a text-only checkpoint left "
-            f"{len(substantial_missing)} language-model weight(s) missing "
-            f"(reinitialized instead of loaded from the checkpoint), e.g. "
-            f"{sorted(substantial_missing)[:5]}. This means "
-            f"_gemma_text_only_key_mapping's key_mapping no longer matches "
-            f"this checkpoint/transformers version -- do not proceed with "
-            f"training on a partially-random base model. See that "
-            f"function's docstring for the versions already verified."
-        )
-
-
 def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpec) -> PreTrainedModel:
     """Load the base causal-LM from the Hugging Face Hub (or a local
     path), at `model_cfg.torch_dtype` (hardware-adjusted -- see
     resolve_effective_dtype), optionally quantized, moved to the best
-    available device. Multimodal checkpoints are narrowed to their text
-    tower -- see resolve_text_only_config."""
+    available device.
+
+    Both students this project trains (Llama-3.2-3B-Instruct for
+    articulation, Qwen2.5-3B-Instruct for delivery) are plain, single-tower
+    causal-LM checkpoints, so the standard `AutoModelForCausalLM` path is
+    all that's needed here -- no custom `config=`/`key_mapping` narrowing.
+
+    This function previously carried a text-tower-narrowing branch for
+    google/gemma-3-4b-it (a multimodal checkpoint that needed extra work to
+    load only its language model, plus a transformers-version-dependent
+    key_mapping fix for a real key-renaming bug hit on Kaggle -- see git
+    history for both). Articulation moved off Gemma specifically to avoid
+    that class of workaround; removed rather than left dormant since
+    nothing else in the repo referenced it (confirmed: grepped for every
+    caller before deleting) and carrying dead, architecture-specific
+    complexity in the one loader both current students share would
+    undermine the reason it doesn't need per-model branches anymore. If a
+    future checkpoint reintroduces a multimodal/composite-config situation,
+    reach for `AutoConfig(...).get_text_config()` again rather than
+    reinventing it -- it's generic, not Gemma-specific, and worked
+    correctly; only the key_mapping fix above it was Gemma's checkpoint
+    naming in particular.
+    """
     dtype = resolve_effective_dtype(model_cfg.torch_dtype)
     quantization_config = _build_quantization_config(quant_cfg)
 
@@ -386,28 +270,7 @@ def load_base_model(model_cfg: ModelConfigSpec, quant_cfg: QuantizationConfigSpe
         load_kwargs["quantization_config"] = quantization_config
         load_kwargs["device_map"] = "auto"  # required by bitsandbytes-quantized loading
 
-    text_config = resolve_text_only_config(model_cfg)
-    if text_config is not None:
-        logger.info(
-            "%s is a multimodal checkpoint; loading its text tower only "
-            "(drops the unused vision encoder and avoids the multimodal loss path's "
-            "extra full-size logits copy).",
-            model_cfg.model_name,
-        )
-        load_kwargs["config"] = text_config
-        key_mapping = _gemma_text_only_key_mapping()
-        if key_mapping is not None:
-            load_kwargs["key_mapping"] = key_mapping
-
-        # See _assert_language_model_weights_loaded's docstring: verify
-        # the real weights actually landed rather than trusting
-        # from_pretrained's version-dependent defaults silently.
-        model, loading_info = AutoModelForCausalLM.from_pretrained(
-            model_cfg.model_name, output_loading_info=True, **load_kwargs
-        )
-        _assert_language_model_weights_loaded(loading_info, model_cfg.model_name)
-    else:
-        model = AutoModelForCausalLM.from_pretrained(model_cfg.model_name, **load_kwargs)
+    model = AutoModelForCausalLM.from_pretrained(model_cfg.model_name, **load_kwargs)
 
     if quantization_config is None:
         model = model.to(select_device())
@@ -506,6 +369,5 @@ __all__ = [
     "load_model_and_tokenizer",
     "load_tokenizer",
     "resolve_effective_dtype",
-    "resolve_text_only_config",
     "select_device",
 ]

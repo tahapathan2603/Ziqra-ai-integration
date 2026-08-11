@@ -1,8 +1,15 @@
 # =============================================================================
 # Articulation Coach — Student Training Configuration
 #
-# Student model: Gemma (~3B-class), LoRA fine-tuned on the Articulation
+# Student model: Llama-3.2-3B-Instruct, LoRA fine-tuned on the Articulation
 # rubrics (Pronunciation, MTI) via backend.knowledge_distillation.training.
+#
+# Migrated off google/gemma-3-4b-it (see git history) specifically to drop
+# the multimodal-checkpoint text-tower-narrowing workaround that model
+# needed in trainer/model_loader.py: Llama-3.2-3B-Instruct is a plain,
+# text-only causal-LM checkpoint (confirmed: AutoConfig(...).get_text_config()
+# returns the config itself, same as Qwen2.5/delivery), so it loads via the
+# same unmodified AutoModelForCausalLM path both students now share.
 #
 # This file is config data only -- no trainer reads it yet (see this
 # package's parent docstring). See README.md in this directory for a full
@@ -10,28 +17,20 @@
 # =============================================================================
 
 model:
-  # Gemma does not ship an exact 3B checkpoint; 4B is the nearest publicly
-  # available instruction-tuned size to the requested "~3B" class. Swap
-  # for whichever Gemma checkpoint you have local weights/license for.
-  #
-  # This is a MULTIMODAL checkpoint (it carries a SigLIP vision tower).
-  # trainer/model_loader.py's resolve_text_only_config() narrows it to its
-  # text tower automatically -- 3.880B params instead of 4.333B, and, far
-  # more importantly, it avoids the multimodal loss path's extra full-size
-  # logits copy that OOM'd a 16GB T4. Nothing to configure; see that
-  # function's docstring for the detail.
-  model_name: "google/gemma-3-4b-it"
+  # Meta's Llama 3.2 line ships an exact 3B instruction-tuned checkpoint --
+  # no size substitution needed here (unlike Gemma's 4B-as-nearest-3B).
+  model_name: "meta-llama/Llama-3.2-3B-Instruct"
   tokenizer_name: null      # null = derive from model_name at load time
-  trust_remote_code: false  # Gemma is natively supported in recent transformers
-  torch_dtype: "bfloat16"   # Gemma is trained/released in bf16; halves memory vs fp32
+  trust_remote_code: false  # Llama 3.2 is natively supported in recent transformers
+  torch_dtype: "bfloat16"   # Llama 3.2 is trained/released in bf16; halves memory vs fp32
 
   # Ollama tag for the SAME model, used only as a local-presence check/pull
   # convenience (see trainer/model_loader.py's docstring for why this is a
   # separate field from model_name -- Ollama's GGUF blobs are not what
   # actually gets loaded for training). Set to null to skip the check
   # entirely. Confirm the exact tag with `ollama list` / the Ollama
-  # library page before relying on it.
-  ollama_model_name: "gemma3:4b"
+  # library page before relying on it -- not independently verified here.
+  ollama_model_name: "llama3.2:3b"
 
 quantization:
   # 4-bit (QLoRA-style) loading via bitsandbytes. Requires a CUDA GPU --
@@ -39,16 +38,14 @@ quantization:
   # since bitsandbytes doesn't support them, so this stays harmless on this
   # project's Apple Silicon dev machine.
   #
-  # REQUIRED, not optional, for a 16GB T4: Gemma-3's vocabulary is 262,208
-  # tokens and transformers' loss does an unchunked logits.float(), keeping
-  # an fp16 logits tensor AND its fp32 copy alive at once
-  # (batch * seq * 262208 * 6 bytes). At the longest real training example
-  # (4176 tokens, measured -- see max_sequence_length below) that is 6.6 GB
-  # of logits alone. Unquantized fp16 weights are another 8.6 GB, totalling
-  # ~16.3 GB against the T4's 14.56 GiB -- it OOM'd. 4-bit drops the weights
-  # to ~3.4 GB, bringing the peak to ~11.1 GB with room to spare.
-  # See trainer/model_loader.py's load_model_and_tokenizer for the
-  # prepare_model_for_kbit_training step this switch turns on.
+  # Kept enabled per this migration's own requirement (consistency with
+  # delivery/Qwen2.5, and a comparable weight-precision baseline across both
+  # students) rather than re-litigated from scratch. It's also a smaller ask
+  # on this model than it was on Gemma: Llama-3.2's 128,256-token vocabulary
+  # is exactly half Gemma-3's 262,208, so the loss's logits.float() term
+  # (batch * seq * vocab * bytes) that drove the original Gemma OOM is
+  # roughly half the size here at the same sequence length -- see
+  # max_sequence_length below for this model's actual measured lengths.
   enabled: true
   load_in_4bit: true
   bnb_4bit_compute_dtype: "bfloat16"
@@ -75,7 +72,7 @@ lora:
   rank: 16
   alpha: 32          # commonly set to 2x rank
   dropout: 0.05
-  target_modules:    # standard attention + MLP projections for Gemma's transformer blocks
+  target_modules:    # standard attention + MLP projections for Llama's transformer blocks -- same names as Qwen2.5/delivery and (previously) Gemma
     - "q_proj"
     - "k_proj"
     - "v_proj"
@@ -95,33 +92,44 @@ training:
   # 2 GPUs instead of doubling it.
   #
   # batch_size MUST stay 1 on a 16GB T4. The logits tensor (see the
-  # quantization block above) scales linearly with batch_size: at 4176 tokens
-  # it is 6.6 GB per sample, so batch_size 2 alone adds another 6.6 GB and
-  # OOMs even with 4-bit weights. This was the direct cause of the observed
-  # crash -- the previous 4 * 4 config needed ~25 GB of logits.
-  # gradient_accumulation_steps is raised 4 -> 16 to compensate, leaving
-  # effective_batch_size unchanged at 16, so training dynamics are identical.
+  # quantization block above) scales linearly with batch_size: at this
+  # model's real max example length (3797 tokens, see max_sequence_length
+  # below) that's real per-sample memory that batch_size 2 would double.
+  # Kept at the value this project settled on after a real OOM on the
+  # original (Gemma) student -- that crash was at Gemma's own 4176-token
+  # max under a batch_size=4 config, needing ~25 GB of logits; the fix
+  # (batch_size 1, gradient_accumulation_steps 16 instead of 4*4) is
+  # preserved unchanged here rather than re-tuned for Llama's smaller
+  # vocabulary, since effective_batch_size (and therefore training
+  # dynamics) must stay comparable across both students to be comparable.
   batch_size: 1
   gradient_accumulation_steps: 16
   warmup_ratio: 0.03
   weight_decay: 0.01
   # Truncation cap only -- it does NOT drive memory. ConversationDataCollator
-  # pads dynamically to each batch's own longest example, so the real cost is
-  # the actual token count, not this ceiling. Measured with the actual Gemma
-  # tokenizer over all 1600 articulation train rows: p50=2830, p95=3954,
-  # max=4176 -- nothing is truncated at 6144. (An earlier comment here cited
-  # "p99 ~5012, max ~5284"; that was measured with a Llama-family tokenizer,
-  # not Gemma's, and overstated the requirement by ~25%.) Left at 6144 rather
-  # than tightened to ~4352 because the headroom is free -- it changes no
-  # memory and no compute, and only matters if the prompt templates or
-  # teacher_output schema grow later.
+  # pads dynamically to each batch's own longest example (and batch_size is
+  # 1 here, so there is no cross-example padding at all), so the real cost
+  # is the actual token count of each example, not this ceiling -- lowering
+  # it would save nothing while removing safety margin for future data.
+  #
+  # Re-measured with the REAL meta-llama/Llama-3.2-3B-Instruct tokenizer
+  # (not carried over from Gemma's numbers) over all 1600 articulation train
+  # rows, tokenizing the exact conversations
+  # training.trainer.dataset._tokenize_conversation produces: p50=2557,
+  # p90=3498, p95=3583, p99=3738, max=3797 -- nothing is truncated at 6144,
+  # and nothing would be truncated even at 4096. Left at 6144 rather than
+  # tightened: the headroom is free (padding is dynamic, per above) and
+  # only matters if the prompt templates or teacher_output schema grow
+  # later -- this is the same reasoning the previous (Gemma) value used,
+  # re-verified against the new tokenizer rather than assumed to still hold.
   max_sequence_length: 6144
 
   # GPU memory: recompute activations during backward instead of storing
-  # them (~20-30% slower per step, large activation-memory cut). This is
-  # what makes batch_size=4 at max_sequence_length=6144 fit on a 16GB T4
-  # at all -- without it, this exact config OOM'd on a single T4 (Colab).
-  # See trainer/model_loader.py's attach_lora for the LoRA-specific
+  # them (~20-30% slower per step, large activation-memory cut). Kept on
+  # unchanged from the original (Gemma) student's config, where it was
+  # required headroom at that model's larger batch_size/vocabulary combo --
+  # without it, that exact combination OOM'd on a single T4 (Colab). See
+  # trainer/model_loader.py's attach_lora for the LoRA-specific
   # prerequisite this pairs with.
   gradient_checkpointing: true
 

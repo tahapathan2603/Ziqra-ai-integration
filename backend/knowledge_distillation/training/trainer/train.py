@@ -1,6 +1,6 @@
 """
 CLI orchestrator for supervised fine-tuning of one student model
-(Articulation -> Gemma, Delivery -> Qwen), driven by one
+(Articulation -> Llama, Delivery -> Qwen), driven by one
 `training/configs/*.yaml` file.
 
 Pure orchestration: every actual responsibility -- model loading

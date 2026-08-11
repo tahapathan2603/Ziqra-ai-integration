@@ -12,7 +12,7 @@ Model responsibilities for this phase (do not blur these):
     Claude (this session)  -> generates Level 1 + Level 2 evidence (here)
     MiniMax M3              -> Articulation teacher outputs, later stage
     MiMo-v2.5                -> Delivery teacher outputs, later stage
-    Gemma / Qwen              -> student models, fine-tuned later, on the
+    Llama / Qwen               -> student models, fine-tuned later, on the
                                  finished dataset -- never used to generate it
 
     SpeakerBlueprint            (speaking behaviour only -- no role/

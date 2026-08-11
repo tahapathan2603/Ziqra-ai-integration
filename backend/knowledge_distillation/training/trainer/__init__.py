@@ -1,6 +1,6 @@
 """
 Supervised fine-tuning trainer for the two knowledge-distillation student
-models (Part 10): Articulation -> Gemma, Delivery -> Qwen.
+models (Part 10): Articulation -> Llama, Delivery -> Qwen.
 
     training/configs/{coach}.yaml
             |

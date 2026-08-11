@@ -1,6 +1,6 @@
 """
 Training pipeline for the knowledge-distillation student models
-(Articulation -> Gemma, Delivery -> Qwen).
+(Articulation -> Llama, Delivery -> Qwen).
 
 Currently contains only `data/` -- preparing the finished teacher-generation
 output into a format supervised fine-tuning can consume. No model loading,
