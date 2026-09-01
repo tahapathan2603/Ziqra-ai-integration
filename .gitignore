@@ -26,3 +26,4 @@ modal_e2e.py
 modal_warmtest.py
 modal_intprof.py
 modal_asr_bakeoff.py
+modal_gopprobe.py

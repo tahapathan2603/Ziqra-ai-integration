@@ -72,6 +72,14 @@ def transcribe_chunk(chunk_path: str, word_timestamps: bool = False) -> Tuple[st
         no_speech_threshold=0.6,
         log_prob_threshold=-1.0,
         temperature=[0.0, 0.2, 0.4],
+        # The thresholds above were not enough on their own: a real recording
+        # still came back opening with "Thank you." before the speaker had
+        # said anything. Whisper's own VAD strips the non-speech either side
+        # of the chunk before decoding, and hallucination_silence_threshold
+        # drops a segment that lands in a silent stretch (it needs word
+        # timestamps, which this pass already computes when asked for them).
+        vad_filter=True,
+        hallucination_silence_threshold=2.0 if word_timestamps else None,
     )
 
     text_parts = []

@@ -28,6 +28,8 @@ from typing import Dict, List, Optional, Tuple
 import torch
 from phonemizer import phonemize
 from phonemizer.separator import Separator
+
+from . import gop
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 from ..exclusions import compute_excluded_words
@@ -186,8 +188,11 @@ def _collapse_ctc_with_timestamps(
 
 
 def _detect_phonemes_batch(
-    waveform: torch.Tensor, sample_rate: int, spans: List[Tuple[float, float]]
-) -> List[List[Dict]]:
+    waveform: torch.Tensor,
+    sample_rate: int,
+    spans: List[Tuple[float, float]],
+    return_log_probs: bool = False,
+):
     """
     Run the wav2vec2-espeak CTC phoneme recognizer on multiple audio spans in one
     batched forward pass, on MPS (Apple Silicon GPU) when available. Spans
@@ -202,6 +207,9 @@ def _detect_phonemes_batch(
     own (measured, not assumed) frame stride.
     """
     results: List[List[Dict]] = [[] for _ in spans]
+    # Per-span log-probs, kept only when the caller wants GOP (see gop.py) —
+    # the same forward pass already computes them, so this is free.
+    span_log_probs: List[Optional[torch.Tensor]] = [None for _ in spans]
 
     slices = []
     slice_indices = []
@@ -214,7 +222,7 @@ def _detect_phonemes_batch(
             slice_durations.append(audio_slice.numel() / sample_rate)
 
     if not slices:
-        return results
+        return (results, span_log_probs) if return_log_probs else results
 
     processor, model, device = _get_model()
     inputs = processor(slices, sampling_rate=sample_rate, return_tensors="pt", padding=True)
@@ -225,6 +233,7 @@ def _detect_phonemes_batch(
     with torch.no_grad():
         logits = model(input_values, attention_mask=attention_mask).logits
     predicted_ids = torch.argmax(logits, dim=-1).cpu()
+    log_probs_batch = torch.log_softmax(logits.float(), dim=-1).cpu() if return_log_probs else None
 
     pad_id = processor.tokenizer.pad_token_id
     vocab = {v: k for k, v in processor.tokenizer.get_vocab().items()}
@@ -242,8 +251,10 @@ def _detect_phonemes_batch(
         time_per_frame = slice_durations[local_i] / real_frame_count
         span_start = spans[span_idx][0]
         results[span_idx] = _collapse_ctc_with_timestamps(frame_ids, pad_id, time_per_frame, span_start, vocab)
+        if log_probs_batch is not None:
+            span_log_probs[span_idx] = log_probs_batch[local_i, :real_frame_count]
 
-    return results
+    return (results, span_log_probs) if return_log_probs else results
 
 
 def _align_phonemes(expected: List[str], detected: List[str]) -> List[Dict]:
@@ -461,16 +472,43 @@ def analyze_phoneme_accuracy(
         padded_end = min(recording_duration, sentence["end"] + SENTENCE_PADDING_SECONDS)
         spans.append((padded_start, padded_end))
 
-    detected_batch = _detect_phonemes_batch(waveform, sample_rate, spans)
+    detected_batch, span_log_probs = _detect_phonemes_batch(
+        waveform, sample_rate, spans, return_log_probs=True
+    )
+
+    # GOP per expected phoneme, from the log-probs of the pass just made. Used
+    # below to drop "errors" the acoustics actually support, and summarised in
+    # the report — see gop.py for why it does not (yet) drive the score.
+    processor, _, _ = _get_model()
+    phoneme_vocab = processor.tokenizer.get_vocab()
+    blank_id = processor.tokenizer.pad_token_id
+    gop_batch: List[Optional[List[Optional[float]]]] = []
+    for (_, expected_seq, _), log_probs in zip(sentence_entries, span_log_probs):
+        if log_probs is None:
+            gop_batch.append(None)
+            continue
+        target_ids = [phoneme_vocab.get(p) for p in expected_seq]
+        if any(t is None for t in target_ids):
+            # An expected phoneme outside the recogniser's inventory cannot be
+            # aligned; scoring the rest would silently shift every position.
+            gop_batch.append(None)
+            continue
+        gop_batch.append(gop.phoneme_gop(log_probs, target_ids, blank_id))
 
     total_phonemes = 0
     mismatched_phonemes = 0
     errors = []
     clip_edge_errors = []
     coarticulation_matches: List[Dict] = []
+    acoustically_supported: List[Dict] = []
     dropped_tokens: List[Dict] = []
     detected_phonemes: List[Dict] = []
-    for (word_indices, expected_seq, phoneme_to_local_word), detected_entries in zip(sentence_entries, detected_batch):
+    all_gop: List[Optional[float]] = []
+    for (word_indices, expected_seq, phoneme_to_local_word), detected_entries, sentence_gop in zip(
+        sentence_entries, detected_batch, gop_batch
+    ):
+        if sentence_gop:
+            all_gop.extend(sentence_gop)
         # Vocab gate (Fix 2): salvage what's recoverable (tone-digit-tagged
         # multilingual noise like "/a5/" -> "/a/"), drop what isn't. Gating
         # applies ONLY to this comparison copy — detected_phonemes (Level 1
@@ -535,6 +573,19 @@ def analyze_phoneme_accuracy(
                 coarticulation_matches.append(entry)
                 continue
 
+            # A mismatch the acoustics actually supported is the recogniser
+            # preferring a near neighbour, not the candidate mispronouncing
+            # anything — see gop.py.
+            position_gop = (
+                sentence_gop[err["expected_index"]]
+                if sentence_gop and err["expected_index"] < len(sentence_gop)
+                else None
+            )
+            if position_gop is not None and position_gop >= gop.GOP_SUPPORTS_EXPECTED:
+                acoustically_supported.append({**entry, "gop": position_gop})
+                continue
+
+            entry["gop"] = position_gop
             errors.append(entry)
             mismatched_phonemes += 1
 
@@ -557,6 +608,10 @@ def analyze_phoneme_accuracy(
 
     return {
         "phoneme_accuracy": accuracy,
+        "gop": {
+            **gop.summarise(all_gop),
+            "errors_dropped_as_acoustically_supported": len(acoustically_supported),
+        },
         "errors": errors,
         "clip_edge_errors": clip_edge_errors,
         "coarticulation_matches": coarticulation_matches,

@@ -190,6 +190,12 @@ def analyze_pronunciation(
     return {
         "pronunciation_score": pronunciation_score,
         "phoneme_accuracy": phoneme_report["phoneme_accuracy"],
+        # How strongly the acoustics supported each expected phoneme, from the
+        # same CTC pass the accuracy above comes from (see gop.py). Reported,
+        # not yet scored: turning it into a calibrated number needs labelled
+        # pronunciation data, and it already earns its place by removing
+        # "errors" the audio actually supports.
+        "gop": phoneme_report.get("gop"),
         "stress_accuracy": stress_report["stress_accuracy"],
         "rhythm_score": rhythm_report["rhythm_score"],
         "phoneme_errors": phoneme_report["errors"],

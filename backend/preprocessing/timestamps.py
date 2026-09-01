@@ -62,10 +62,32 @@ def _finalize_sentence(sentence_words: List[Dict]) -> Dict:
     }
 
 
+# A pause this long between words ends a sentence when the ASR gave us no
+# punctuation to go on. 0.7s is comfortably longer than the gaps inside a
+# phrase and shorter than the beat between two spoken sentences.
+PAUSE_SENTENCE_BREAK_SECONDS = 0.7
+# Below this many words, a run-on is not worth splitting; above it, treating
+# the whole answer as one "sentence" starts to matter.
+MIN_WORDS_BEFORE_PAUSE_SPLIT = 12
+
+
 def build_sentence_timestamps(words: List[Dict]) -> List[Dict]:
     """
     Group words into sentences using terminal punctuation (./!/?), deriving each
     sentence's start/end from its first and last word.
+
+    Falls back to pauses when the transcript has no terminal punctuation at
+    all. Whisper usually punctuates, but not always — measured on real
+    unscripted recordings, two of five came back as a single unpunctuated
+    run-on ("I love the dynamic fast-paced nature of sales and the fact that
+    my hard work ... " with no stops anywhere).
+
+    That silently degrades more than it looks: the whole answer becomes one
+    "sentence", so pronunciation slices the entire utterance into wav2vec2 in
+    one go instead of sentence by sentence, and sentences-per-minute reports
+    a confident 2.5 for a two-minute answer. Timing is independent of the
+    ASR's punctuation habits, so it is the more reliable signal when
+    punctuation is missing entirely.
     """
     logger.info("Building sentence timestamps...")
     sentences = []
@@ -80,6 +102,36 @@ def build_sentence_timestamps(words: List[Dict]) -> List[Dict]:
     if current:
         sentences.append(_finalize_sentence(current))
 
+    if _needs_pause_fallback(words, sentences):
+        logger.info("No terminal punctuation in the transcript — segmenting on pauses instead.")
+        return _segment_on_pauses(words)
+
+    return sentences
+
+
+def _needs_pause_fallback(words: List[Dict], sentences: List[Dict]) -> bool:
+    """True when punctuation produced a single run-on out of a long transcript."""
+    return (
+        len(sentences) <= 1
+        and len(words) >= MIN_WORDS_BEFORE_PAUSE_SPLIT
+        and not any(w["word"].endswith(SENTENCE_END_CHARS) for w in words)
+    )
+
+
+def _segment_on_pauses(words: List[Dict]) -> List[Dict]:
+    sentences = []
+    current: List[Dict] = []
+    for previous, word in zip([None] + words[:-1], words):
+        if (
+            current
+            and previous is not None
+            and (word.get("start", 0.0) - previous.get("end", 0.0)) >= PAUSE_SENTENCE_BREAK_SECONDS
+        ):
+            sentences.append(_finalize_sentence(current))
+            current = []
+        current.append(word)
+    if current:
+        sentences.append(_finalize_sentence(current))
     return sentences
 
 
