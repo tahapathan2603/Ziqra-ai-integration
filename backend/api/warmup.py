@@ -99,7 +99,23 @@ def _warm() -> None:
         analyze_monotonicity(wave, _SAMPLE_RATE, pitch_contour=pitch, speech_chunks=None)
         analyze_emphasis([], wave, _SAMPLE_RATE, pitch_contour=pitch, energy_contour=energy)
 
-        # 4. espeak/phonemizer's first call also pays a library-load cost.
+        # 4. Vocal arousal (engagement) and the SQUIM quality model — both
+        #    load weights on first use, same as the two above.
+        from backend.feature_extractors.audio.engagement.vocal_arousal import analyze_vocal_arousal
+        from backend.feature_extractors.audio.quality import assess_quality
+
+        probe = _synthetic_speech()
+        try:
+            analyze_vocal_arousal(probe, _SAMPLE_RATE)
+        except Exception as err:  # pragma: no cover
+            logger.info("Warm-up: arousal model skipped (%s)", err)
+        try:
+            assess_quality(probe, _SAMPLE_RATE)
+        except Exception as err:  # pragma: no cover
+            logger.info("Warm-up: quality model skipped (%s)", err)
+
+        # 5. espeak/phonemizer's first call also pays a library-load cost, and
+        #    Praat's pitch tracker compiles nothing but does load a library.
         phoneme_accuracy.get_expected_phonemes("warmup")
 
         _state["warm"] = True

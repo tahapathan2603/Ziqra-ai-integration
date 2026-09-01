@@ -141,6 +141,9 @@ def build_features(audio_analysis: Dict, session_id: str) -> Dict:
             "intonation": intonation_copy,
             "engagement": audio_analysis["engagement"],
         },
+        # Channel quality sits beside the analysis rather than inside it: it
+        # describes the recording, not the speaker.
+        "audio_quality": audio_analysis.get("audio_quality"),
         "processing_metadata": audio_analysis.get("processing_metadata", {}),
     }
 

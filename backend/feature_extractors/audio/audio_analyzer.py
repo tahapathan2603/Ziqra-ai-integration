@@ -46,6 +46,32 @@ from ..fluency.fluency_analyzer import analyze_fluency
 logger = logging.getLogger(__name__)
 
 
+def _vocal_arousal(audio_path: str):
+    """Arousal/dominance/valence for the whole recording. Never fatal: if the
+    model cannot load, engagement falls back to its heuristic score alone."""
+    try:
+        from .engagement.vocal_arousal import analyze_vocal_arousal
+        from .intonation.intonation_analyzer import SAMPLE_RATE, _load_waveform
+
+        return analyze_vocal_arousal(_load_waveform(audio_path), SAMPLE_RATE)
+    except Exception as err:
+        logger.info("Vocal arousal unavailable (%s); engagement will use heuristics only.", err)
+        return {"arousal": None, "dominance": None, "valence": None, "windows": 0}
+
+
+def _audio_quality(audio_path: str):
+    """Channel quality, so a noisy recording is reported as one instead of
+    being scored as poor speaking."""
+    try:
+        from .intonation.intonation_analyzer import SAMPLE_RATE, _load_waveform
+        from .quality import assess_quality
+
+        return assess_quality(_load_waveform(audio_path), SAMPLE_RATE)
+    except Exception as err:
+        logger.info("Quality assessment unavailable (%s).", err)
+        return {"stoi": None, "pesq": None, "si_sdr": None, "usable": True, "verdict": "unknown"}
+
+
 def _timed(name: str, durations: Dict[str, float], fn, *args, **kwargs):
     """Run fn and record its wall-clock duration under `name` in `durations`
     (a dict shared across threads — dict item assignment is atomic in
@@ -99,7 +125,9 @@ def analyze_audio(
     """
     durations: Dict[str, float] = {}
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    # Six independent tasks now: fluency, pronunciation, intonation, vocal
+    # arousal, audio quality, and MTI once pronunciation lands.
+    with ThreadPoolExecutor(max_workers=6) as executor:
         logger.info("Starting Fluency, Pronunciation, and Intonation in parallel...")
         fluency_future = executor.submit(_timed, "fluency", durations, analyze_fluency, words, sentences, speech_duration)
         pronunciation_future = executor.submit(
@@ -108,6 +136,10 @@ def analyze_audio(
         intonation_future = executor.submit(
             _timed, "intonation", durations, analyze_intonation, audio_path, transcript, words, speech_chunks
         )
+        # Vocal arousal and audio quality are independent of everything else,
+        # so they ride alongside rather than adding to the critical path.
+        arousal_future = executor.submit(_timed, "vocal_arousal", durations, _vocal_arousal, audio_path)
+        quality_future = executor.submit(_timed, "audio_quality", durations, _audio_quality, audio_path)
 
         # MTI can't start until Pronunciation's phoneme/stress data exists —
         # submit it as its own follow-up task the moment that's available,
@@ -131,10 +163,18 @@ def analyze_audio(
         intonation_report = intonation_future.result()
         mti_report = mti_future.result()
 
+        arousal_report = arousal_future.result()
+        quality_report = quality_future.result()
+
     logger.info("Fluency, Pronunciation, MTI, Intonation complete — running Engagement...")
     engagement_start = time.time()
     engagement_report = analyze_engagement(
-        fluency_report, pronunciation_report, mti_report, intonation_report, total_duration=total_duration
+        fluency_report,
+        pronunciation_report,
+        mti_report,
+        intonation_report,
+        total_duration=total_duration,
+        vocal_arousal=arousal_report,
     )
     durations["engagement"] = round(time.time() - engagement_start, 3)
 
@@ -146,6 +186,7 @@ def analyze_audio(
         "mti": mti_report,
         "intonation": intonation_report,
         "engagement": engagement_report,
+        "audio_quality": quality_report,
         "processing_metadata": {
             "analyzer_durations_seconds": durations,
             "parallel_execution": True,

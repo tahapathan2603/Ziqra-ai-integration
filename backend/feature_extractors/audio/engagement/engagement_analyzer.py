@@ -240,6 +240,7 @@ def analyze_engagement(
     mti_output: Dict,
     intonation_output: Dict,
     total_duration: Optional[float] = None,
+    vocal_arousal: Optional[Dict] = None,
 ) -> Dict:
     """
     Run the full engagement pipeline and combine results into one report.
@@ -293,6 +294,31 @@ def analyze_engagement(
     # the headline number moves with the timeline instead of against it.
     coverage_penalty = COVERAGE_PENALTY_MAX * _merged_coverage(problem_sections, total_duration)
     engagement_score = max(0, min(100, round(base_score - coverage_penalty)))
+    heuristic_score = engagement_score
+
+    # Vocal arousal is measured and reported (see vocal_arousal.py) but does
+    # NOT move this score, because the measurement did not earn it.
+    #
+    # The idea was sound — these four heuristics are uncalibrated and do not
+    # discriminate (read-aloud Harvard sentences, about the least expressive
+    # speech there is, score 87-96 "highly engaging") — and audeering's
+    # MSP-Podcast model is fitted to human arousal ratings at CCC ~0.76-0.82.
+    # But on this repo's own recordings it ranks them the wrong way round:
+    #
+    #     energetic sales pitch   arousal 28
+    #     mumbling teenager       arousal 34
+    #     monotone read passage   arousal 38
+    #
+    # Every sample lands in a 28-38 band, so blending it half-and-half simply
+    # moved every score from "highly engaging" to "needs improvement" —
+    # saturation at the other end, not discrimination. Arousal on naturalistic
+    # podcast speech is not the same axis as engagement in a mock interview,
+    # and the absolute values are not calibrated for this domain even if the
+    # ordering within one speaker's own answers turns out to carry signal.
+    #
+    # It is exposed so that can be checked against real data later. Wiring it
+    # into the headline number before then would be trading one uncalibrated
+    # guess for another.
 
     # Derive the level from the (penalized) score, then cap it so it can never
     # claim more than the timeline supports.
@@ -307,6 +333,8 @@ def analyze_engagement(
 
     return {
         "engagement_score": engagement_score,
+        "heuristic_engagement_score": heuristic_score,
+        "vocal_arousal": vocal_arousal or {"arousal": None, "dominance": None, "valence": None, "windows": 0},
         "engagement_level": engagement_level,
         "strengths": strengths,
         "improvement_areas": improvement_areas,

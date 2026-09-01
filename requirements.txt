@@ -140,6 +140,9 @@ pronouncing==0.3.0
 phonemizer==3.3.0
 audioread==3.1.0
 librosa==0.11.0
+# Praat's own pitch tracker (pitch_variation.py) — the algorithms the phonetics
+# literature is built on, and C++ fast.
+praat-parselmouth==0.4.7
 llvmlite==0.48.0
 numba==0.66.0
 pooch==1.9.0

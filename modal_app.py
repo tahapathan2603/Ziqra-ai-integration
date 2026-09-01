@@ -208,6 +208,22 @@ def _prefetch_models() -> None:
         )
 
     WhisperModel("large-v3", device="cpu", compute_type="int8")
+
+    # Vocal arousal (engagement) and the SQUIM quality model. Same reasoning
+    # as the two above: bake them into the image layer instead of paying a
+    # multi-gigabyte download on every cold container.
+    from transformers import Wav2Vec2Processor as _Proc
+
+    _Proc.from_pretrained("audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim")
+    import torch as _torch
+    from transformers import AutoConfig as _AutoConfig, AutoModel as _AutoModel
+
+    _AutoConfig.from_pretrained("audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim")
+    _AutoModel.from_pretrained("audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim")
+
+    from torchaudio.pipelines import SQUIM_OBJECTIVE as _SQUIM
+
+    _SQUIM.get_model()
     Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-lv-60-espeak-cv-ft")
     Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-lv-60-espeak-cv-ft", low_cpu_mem_usage=True)
 

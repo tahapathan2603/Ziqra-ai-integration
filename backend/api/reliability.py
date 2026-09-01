@@ -86,6 +86,20 @@ def apply(level2: Dict, speech_seconds: float, word_count: int) -> Dict:
     reasons: List[Dict[str, Any]] = []
     analysis = level2.get("analysis", {})
 
+    # A noisy or muffled channel degrades phoneme matching first and worst, and
+    # the failure looks exactly like poor pronunciation. If the recording
+    # itself is the problem, say so instead of scoring the speaker for it.
+    quality = level2.get("audio_quality") or {}
+    if quality.get("verdict") == "poor":
+        if _suppress(analysis, PRONUNCIATION_FAMILY):
+            reasons.append({
+                "metrics": list(PRONUNCIATION_FAMILY),
+                "reason": (
+                    f"recording quality is poor (STOI {quality.get('stoi')}, PESQ {quality.get('pesq')}); "
+                    "phoneme scores measure the channel as much as the speaker at this level"
+                ),
+            })
+
     if speech_seconds < MIN_SPEECH_SECONDS_FOR_PITCH:
         if _suppress(analysis, PITCH_FAMILY):
             reasons.append({

@@ -54,21 +54,82 @@ OCTAVE_REJECT_LOW_RATIO = 0.55
 CLEAN_MEDIAN_FILTER_KERNEL = 5
 
 
+def _praat_pitch(waveform: np.ndarray, sample_rate: int, times: np.ndarray):
+    """
+    F0 and voicing from Praat (via parselmouth), sampled onto `times`.
+
+    Praat's autocorrelation pitch tracker decides voiced/unvoiced itself,
+    using the same algorithm the phonetics literature is built on, rather
+    than the energy-percentile-plus-boundary-margin heuristic that librosa.yin
+    needs bolted on (yin returns a number for every frame whether or not
+    anything was voiced, which is why that heuristic existed at all).
+
+    The result is resampled onto the caller's existing frame grid deliberately:
+    energy_variation.py indexes this function's `voiced` array against its own
+    energy frames, so changing the grid would silently misalign the two.
+
+    Returns (f0, voiced) or None if parselmouth is unavailable.
+    """
+    try:
+        import parselmouth
+    except ImportError:  # pragma: no cover - dependency is in the image
+        return None
+
+    sound = parselmouth.Sound(np.asarray(waveform, dtype=np.float64), sampling_frequency=sample_rate)
+    pitch = sound.to_pitch(time_step=HOP_LENGTH / sample_rate, pitch_floor=FMIN, pitch_ceiling=FMAX)
+    praat_f0 = pitch.selected_array["frequency"]  # 0.0 where Praat found no voicing
+    praat_times = pitch.xs()
+    if praat_times.size == 0:
+        return None
+
+    # Nearest Praat frame for each frame on our grid.
+    idx = np.clip(np.searchsorted(praat_times, times), 0, len(praat_times) - 1)
+    left = np.clip(idx - 1, 0, len(praat_times) - 1)
+    take_left = np.abs(praat_times[left] - times) < np.abs(praat_times[idx] - times)
+    idx = np.where(take_left, left, idx)
+
+    f0 = praat_f0[idx]
+    voiced = f0 > 0
+    # Unvoiced frames carry 0 Hz from Praat; downstream code reads f0 only
+    # where `voiced` is true, but a 0 would poison any accidental mean, so
+    # they are filled with the median voiced value instead of a fake pitch.
+    if voiced.any():
+        f0 = np.where(voiced, f0, float(np.median(f0[voiced])))
+    return f0, voiced
+
+
 def compute_pitch_contour(waveform: np.ndarray, sample_rate: int) -> Dict:
     """
     Compute the pitch contour for a waveform, shared across pitch_variation.py,
     monotonicity.py, and emphasis.py so it's only computed once per recording.
 
+    Praat is the primary tracker (see _praat_pitch); librosa.yin remains as the
+    fallback so the pipeline still runs if parselmouth is missing, with the
+    energy/boundary voicing heuristic that yin requires.
+
     Returns: {"f0": np.ndarray, "times": np.ndarray, "voiced": np.ndarray[bool]}
     """
+    rms = librosa.feature.rms(y=waveform, frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH)[0]
+    times = librosa.frames_to_time(np.arange(len(rms)), sr=sample_rate, hop_length=HOP_LENGTH)
+
+    praat = _praat_pitch(waveform, sample_rate, times)
+    if praat is not None:
+        f0, voiced = praat
+        # Keep the energy gate as a second opinion: Praat can call a very
+        # quiet stretch voiced, and a frame with no energy behind it is not
+        # something to score delivery on either way.
+        energy_threshold = np.percentile(rms, VOICED_RMS_PERCENTILE) if len(rms) else 0.0
+        voiced = voiced & (rms > energy_threshold)
+        return {"f0": f0, "times": times, "voiced": voiced}
+
     f0 = librosa.yin(
         waveform, fmin=FMIN, fmax=FMAX, sr=sample_rate,
         frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH,
     )
     f0 = medfilt(f0, kernel_size=MEDIAN_FILTER_KERNEL)
-
-    rms = librosa.feature.rms(y=waveform, frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH)[0]
-    times = librosa.frames_to_time(np.arange(len(f0)), sr=sample_rate, hop_length=HOP_LENGTH)
+    f0 = f0[: len(times)]
+    times = times[: len(f0)]
+    rms = rms[: len(f0)]
 
     energy_threshold = np.percentile(rms, VOICED_RMS_PERCENTILE) if len(rms) else 0.0
     has_energy = rms > energy_threshold
