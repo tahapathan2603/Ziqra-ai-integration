@@ -28,6 +28,7 @@ from typing import Any, Dict, Optional
 from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
+from backend.api import warmup
 from backend.api.pipeline import NoSpeechDetectedError, extract_features
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,18 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+@app.on_event("startup")
+def _begin_warmup() -> None:
+    """
+    Starts warm-up the instant the container's server comes up, in a
+    background thread — so a container booted by nothing more than a health
+    ping is loading models while it waits, instead of at the moment someone
+    finally speaks. Deliberately not awaited: the server must answer /health
+    immediately and report `warm: false` until it is ready.
+    """
+    warmup.start_warmup()
+
 # ffmpeg (silero_vad._convert_to_wav) can decode far more than this list --
 # this is a cheap, fast rejection of obviously-wrong uploads (e.g. a .txt
 # file) before spending time launching a subprocess and loading models.
@@ -63,6 +76,8 @@ MAX_UPLOAD_BYTES = 200 * 1024 * 1024  # 200 MB
 
 class HealthResponse(BaseModel):
     status: str = "ok"
+    warm: bool = Field(False, description="True once models are loaded and the JIT paths are compiled.")
+    warmup_seconds: Optional[float] = Field(None, description="How long warm-up took in this container.")
 
 
 class ExtractResponse(BaseModel):
@@ -133,10 +148,24 @@ def verify_client_token(x_client_token: Optional[str] = Header(None, alias="X-Cl
 
 
 @app.get("/health", response_model=HealthResponse)
-def health() -> HealthResponse:
-    """Liveness check -- does not load or touch any model, and requires no
-    auth (see verify_client_token's docstring for why)."""
-    return HealthResponse(status="ok")
+def health(wait: float = 0.0) -> HealthResponse:
+    """
+    Liveness, and now readiness: `warm` says whether this container has
+    already paid its one-time model-load and JIT cost (~28s, measured — see
+    backend/api/warmup.py).
+
+    Requires no auth (see verify_client_token's docstring for why) and never
+    blocks by default, so it stays a cheap liveness probe. `?wait=<seconds>`
+    blocks up to that long for warm-up to finish, which is what a caller
+    wanting a guaranteed-warm container should use — the app pre-warms at the
+    start of onboarding, and before this the ping only booted a container and
+    left the whole cost for the user's first real answer.
+    """
+    warmup.start_warmup()
+    if wait > 0:
+        warmup.wait_until_warm(min(wait, 120.0))
+    state = warmup.status()
+    return HealthResponse(status="ok", warm=bool(state["warm"]), warmup_seconds=state["seconds"])
 
 
 @app.post("/extract", response_model=ExtractResponse, dependencies=[Depends(verify_client_token)])

@@ -3,13 +3,17 @@
 import logging
 from typing import Dict, List, Tuple
 
+import torch
 from faster_whisper import WhisperModel
 
 logger = logging.getLogger(__name__)
 
 MODEL_SIZE = "large-v3"
 DEVICE = "auto"
-COMPUTE_TYPE = "default"
+# float16 on GPU, int8 on CPU. "default" resolves to the converted model's own
+# dtype — float32 for large-v3 — which is roughly twice the compute and twice
+# the VRAM for no accuracy gain that matters here.
+COMPUTE_TYPE = "float16" if torch.cuda.is_available() else "int8"
 
 _model = None
 
@@ -49,7 +53,26 @@ def transcribe_chunk(chunk_path: str, word_timestamps: bool = False) -> Tuple[st
     explicitly avoids (see feature_extractors/audio/mti/mti_analyzer.py).
     """
     model = get_model()
-    segments, info = model.transcribe(chunk_path, beam_size=5, word_timestamps=word_timestamps)
+    segments, info = model.transcribe(
+        chunk_path,
+        beam_size=5,
+        word_timestamps=word_timestamps,
+        # Whisper's well-known failure on short or near-silent audio is to
+        # invent a stock phrase — "Thank you.", "Thanks for watching!" — and a
+        # VAD chunk of a hesitant answer is exactly that kind of input. A real
+        # production answer came back as "I am Dave. Well, thank you." for
+        # this reason, and because the transcript is the reference the
+        # pronunciation scorer compares against, an invented tail does not
+        # just read badly: it drags the phoneme accuracy down with it.
+        #
+        # condition_on_previous_text=False stops one chunk's hallucination
+        # seeding the next; the two thresholds make the decoder drop a segment
+        # it is not reasonably confident about rather than emit filler.
+        condition_on_previous_text=False,
+        no_speech_threshold=0.6,
+        log_prob_threshold=-1.0,
+        temperature=[0.0, 0.2, 0.4],
+    )
 
     text_parts = []
     words = []

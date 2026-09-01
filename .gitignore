@@ -18,3 +18,11 @@ venv/
 # Project-generated runtime artifacts
 backend/storage/chunks/
 backend/storage/feedback_samples/
+
+# Ad-hoc Modal diagnostics (kept out of the deployable app; they exist to be
+# re-run by hand, not imported).
+modal_diag.py
+modal_e2e.py
+modal_warmtest.py
+modal_intprof.py
+modal_asr_bakeoff.py

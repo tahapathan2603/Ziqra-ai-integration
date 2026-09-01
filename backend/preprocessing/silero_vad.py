@@ -30,7 +30,14 @@ from silero_vad import get_speech_timestamps, load_silero_vad, read_audio, save_
 logger = logging.getLogger(__name__)
 
 SAMPLE_RATE = 16000
-SUPPORTED_EXTENSIONS = (".wav", ".mp3", ".m4a", ".opus", ".ogg")
+# Must stay a superset of backend/api/main.py's ALLOWED_EXTENSIONS — that's
+# the API layer's advertised contract, but this check runs first and used to
+# be narrower (missing .flac/.webm), so a request main.py accepted still
+# blew up here as an unhandled ValueError -> vague 500 instead of the 400 the
+# API boundary implies. _convert_to_wav shells out to ffmpeg, which decodes
+# any of these containers the same way, so there's no real reason for this
+# list to be narrower than main.py's at all.
+SUPPORTED_EXTENSIONS = (".wav", ".mp3", ".m4a", ".opus", ".ogg", ".flac", ".webm")
 CHUNKS_DIR = os.path.join(_THIS_DIR, "..", "storage", "chunks")
 
 _model = None

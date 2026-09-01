@@ -171,11 +171,19 @@ def analyze_pronunciation(
     # stress_accuracy is intentionally NOT part of this composite: stress
     # detection is still a placeholder that always reports 100% (see
     # stress_placement.py), so averaging it in would inflate every score toward
-    # 100 regardless of real delivery. Score on phoneme accuracy + rhythm only,
-    # which are real measurements. Add stress back into the average once real
-    # acoustic stress detection lands.
+    # 100 regardless of real delivery. Add stress back into the average once
+    # real acoustic stress detection lands.
+    #
+    # Phoneme accuracy carries the weight, rhythm contributes a quarter. They
+    # used to be averaged 50/50, which let a heuristic that rhythm.py's own
+    # docstring calls "directional, not authoritative" move the headline
+    # pronunciation number by up to 50 points. It is real signal — Fix 8 made
+    # it discriminate between sessions — but it measures inter-word timing,
+    # not pronunciation, and it is not calibrated against any outcome. A
+    # quarter keeps it visible in the composite without letting it outvote the
+    # measurement the score is named after.
     pronunciation_score = round(
-        100 * (phoneme_report["phoneme_accuracy"] + rhythm_report["rhythm_score"]) / 2
+        100 * (0.75 * phoneme_report["phoneme_accuracy"] + 0.25 * rhythm_report["rhythm_score"])
     )
     logger.info(f"Pronunciation analysis complete. Score: {pronunciation_score}")
 

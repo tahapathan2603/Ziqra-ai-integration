@@ -250,7 +250,17 @@ app = modal.App("ziqra-audio-api", image=image)
     # while the cost of a too-high one is only that a genuinely wedged
     # request holds its GPU longer before being reaped.
     timeout=1200,
-    scaledown_window=300,  # keep the container (and its loaded models) warm for 5 min after the last request
+    # A cold container costs ~28s of one-time model-load and JIT before it
+    # can analyse anything (measured; see backend/api/warmup.py), against
+    # ~1.4s once warm. An interview is a sequence of answers with thinking
+    # time between them, so 5 minutes was short enough to drop the container
+    # mid-session and make a candidate pay that cost twice in one interview.
+    # 15 minutes covers a full session's gaps.
+    #
+    # Zero cold starts would mean min_containers=1, which bills an idle A10G
+    # around the clock — a cost decision, not a code one, so it stays off and
+    # the warm-up path above is what makes cold starts cheap instead.
+    scaledown_window=900,
     # Cost guard for the testing phase: without a ceiling, a burst of
     # requests autoscales GPU containers with nothing to bound the bill.
     # Each container is also a multi-GB cold start, so unbounded fan-out

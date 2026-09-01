@@ -33,6 +33,7 @@ from typing import Dict
 
 from silero_vad import save_audio
 
+from backend.api import reliability
 from backend.distillation.dataset_builder import build_features, build_timeline, generate_session_id
 from backend.feature_extractors.audio.audio_analyzer import analyze_audio
 from backend.preprocessing.silero_vad import process_audio
@@ -113,7 +114,6 @@ def extract_features(audio_path: str, chunks_dir: str) -> Dict:
         speech_duration,
         total_duration=total_duration,
         speech_chunks=speech_chunks,
-        language_probability=ts_result.get("language_probability"),
     )
 
     session_id = generate_session_id()
@@ -131,6 +131,17 @@ def extract_features(audio_path: str, chunks_dir: str) -> Dict:
     )
     level2 = build_features(audio_analysis, session_id)
 
+    # Two corrections applied at the boundary rather than inside the analyzers,
+    # so the analyzers keep reporting their own raw view and only what leaves
+    # this API changes: rhythm_score onto the same 0-100 scale as its
+    # neighbours, and metrics the recording is too short to support blanked
+    # out instead of published as flattering numbers. See reliability.py.
+    reliability.rescale_rhythm(level2)
+    reliability_report = reliability.apply(
+        level2, speech_seconds=speech_duration, word_count=len(ts_result["words"])
+    )
+    level2["reliability"] = reliability_report
+
     return {
         "session_id": session_id,
         "level1": level1,
@@ -139,6 +150,8 @@ def extract_features(audio_path: str, chunks_dir: str) -> Dict:
             "duration_seconds": round(total_duration, 3),
             "speech_seconds": round(speech_duration, 3),
             "processing_seconds": round(time.time() - start_time, 3),
+            "words": len(ts_result["words"]),
+            "fully_measured": reliability_report["fully_measured"],
         },
     }
 
