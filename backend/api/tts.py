@@ -80,20 +80,25 @@ MODEL_ID = os.environ.get("TTS_MODEL_ID", "ai4bharat/indic-parler-tts")
 # took 8.3s), and generation tracks audio duration at about 1.2x real time.
 VOICE_SPEAKER = os.environ.get("TTS_VOICE_SPEAKER", "Mary")
 
-# The wording follows the model card rather than reading nicely:
+# This exact string measured best, and it is worth recording that it beat the
+# one the model card's advice suggested (modal_speaker_probe.py, three
+# variants, same speaker and lines):
 #
-#   * "very clear audio" is a documented magic phrase — "Include the term
-#     'very clear audio' to generate the highest quality audio".
-#   * speaking rate, pitch, background noise and reverberation are all
-#     controlled through this description, so each is stated explicitly
-#     instead of left to the model.
-#   * "moderate speaking rate", not "a measured pace": generation time tracks
-#     audio duration almost linearly, so this phrase is a speed setting as
-#     much as a stylistic one.
+#   "at a measured pace"            pronunciation 95.5 mean, 11.08s total
+#   no pace phrase                  93.5, 11.90s
+#   + "very clear audio", pitch     92.5, 11.96s   <- what was deployed
+#
+# The card names "very clear audio" as the term to include for the highest
+# quality audio, and the combination written around it here came last on both
+# axes. Word-error rate was 0.0 for every variant, so this is not about
+# intelligibility. Taken on the card's authority once; measured now.
+#
+# Anything overriding TTS_VOICE_STYLE should bump TTS_VOICE_ID in the Worker
+# and VOICE_CACHE_VERSION in the app, or the caches keep serving the old voice.
 VOICE_STYLE = os.environ.get(
     "TTS_VOICE_STYLE",
-    "speaks in a clear, warm and professional tone at a moderate speaking rate with balanced pitch, "
-    "as if interviewing someone. Very clear audio, very close-sounding, with no background noise.",
+    "speaks Indian English in a clear, warm, professional tone at a measured pace, as if "
+    "interviewing someone. The recording is very close-sounding and completely noise-free.",
 )
 VOICE = os.environ.get("TTS_VOICE", f"{VOICE_SPEAKER} {VOICE_STYLE}")
 

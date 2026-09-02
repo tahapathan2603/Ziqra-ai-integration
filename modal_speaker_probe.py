@@ -54,7 +54,7 @@ EXTRACT_URL = "https://ramramjibkn--ziqra-audio-api-fastapi-app.modal.run"
 # duration by a factor of nearly two for identical text (Mary 4.4s vs Jatin
 # 8.3s), and generation tracks duration at about 1.2x real time — so the words
 # in this description are a speed setting, not just a stylistic one.
-CANDIDATES = ["Mary", "Thoma"]
+CANDIDATES = ["Mary"]
 
 LINES = [
     "Tell me about a project you are proud of, and what your part in it was.",
@@ -69,7 +69,16 @@ STYLE_BRISK = (
     "speaks Indian English in a clear, warm, professional tone, as if interviewing someone. "
     "The recording is very close-sounding and completely noise-free."
 )
-STYLES = {"measured": STYLE, "brisk": STYLE_BRISK}
+# The third variant is what is actually deployed, and it belongs here because
+# neither of the two above is it: it adds "very clear audio", which the model
+# card names as the term to include for the highest quality, and states pitch
+# explicitly. Comparing the deployed string is the only way to know whether
+# the card's advice costs anything.
+STYLE_DEPLOYED = (
+    "speaks in a clear, warm and professional tone at a moderate speaking rate with balanced pitch, "
+    "as if interviewing someone. Very clear audio, very close-sounding, with no background noise."
+)
+STYLES = {"measured": STYLE, "brisk": STYLE_BRISK, "deployed": STYLE_DEPLOYED}
 
 
 def _find_transcript(node, depth: int = 0):
