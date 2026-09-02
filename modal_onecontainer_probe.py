@@ -45,6 +45,10 @@ combined = (
 
 app = modal.App("ziqra-onecontainer-probe", image=combined)
 cache = modal.Volume.from_name("ziqra-tts-cache", create_if_missing=True)
+# Written to the volume, not just returned: the local Modal client dropped
+# this run twice ("Deadline exceeded", then "'Connection' object has no
+# attribute '_transport'") and took the printed result with it each time.
+REPORT_PATH = "/cache/fixtures/onecontainer-report.json" 
 
 
 @app.function(
@@ -91,7 +95,10 @@ def probe() -> dict:
     try:
         from backend.api.pipeline import extract_features
 
-        wav = "/root/backend/test_audio/chunk_1.wav"
+        # NOT chunk_1.wav: that file is 0 bytes in the repo (its "copy" is
+        # the real one), and ffmpeg rightly refuses it — which cost this probe
+        # a run. This mp3 is one the deployed pipeline has already scored.
+        wav = "/root/backend/test_audio/saa_indian_samples/hindi3.mp3"
         import os
 
         if not os.path.exists(wav):
@@ -111,6 +118,11 @@ def probe() -> dict:
     except Exception as err:  # noqa: BLE001
         report["pipeline"] = {"ok": False, "error": f"{type(err).__name__}: {err}"[:300]}
 
+    from pathlib import Path
+
+    Path(REPORT_PATH).parent.mkdir(parents=True, exist_ok=True)
+    Path(REPORT_PATH).write_text(json.dumps(report, indent=2, default=str))
+    cache.commit()
     return report
 
 

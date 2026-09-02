@@ -72,12 +72,6 @@ STYLE_BRISK = (
 STYLES = {"measured": STYLE, "brisk": STYLE_BRISK}
 
 
-@app.function(
-    gpu="A10G",
-    timeout=3600,
-    volumes={"/cache": tts_cache},
-    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME), modal.Secret.from_name(HF_SECRET_NAME)],
-)
 def _find_transcript(node, depth: int = 0):
     """Finds the transcript wherever the pipeline puts it.
 
@@ -102,6 +96,12 @@ def _find_transcript(node, depth: int = 0):
     return None
 
 
+@app.function(
+    gpu="A10G",
+    timeout=3600,
+    volumes={"/cache": tts_cache},
+    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME), modal.Secret.from_name(HF_SECRET_NAME)],
+)
 def probe() -> str:
     """Generates every line for every candidate, reads each back through the
     deployed pipeline, and writes the report to the volume."""
