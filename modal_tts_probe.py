@@ -20,7 +20,7 @@ import time
 
 import modal
 
-from modal_app import MODAL_SECRET_NAME, tts_cache, tts_image
+from modal_app import HF_SECRET_NAME, MODAL_SECRET_NAME, tts_cache, tts_image
 
 # Its own App, like the other probes here, so running this never touches the
 # deployed one. The two local modules have to be added to the image
@@ -42,7 +42,7 @@ LINES = [
     gpu="A10G",
     timeout=1800,
     volumes={"/cache": tts_cache},
-    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME)],
+    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME), modal.Secret.from_name(HF_SECRET_NAME)],
 )
 def probe() -> dict:
     import os

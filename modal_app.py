@@ -23,6 +23,9 @@ import modal
 
 
 MODAL_SECRET_NAME = "custom-secret"
+# Hugging Face read token, for the gated Indian-English TTS model. Its own
+# secret so the client-token one above is never rewritten.
+HF_SECRET_NAME = "huggingface"
 
 # requirements.txt is shared with local dev, which needs gradio for
 # backend/preprocessing/vad_ui.py's dev-only Gradio UI. The Modal container
@@ -330,7 +333,12 @@ tts_cache = modal.Volume.from_name("ziqra-tts-cache", create_if_missing=True)
     # two containers synthesising the same line would each pay the GPU for it.
     max_containers=1,
     volumes={"/cache": tts_cache},
-    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME)],
+    # Two secrets, and deliberately not one: the shared client token lives in
+    # custom-secret, and `modal secret create --force` REPLACES a secret
+    # wholesale, so adding HF_TOKEN to that one would have wiped CLIENT_TOKEN
+    # and taken the transcription API down with it. A second secret adds the
+    # token without touching the first.
+    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME), modal.Secret.from_name(HF_SECRET_NAME)],
 )
 @modal.asgi_app()
 def tts_app():
