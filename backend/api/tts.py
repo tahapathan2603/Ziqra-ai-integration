@@ -57,18 +57,59 @@ CLIENT_TOKEN_ENV_VAR = "CLIENT_TOKEN"
 
 MODEL_ID = os.environ.get("TTS_MODEL_ID", "ai4bharat/indic-parler-tts")
 
-# The speaker is chosen by describing them in words — Parler's whole
-# interface. Kept as one env-overridable string so the voice can be retuned
-# without a code change or a cache-invalidating model swap.
+# The speaker is chosen by NAMING one, then describing the delivery — that is
+# Parler's whole interface.
 #
-# "Anjali" is one of indic-parler-tts's recommended named Indian English
-# speakers; the rest of the sentence is what the model card asks for: the
-# recording conditions and the delivery, not the words.
-VOICE = os.environ.get(
-    "TTS_VOICE",
-    "Anjali speaks Indian English in a clear, warm, professional tone, at a measured pace, "
-    "as if interviewing someone. The recording is very close-sounding and completely noise-free.",
+# The name has to come from this model's own English set, and that is what was
+# wrong before: it said "Anjali", who is a speaker for other languages in this
+# model but NOT one of its English voices, so there was no speaker to lock on
+# to and every generation sampled a different voice. The accent audibly moved
+# between questions for exactly that reason. The model card lists 21 English
+# speakers and recommends two of them, Thoma and Mary; every one of them is an
+# Indian English voice, since that is what this model is.
+#
+# Which of them is used is decided by measurement, not taste — see
+# modal_speaker_probe.py, which reads each candidate back through this repo's
+# own pipeline and compares transcription accuracy and mother-tongue
+# influence. Overridable so that choice can change without a code deploy.
+# Measured, not chosen by ear: modal_speaker_probe.py generates the same two
+# interview lines for six of this model's English speakers and reads each back
+# through this repo's own fitted pronunciation model. Mary won on both axes at
+# once — 100 and 91 against Thoma's 98 and 87, and the fastest of the six
+# because she produces the shortest audio for identical text (4.4s where Jatin
+# took 8.3s), and generation tracks audio duration at about 1.2x real time.
+VOICE_SPEAKER = os.environ.get("TTS_VOICE_SPEAKER", "Mary")
+
+# The wording follows the model card rather than reading nicely:
+#
+#   * "very clear audio" is a documented magic phrase — "Include the term
+#     'very clear audio' to generate the highest quality audio".
+#   * speaking rate, pitch, background noise and reverberation are all
+#     controlled through this description, so each is stated explicitly
+#     instead of left to the model.
+#   * "moderate speaking rate", not "a measured pace": generation time tracks
+#     audio duration almost linearly, so this phrase is a speed setting as
+#     much as a stylistic one.
+VOICE_STYLE = os.environ.get(
+    "TTS_VOICE_STYLE",
+    "speaks in a clear, warm and professional tone at a moderate speaking rate with balanced pitch, "
+    "as if interviewing someone. Very clear audio, very close-sounding, with no background noise.",
 )
+VOICE = os.environ.get("TTS_VOICE", f"{VOICE_SPEAKER} {VOICE_STYLE}")
+
+VOICE_SEED = int(os.environ.get("TTS_VOICE_SEED", "42"))
+
+# Padding both tokenizers to fixed lengths is what makes torch.compile pay:
+# it keeps the input shapes static, so the compiled graph is reused instead of
+# recompiled per line length (parler-tts's own INFERENCE.md guidance).
+DESCRIPTION_TOKENS = 64
+PROMPT_TOKENS = 64
+
+# A ceiling on generated audio, in decoder tokens. Long enough for any
+# interview line at ~86 tokens/second of audio, and it stops a pathological
+# generation from running away with the GPU.
+MAX_NEW_TOKENS = int(os.environ.get("TTS_MAX_NEW_TOKENS", "1500"))
+
 
 # Where synthesised audio lives. A Modal Volume in deployment; anywhere
 # writable locally.
@@ -140,13 +181,45 @@ def _load() -> None:
             from transformers import AutoTokenizer
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
-            model = ParlerTTSForConditionalGeneration.from_pretrained(MODEL_ID).to(device)
+            # float16 on the GPU, not the checkpoint's float32. This is the
+            # single biggest win available and it was simply being left on the
+            # table: the A10G has fp16 tensor cores and this model is a
+            # transformer decoder, so it is the arithmetic that dominates.
+            dtype = torch.float16 if device == "cuda" else torch.float32
+            # No attn_implementation="sdpa" here, though parler-tts's guide
+            # suggests it: measured, it refuses to load at all —
+            # "T5EncoderModel does not support an attention implementation
+            # through torch.nn.functional.scaled_dot_product_attention yet"
+            # (transformers 4.46). The setting applies to the whole model, and
+            # this one contains a T5 text encoder, so the default stands and
+            # the speed comes from fp16 and the compiled decoder below.
+            model = ParlerTTSForConditionalGeneration.from_pretrained(
+                MODEL_ID,
+                torch_dtype=dtype,
+            ).to(device)
+            model.eval()
             tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
             # Parler reads the speaker description with the text encoder's own
             # tokenizer, which is a different one from the prompt tokenizer.
             description_tokenizer = AutoTokenizer.from_pretrained(model.config.text_encoder._name_or_path)
             _model, _tokenizer, _description_tokenizer = model, tokenizer, description_tokenizer
-            logger.info("tts: loaded %s on %s in %.1fs", MODEL_ID, device, time.time() - started)
+            logger.info("tts: loaded %s on %s (%s) in %.1fs", MODEL_ID, device, dtype, time.time() - started)
+
+            # No static cache and no torch.compile, though parler-tts's
+            # INFERENCE.md recommends both — measured, they do not work on
+            # this version pair and the failure is at generate() time, not at
+            # set-up time, so it would have taken the whole voice down:
+            #
+            #   AttributeError: 'StaticCache' object has no attribute
+            #   'max_batch_size'
+            #
+            # parler-tts reads that attribute; transformers 4.46 renamed it to
+            # `batch_size` (its own deprecation notice says so). Pinning a
+            # transformers old enough for parler and new enough for the model
+            # is a bigger change than the win justifies, and without a static
+            # cache torch.compile only recompiles per line length. fp16 above
+            # is where the speed comes from; the caches and the app's prefetch
+            # are where the *felt* speed comes from.
         except Exception as err:  # noqa: BLE001 - reported to the caller, not raised
             _load_error = f"{type(err).__name__}: {err}"
             logger.error("tts: could not load %s: %s", MODEL_ID, _load_error)
@@ -192,17 +265,53 @@ def synthesise(text: str, voice: str) -> bytes:
     import torch
 
     device = next(_model.parameters()).device
-    description_ids = _description_tokenizer(voice, return_tensors="pt").to(device)
-    prompt_ids = _tokenizer(text, return_tensors="pt").to(device)
+    # padding to a fixed length, not to the batch: static shapes are what let
+    # the compiled graph above be reused instead of recompiled for every
+    # different line length.
+    description_ids = _description_tokenizer(
+        voice, return_tensors="pt", padding="max_length", max_length=DESCRIPTION_TOKENS, truncation=True
+    ).to(device)
+    prompt_ids = _tokenizer(
+        text, return_tensors="pt", padding="max_length", max_length=PROMPT_TOKENS, truncation=True
+    ).to(device)
+    # Deterministic: the same line is the same voice every time, and the voice
+    # does not drift between questions.
+    torch.manual_seed(VOICE_SEED)
     with torch.inference_mode():
         generation = _model.generate(
             input_ids=description_ids.input_ids,
             attention_mask=description_ids.attention_mask,
             prompt_input_ids=prompt_ids.input_ids,
             prompt_attention_mask=prompt_ids.attention_mask,
+            max_new_tokens=MAX_NEW_TOKENS,
         )
-    audio = generation.cpu().numpy().squeeze()
+    audio = generation.to(torch.float32).cpu().numpy().squeeze()
     return _to_mp3(audio, _model.config.sampling_rate)
+
+
+@app.on_event("startup")
+def _begin_warmup() -> None:
+    """Loads the model and pays the compile cost before any request arrives.
+
+    In a thread, not inline: the server has to start answering /health
+    immediately, and the Worker's readiness check depends on that. The first
+    generation is what actually triggers compilation, so a throwaway line is
+    synthesised here — otherwise the first candidate to ask a question pays a
+    minute of it.
+    """
+
+    def run() -> None:
+        try:
+            _load()
+            if _model is None:
+                return
+            started = time.time()
+            synthesise("Ready.", VOICE)
+            logger.info("tts: warm-up generation took %.1fs", time.time() - started)
+        except Exception as err:  # noqa: BLE001 - a failed warm-up is not fatal
+            logger.warning("tts: warm-up failed: %s", err)
+
+    threading.Thread(target=run, daemon=True, name="tts-warmup").start()
 
 
 @app.get("/health")
