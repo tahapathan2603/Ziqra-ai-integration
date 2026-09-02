@@ -263,6 +263,86 @@ image = (
 app = modal.App("ziqra-audio-api", image=image)
 
 
+# ---------------------------------------------------------------------------
+# Indian-English TTS
+# ---------------------------------------------------------------------------
+#
+# Its own image and its own function, not another route on the extraction
+# app: that container holds Whisper large-v3 and wav2vec2 on the GPU and pays
+# ~28s of one-time load before it can serve anything. Bolting a TTS model
+# onto it would grow the cold start and the GPU footprint of every
+# transcription, for something transcription never uses. See
+# backend/api/tts.py.
+tts_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    # libmp3lame lives in ffmpeg here; tts.py pipes raw floats through it
+    # rather than shipping 44.1kHz wav to a phone on mobile data.
+    .apt_install("ffmpeg", "git")
+    # torch pinned to the same 2.8.0 the extraction image runs, and pinned
+    # *with* parler-tts in one resolve rather than before it. Measured
+    # (modal_tts_probe.py): installing parler-tts separately let pip pull a
+    # cu13 torch wheel whose CUDA runtime is not in this image, and the model
+    # then failed to load with "libcudart.so.13: cannot open shared object
+    # file" — a GPU-less container that looked like a broken model.
+    .pip_install(
+        "torch==2.8.0",
+        "torchaudio==2.8.0",
+        "transformers==4.46.1",
+        "soundfile==0.12.1",
+        "numpy<2",
+        "fastapi[standard]==0.115.6",
+        # Parler is not on PyPI; the model's own architecture class lives here
+        # and transformers cannot load ai4bharat/indic-parler-tts without it.
+        "git+https://github.com/huggingface/parler-tts.git@main",
+    )
+    # The model is NOT prefetched into the image, unlike the extraction one:
+    # ai4bharat/indic-parler-tts is gated, so a build that downloaded it would
+    # fail for anyone whose account has not accepted the terms and whose
+    # container has no HF token — making the whole service undeployable
+    # instead of merely unvoiced. It is loaded lazily on the first cache miss,
+    # into the volume-backed HF cache below, so the download happens once
+    # across all containers rather than once per container.
+    #
+    # HF_HOME points at the volume for exactly that reason: the default cache
+    # is container-local, so every cold start would re-download ~2GB of gated
+    # weights. On the volume it survives scale-to-zero and redeploys.
+    .env({"HF_HOME": "/cache/hf"})
+    .add_local_python_source("backend")
+)
+
+# Synthesised lines, and the model weights, both outlive containers here.
+# Questions come from a fixed script, so the same few dozen strings are
+# spoken over and over: with this, the GPU runs once per distinct line ever.
+tts_cache = modal.Volume.from_name("ziqra-tts-cache", create_if_missing=True)
+
+
+@app.function(
+    image=tts_image,
+    gpu="A10G",
+    # Generation is autoregressive, so a long coaching line takes longer than
+    # a short question; this is a ceiling for a wedged request, not a target.
+    timeout=600,
+    # Shorter than the extraction app's 15 minutes. TTS calls cluster inside
+    # one interview and the cache absorbs the repeats, so an idle GPU here
+    # buys much less than it does there.
+    scaledown_window=300,
+    # One container: the cache is a volume with last-write-wins semantics, and
+    # two containers synthesising the same line would each pay the GPU for it.
+    max_containers=1,
+    volumes={"/cache": tts_cache},
+    secrets=[modal.Secret.from_name(MODAL_SECRET_NAME)],
+)
+@modal.asgi_app()
+def tts_app():
+    from backend.api import tts
+
+    # Hand the module the *mounted* volume: a Volume is committed through the
+    # object the function was given, and a fresh from_name() handle is not it.
+    tts.set_volume(tts_cache)
+    return tts.app
+
+
+
 @app.function(
     gpu="A10G",
     # Raised from 600s. A cold container has to import torch/transformers,
