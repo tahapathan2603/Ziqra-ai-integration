@@ -46,7 +46,7 @@ FEATURES_DIRNAME = "features"
 # Keys lifted out of the Level 2 intonation copy because they already live in
 # Level 1's acoustic_contours (see build_features) — keeping both would
 # silently duplicate a several-hundred-point array per session.
-_INTONATION_CONTOUR_KEYS = ("pitch_contour", "energy_contour")
+_INTONATION_CONTOUR_KEYS = ("pitch_contour", "energy_contour", "_arrays")
 
 
 def generate_session_id() -> str:

@@ -196,6 +196,10 @@ def analyze_pronunciation(
         # pronunciation data, and it already earns its place by removing
         # "errors" the audio actually supports.
         "gop": phoneme_report.get("gop"),
+        # Underscore-prefixed: consumed by scoring.py inside this process and
+        # dropped before publication (see audio_analyzer).
+        "_gop_scores": phoneme_report.get("_gop_scores", []),
+        "_expected_phonemes": phoneme_report.get("_expected_phonemes", 0),
         "stress_accuracy": stress_report["stress_accuracy"],
         "rhythm_score": rhythm_report["rhythm_score"],
         "phoneme_errors": phoneme_report["errors"],

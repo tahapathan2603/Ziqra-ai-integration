@@ -612,6 +612,10 @@ def analyze_phoneme_accuracy(
             **gop.summarise(all_gop),
             "errors_dropped_as_acoustically_supported": len(acoustically_supported),
         },
+        # Raw per-phoneme GOP for the fitted scorers (scoring.py). Not
+        # published: stripped in pronunciation_analyzer's report.
+        "_gop_scores": all_gop,
+        "_expected_phonemes": sum(len(e[1]) for e in sentence_entries),
         "errors": errors,
         "clip_edge_errors": clip_edge_errors,
         "coarticulation_matches": coarticulation_matches,

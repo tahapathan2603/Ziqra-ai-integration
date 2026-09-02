@@ -46,6 +46,85 @@ from ..fluency.fluency_analyzer import analyze_fluency
 logger = logging.getLogger(__name__)
 
 
+def _fitted_scores(pronunciation_report, intonation_report, fluency_report, words, total_duration):
+    """
+    Runs the scorers fitted on speechocean762's human ratings.
+
+    Everything it needs was computed by the analyzers above — GOP from the
+    pronunciation pass, the pitch and energy arrays from intonation — so this
+    adds a feature assembly and five small regressions, not another model.
+    """
+    try:
+        from .intonation.pitch_variation import HOP_LENGTH
+        from .intonation.intonation_analyzer import SAMPLE_RATE
+        from . import scoring
+
+        arrays = intonation_report.get("_arrays") or {}
+        if arrays.get("f0") is None or arrays.get("rms") is None:
+            return {"fitted": False}
+
+        features = scoring.build_feature_vector(
+            gop_scores=pronunciation_report.get("_gop_scores") or [],
+            f0=arrays["f0"],
+            voiced=arrays["voiced"],
+            rms=arrays["rms"],
+            expected_phonemes=pronunciation_report.get("_expected_phonemes") or 0,
+            duration_seconds=total_duration or 0.0,
+            word_count=len(words or []),
+            sample_rate=SAMPLE_RATE,
+            hop_length=HOP_LENGTH,
+        )
+        return scoring.score(features)
+    except Exception as err:
+        logger.info("Fitted scoring unavailable (%s); heuristic scores stand.", err)
+        return {"fitted": False}
+
+
+def _apply_fitted_scores(fitted, pronunciation_report, intonation_report, fluency_report, engagement_report):
+    """
+    Swap the headline numbers for the fitted ones, keeping the heuristics
+    beside them under *_heuristic.
+
+    Each mapping is to what the annotators were actually asked to rate:
+
+      accuracy -> pronunciation_score   phoneme-level correctness
+      prosodic -> intonation_score      prosody / delivery
+      fluency  -> fluency_score         fluency (there was no single number)
+      total    -> overall_score         the raters' overall impression
+
+    `total` deliberately does NOT become engagement_score. speechocean762
+    rates pronunciation, not how engaging someone is in an interview, and
+    renaming one to the other would repeat exactly the mistake that kept
+    engagement uncalibrated in the first place. engagement_score stays the
+    heuristic it always was, now labelled as such, and the app shows the
+    fitted four instead.
+
+    `completeness` is not published at all: in the corpus it means "how much
+    of the given prompt did the speaker read", and an interview answer has no
+    prompt to be complete against — the fitted model for it can only be
+    reading duration and word count.
+    """
+    for report, key, target in (
+        (pronunciation_report, "pronunciation_score", "accuracy"),
+        (intonation_report, "intonation_score", "prosodic"),
+        (fluency_report, "fluency_score", "fluency"),
+    ):
+        value = fitted.get(target)
+        if value is None:
+            continue
+        if key in report:
+            report[f"{key}_heuristic"] = report[key]
+        report[key] = value
+
+    if fitted.get("total") is not None:
+        pronunciation_report["overall_score"] = fitted["total"]
+
+    # Mark the one number that is still a hand-weighted blend, so nothing
+    # downstream mistakes it for a fitted score.
+    if "engagement_score" in engagement_report:
+        engagement_report["engagement_score_is_heuristic"] = True
+
+
 def _vocal_arousal(audio_path: str):
     """Arousal/dominance/valence for the whole recording. Never fatal: if the
     model cannot load, engagement falls back to its heuristic score alone."""
@@ -178,6 +257,21 @@ def analyze_audio(
     )
     durations["engagement"] = round(time.time() - engagement_start, 3)
 
+    # Fitted scores replace the hand-weighted composites as the headline
+    # numbers (see scoring.py). The heuristics are kept beside them under
+    # *_heuristic so the two can be compared on live traffic, and so nothing
+    # is lost if the fitted bundle is ever unavailable.
+    fitted_start = time.time()
+    fitted = _fitted_scores(pronunciation_report, intonation_report, fluency_report, words, total_duration)
+    if fitted.get("fitted"):
+        _apply_fitted_scores(fitted, pronunciation_report, intonation_report, fluency_report, engagement_report)
+    durations["fitted_scoring"] = round(time.time() - fitted_start, 3)
+
+    # Internal hand-offs, never published.
+    for report, key in ((pronunciation_report, "_gop_scores"), (pronunciation_report, "_expected_phonemes"),
+                        (intonation_report, "_arrays")):
+        report.pop(key, None)
+
     logger.info(f"Audio analysis complete. Analyzer durations (s): {durations}")
 
     return {
@@ -187,6 +281,7 @@ def analyze_audio(
         "intonation": intonation_report,
         "engagement": engagement_report,
         "audio_quality": quality_report,
+        "fitted_scores": fitted,
         "processing_metadata": {
             "analyzer_durations_seconds": durations,
             "parallel_execution": True,

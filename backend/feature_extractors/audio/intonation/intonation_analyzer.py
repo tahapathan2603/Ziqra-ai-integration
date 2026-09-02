@@ -243,4 +243,12 @@ def analyze_intonation(
         "overall_observations": overall_observations,
         "pitch_contour": _serialize_pitch_contour(pitch_contour),
         "energy_contour": _serialize_energy_contour(energy_contour),
+        # Raw arrays for the fitted scorers (scoring.py), so they don't have to
+        # recompute a pitch track that was just computed here. Stripped before
+        # anything is published — see dataset_builder._INTONATION_CONTOUR_KEYS.
+        "_arrays": {
+            "f0": pitch_contour["f0"],
+            "voiced": pitch_contour["voiced"],
+            "rms": energy_contour["rms"],
+        },
     }

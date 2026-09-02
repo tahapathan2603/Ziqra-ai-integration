@@ -251,6 +251,13 @@ image = (
     # backend/*.py file would invalidate _prefetch_models too, and every
     # code change would re-download both models on the next build.
     .add_local_python_source("backend")
+    # The fitted scorer bundle is data, not Python, so add_local_python_source
+    # does not carry it — without this the container silently falls back to
+    # heuristic scores with only a log line to say so.
+    .add_local_dir(
+        "backend/feature_extractors/audio/models",
+        remote_path="/root/backend/feature_extractors/audio/models",
+    )
 )
 
 app = modal.App("ziqra-audio-api", image=image)

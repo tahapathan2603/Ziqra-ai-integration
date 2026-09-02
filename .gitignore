@@ -28,3 +28,4 @@ modal_intprof.py
 modal_asr_bakeoff.py
 modal_gopprobe.py
 modal_squimprobe.py
+refit_scorers.py
